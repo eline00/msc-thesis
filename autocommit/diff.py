@@ -172,7 +172,7 @@ class GitDiffExtractor:
         )
 
     def get_diff_summary(self) -> dict[str, int]:
-        """Get a summary of changes by type.
+        """Get a summary of changes.
 
         Returns:
             Dictionary with counts of added, modified, deleted, and renamed files
@@ -198,7 +198,7 @@ class GitDiffExtractor:
 
 
 def extract_diffs(repo_path: str | Path = ".") -> list[DiffHunk]:
-    """Convenience function to extract all changes from a repository.
+    """Extracts all changes from a repository.
 
     Args:
         repo_path: Path to the git repository (defaults to current directory)
