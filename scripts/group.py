@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-Groups hunks into buildable sets for ETC.
+Groups hunks into the smallest buildable set for ETC.
+
+Uses delta_debug() from the ddmin library (andrewchambers/ddmin-python,
+which implements the ddmin algorithm from Zeller & Hildebrandt, 2002) to find
+the minimal set of hunks required alongside the primary hunk.
 
 Arguments:
     build_cmd     : shell command to check the build
@@ -10,6 +14,8 @@ Arguments:
 
 import subprocess
 import sys
+
+from ddmin import delta_debug
 
 
 # ------------------------------------------------------------------ #
@@ -52,9 +58,7 @@ def git_apply(patches: list[str], check_only: bool = False) -> bool:
 
 
 def git_revert(patches: list[str]) -> None:
-    """
-    Revert previously applied patches in reverse order.
-    """
+    """Revert previously applied patches in reverse order."""
     for patch in reversed(patches):
         subprocess.run(
             ["git", "apply", "--unidiff-zero", "-R", patch],
@@ -63,7 +67,7 @@ def git_revert(patches: list[str]) -> None:
 
 
 # ------------------------------------------------------------------ #
-#  Build check                                                         #
+#  Build check                                                       #
 # ------------------------------------------------------------------ #
 
 def run_build(build_cmd: str) -> bool:
@@ -73,28 +77,39 @@ def run_build(build_cmd: str) -> bool:
 
 
 # ------------------------------------------------------------------ #
-#  Core                                                                #
+#  Probing vs. final application                                     #
 # ------------------------------------------------------------------ #
 
-def try_apply_group(hunks: list[str], build_cmd: str) -> bool:
-    """
-    Apply hunks in order, then run the build.
-    """
+def test_group(hunks: list[str], build_cmd: str) -> bool:
+    """Apply hunks, run the build, revert."""
     applied: list[str] = []
-
     for hunk in hunks:
         if git_apply([hunk]):
             applied.append(hunk)
         else:
             git_revert(applied)
             return False
+    result = run_build(build_cmd)
+    git_revert(applied)
+    return result
 
-    if run_build(build_cmd):
-        return True
-    else:
-        git_revert(applied)
-        return False
 
+def apply_group(hunks: list[str]) -> bool:
+    """Apply hunks and leave them applied."""
+    applied: list[str] = []
+    for hunk in hunks:
+        if git_apply([hunk]):
+            applied.append(hunk)
+        else:
+            log("ERROR: Failed to apply final group —> reverting.")
+            git_revert(applied)
+            return False
+    return True
+
+
+# ------------------------------------------------------------------ #
+#  Core                                                              #
+# ------------------------------------------------------------------ #
 
 def find_buildable_group(
     primary: str,
@@ -102,41 +117,61 @@ def find_buildable_group(
     build_cmd: str,
 ) -> list[str] | None:
     """
-    Search for the smallest buildable group starting with 'primary'.
-    
-    Returns the buildable group, or None.
+    Find the smallest buildable group.
+
+    Steps:
+      1. Try primary alone —> done if it builds.
+      2. Try primary + all others —> if this fails, no solution exists, so return None.
+      3. Pass the candidate list to delta_debug. delta_debug returns the
+         minimal set needed.
+      4. Apply the final group and leave it staged for etc.sh to commit.
     """
     others = [p for p in pending if p != primary]
 
-    # 1. Only primary
+    # --- 1. Primary alone ---
     log(f"Trying {name(primary)} alone...")
-    if try_apply_group([primary], build_cmd):
-        log(f"Hunk {name(primary)} succeeded alone.")
+    if test_group([primary], build_cmd):
+        log(f"{name(primary)} builds alone.")
+        apply_group([primary])
         return [primary]
 
-    # 2. Pairs: primary + one other
-    log(f"Hunk {name(primary)} failed alone. Trying pairs...")
-    for candidate in others:
-        log(f"  + {name(candidate)}...")
-        if try_apply_group([primary, candidate], build_cmd):
-            log("  Pair succeeded.")
-            return [primary, candidate]
+    if not others:
+        log(f"{name(primary)} fails alone and there are no other hunks.")
+        return None
 
-    # 3. Incremental growth: keep adding hunks until the build passes.
-    if others:
-        log(f"Pairs failed. Trying bigger groups...")
-        accumulated = [primary]
-        for candidate in others:
-            accumulated.append(candidate)
-            log(f"  Trying group of {len(accumulated)}: {name(candidate)} added...")
-            if try_apply_group(accumulated, build_cmd):
-                log(f"  Group of {len(accumulated)} succeeded.")
-                return accumulated
+    # --- 2. Upper-bound check ---
+    # delta_debug requires that interesting_test(interesting_input) is True,
+    # i.e. the full candidate list must already pass.
+    log(f"{name(primary)} fails alone. "
+        f"Checking upper bound (primary + all {len(others)} remaining hunk(s))...")
+    if not test_group([primary] + others, build_cmd):
+        log(f"Even primary + all pending fails. No buildable group for {name(primary)}.")
+        return None
 
-    log(f"No buildable group found for {name(primary)}.")
-    return None
+    # --- 3. Minimise companions via delta_debug ---
+    log(f"Upper bound passes. Minimising companions via delta_debug "
+        f"({len(others)} candidate(s))...")
+
+    def predicate(companions: list[str]) -> bool:
+        result = test_group([primary] + companions, build_cmd)
+        log(f"    probe {len(companions)} hunk(s) -> {'PASS' if result else 'fail'}")
+        return result
+
+    minimal_companions = delta_debug(predicate, others)
+
+    group = [primary] + minimal_companions
+    log(f"Minimal group found: {names(group)} ({len(group)} hunk(s))")
+
+    # --- 4. Apply final group (leave staged for etc.sh) ---
+    if not apply_group(group):
+        return None
+
+    return group
 
 
+# ------------------------------------------------------------------ #
+#  Entry point                                                       #
+# ------------------------------------------------------------------ #
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
