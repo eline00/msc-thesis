@@ -15,7 +15,7 @@ Arguments:
 import subprocess
 import sys
 
-from ddmin import delta_debug
+from scripts.ddmin import delta_debug
 
 
 # ------------------------------------------------------------------ #
@@ -112,55 +112,16 @@ def apply_group(hunks: list[str]) -> bool:
 # ------------------------------------------------------------------ #
 
 def find_buildable_group(
-    primary: str,
     pending: list[str],
     build_cmd: str,
 ) -> list[str] | None:
-    """
-    Find the smallest buildable group.
-
-    Steps:
-      1. Try primary alone —> done if it builds.
-      2. Try primary + all others —> if this fails, no solution exists, so return None.
-      3. Pass the candidate list to delta_debug. delta_debug returns the
-         minimal set needed.
-      4. Apply the final group and leave it staged for etc.sh to commit.
-    """
-    others = [p for p in pending if p != primary]
-
-    # --- 1. Primary alone ---
-    log(f"Trying {name(primary)} alone...")
-    if test_group([primary], build_cmd):
-        log(f"{name(primary)} builds alone.")
-        apply_group([primary])
-        return [primary]
-
-    if not others:
-        log(f"{name(primary)} fails alone and there are no other hunks.")
-        return None
-
-    # --- 2. Upper-bound check ---
-    # delta_debug requires that interesting_test(interesting_input) is True,
-    # i.e. the full candidate list must already pass.
-    log(f"{name(primary)} fails alone. "
-        f"Checking upper bound (primary + all {len(others)} remaining hunk(s))...")
-    if not test_group([primary] + others, build_cmd):
-        log(f"Even primary + all pending fails. No buildable group for {name(primary)}.")
-        return None
-
-    # --- 3. Minimise companions via delta_debug ---
-    log(f"Upper bound passes. Minimising companions via delta_debug "
-        f"({len(others)} candidate(s))...")
 
     def predicate(companions: list[str]) -> bool:
-        result = test_group([primary] + companions, build_cmd)
+        result = test_group(companions, build_cmd)
         log(f"    probe {len(companions)} hunk(s) -> {'PASS' if result else 'fail'}")
         return result
 
-    minimal_companions = delta_debug(predicate, others)
-
-    group = [primary] + minimal_companions
-    log(f"Minimal group found: {names(group)} ({len(group)} hunk(s))")
+    group = delta_debug(predicate, pending)
 
     # --- 4. Apply final group (leave staged for etc.sh) ---
     if not apply_group(group):
@@ -174,19 +135,18 @@ def find_buildable_group(
 # ------------------------------------------------------------------ #
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print(
-            "Usage: group.py <build_cmd> <primary_hunk> [pending_hunk ...]",
+            "Usage: group.py <build_cmd> [pending_hunk ...]",
             file=sys.stderr,
         )
         sys.exit(2)
 
     build_cmd = sys.argv[1]
-    primary   = sys.argv[2]
-    pending   = sys.argv[3:]
+    pending   = sys.argv[2:]
 
     try:
-        group = find_buildable_group(primary, pending, build_cmd)
+        group = find_buildable_group(pending, build_cmd)
     except KeyboardInterrupt:
         print("\n[group] Interrupted.", file=sys.stderr, flush=True)
         sys.exit(130)
