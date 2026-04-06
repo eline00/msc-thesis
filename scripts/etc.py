@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-ETC — Extract Tangled Commits
-Main orchestration loop.
-"""
-
 import re
 import signal
 import subprocess
@@ -15,79 +9,12 @@ SCRIPT_DIR = Path(__file__).parent
 BUILD_CMD = "dotnet build --no-restore"
 METRICS_LOG = Path("patches/metrics.log")
 
-# Mutable state accessible by the signal handler.
+# Global state for cleanup
 _original_branch: str = ""
 _tangled_sha: str = ""
+_log_file = None  # file handle for run.log, opened in main()
 
-
-# ------------------------------------------------------------------ #
-#  Logging                                                           #
-# ------------------------------------------------------------------ #
-
-def log_info(msg: str)    -> None: print(f"\033[1;34m[INFO]\033[0m {msg}")
-def log_error(msg: str)   -> None: print(f"\033[1;31m[ERROR]\033[0m {msg}")
-def log_success(msg: str) -> None: print(f"\033[1;32m[SUCCESS]\033[0m {msg}")
-def log_warning(msg: str) -> None: print(f"\033[1;33m[WARNING]\033[0m {msg}")
-
-
-# ------------------------------------------------------------------ #
-#  Metrics                                                           #
-# ------------------------------------------------------------------ #
-
-def metrics_event(event: str, data: str = "") -> None:
-    ts = int(time.time() * 1000)
-    METRICS_LOG.parent.mkdir(parents=True, exist_ok=True)
-    with open(METRICS_LOG, "a") as f:
-        f.write(f"{ts}|{event}|{data}\n")
-
-
-# ------------------------------------------------------------------ #
-#  Signal handling / cleanup                                         #
-# ------------------------------------------------------------------ #
-
-def cleanup(signum=None, frame=None) -> None:
-    print()
-    log_warning("Interrupted. Cleaning up...")
-    metrics_event("INTERRUPTED")
-    if _tangled_sha:
-        subprocess.run(["git", "reset", "--hard", _tangled_sha], capture_output=True)
-    if _original_branch:
-        subprocess.run(["git", "checkout", _original_branch], capture_output=True)
-        subprocess.run(["git", "branch", "-D", "detangling"], capture_output=True)
-        log_info(f"Restored to branch '{_original_branch}'.")
-    sys.exit(1)
-
-
-signal.signal(signal.SIGINT, cleanup)
-signal.signal(signal.SIGTERM, cleanup)
-
-
-# ------------------------------------------------------------------ #
-#  Git helpers                                                       #
-# ------------------------------------------------------------------ #
-
-def git_run(*args: str) -> int:
-    """Run a git command, letting output flow to the terminal."""
-    return subprocess.run(["git", *args]).returncode
-
-
-def git_output(*args: str) -> str:
-    """Run a git command and return its stdout."""
-    result = subprocess.run(["git", *args], capture_output=True, text=True)
-    return result.stdout.strip()
-
-
-def git_diff_to_file(output_path: Path, *extra_args: str) -> None:
-    result = subprocess.run(
-        ["git", "diff", "-U0", *extra_args], capture_output=True, text=True
-    )
-    output_path.write_text(result.stdout)
-
-
-# ------------------------------------------------------------------ #
-#  Hunk splitting                                                    #
-# ------------------------------------------------------------------ #
-
+# region Hunk splitting
 def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
     """Split a unified diff into one file per hunk under hunks_dir."""
     for f in hunks_dir.glob("hunk_*.patch"):
@@ -141,13 +68,74 @@ def count_hunks(patch_file: Path) -> int:
         return 0
     return sum(1 for line in patch_file.read_text().splitlines() if line.startswith("@@"))
 
+# endregion
 
-# ------------------------------------------------------------------ #
-#  Main                                                              #
-# ------------------------------------------------------------------ #
+# region Logging
+def _log_to_file(level: str, msg: str) -> None:
+    if _log_file:
+        ts = time.strftime("%H:%M:%S")
+        _log_file.write(f"{ts} [{level}] {msg}\n")
+        _log_file.flush()
 
+def log_info(msg: str)    -> None: print(f"\033[1;34m[INFO]\033[0m {msg}");    _log_to_file("INFO",    msg)
+def log_error(msg: str)   -> None: print(f"\033[1;31m[ERROR]\033[0m {msg}");   _log_to_file("ERROR",   msg)
+def log_success(msg: str) -> None: print(f"\033[1;32m[SUCCESS]\033[0m {msg}"); _log_to_file("SUCCESS", msg)
+def log_warning(msg: str) -> None: print(f"\033[1;33m[WARNING]\033[0m {msg}"); _log_to_file("WARNING", msg)
+
+# endregion
+
+# region Metrics
+def metrics_event(event: str, data: str = "") -> None:
+    ts = int(time.time() * 1000)
+    METRICS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(METRICS_LOG, "a") as f:
+        f.write(f"{ts}|{event}|{data}\n")
+        
+# endregion
+
+# region Cleanup
+def cleanup(signum=None, frame=None) -> None:
+    print()
+    log_warning("Interrupted. Cleaning up...")
+    metrics_event("INTERRUPTED")
+    if _tangled_sha:
+        subprocess.run(["git", "reset", "--hard", _tangled_sha], capture_output=True)
+    if _original_branch:
+        subprocess.run(["git", "checkout", _original_branch], capture_output=True)
+        subprocess.run(["git", "branch", "-D", "detangling"], capture_output=True)
+        log_info(f"Restored to branch '{_original_branch}'.")
+    sys.exit(1)
+
+
+signal.signal(signal.SIGINT, cleanup)
+signal.signal(signal.SIGTERM, cleanup)
+
+# endregion
+
+# region Git helpers
+def git_run(*args: str) -> int:
+    """Run a git command and return its exit code."""
+    return subprocess.run(["git", *args]).returncode
+
+
+def git_output(*args: str) -> str:
+    """Run a git command and return its stdout."""
+    result = subprocess.run(["git", *args], capture_output=True, text=True)
+    return result.stdout.strip()
+
+
+def git_diff_to_file(output_path: Path, *extra_args: str) -> None:
+    """Run 'git diff' and write the output to output_path."""
+    result = subprocess.run(
+        ["git", "diff", "-U0", *extra_args], capture_output=True, text=True
+    )
+    output_path.write_text(result.stdout)
+
+# endregion
+
+# Main
 def main() -> None:
-    global _original_branch, _tangled_sha
+    global _original_branch, _tangled_sha, _log_file
 
     _original_branch = git_output("branch", "--show-current")
 
@@ -155,8 +143,8 @@ def main() -> None:
     git_run("checkout", "-b", "detangling")
     log_info("Created and switched to 'detangling' branch.")
 
-    # ----- Step 2: Check there are changes to process -----
-    git_run("add", "-N", ".")  # surface untracked files so they appear in diff
+    # ----- Step 2: Check for changes -----
+    git_run("add", "-N", ".")  # temporarily track untracked files so they appear in diff
     if not git_output("diff", "-U0"):
         log_warning("No changes found.")
         git_run("checkout", _original_branch)
@@ -166,9 +154,10 @@ def main() -> None:
     # ----- Step 3: Save the full original patch for reference -----
     Path("patches").mkdir(exist_ok=True)
     git_diff_to_file(Path("patches/full.patch"))
+    _log_file = open("patches/run.log", "w")
     log_info("Full patch saved to patches/full.patch")
 
-    # ----- Step 4: Temporarily commit all changes as the tangled state, then reset back -----
+    # ----- Step 4: Temporarily commit all changes as the tangled state, then reset -----
     log_info("Creating temporary tangled commit...")
     git_run("add", "-A")
     git_run("commit", "-m", "tangled changes")
@@ -189,7 +178,7 @@ def main() -> None:
     metrics_event("RUN_START", f"total_hunks={total_hunk_count},build_cmd={BUILD_CMD}")
 
     # ----- Step 6: Grouping loop -----
-    log_info("Starting grouping loop...")
+    log_info("Starting grouping with delta debugging...")
     group_count = 0
     iteration = 0
 
@@ -222,6 +211,9 @@ def main() -> None:
         )
         invocations_log.write_text(result.stderr)
         print(result.stderr, end="", file=sys.stderr)
+        if _log_file and result.stderr:
+            _log_file.write(result.stderr)
+            _log_file.flush()
 
         invocations = sum(1 for line in result.stderr.splitlines() if "test" in line)
 
@@ -250,7 +242,7 @@ def main() -> None:
         group_names = ", ".join(Path(g).name for g in group)
         log_success(f"Group {group_count} ({len(group)} hunk(s)) → {group_file}  [{group_names}]")
 
-        # Commit the group so HEAD advances and re-diff shrinks next iteration
+        # Commit the group so HEAD advances and re-diff has only the remaining hunks
         git_run("add", "-A")
         git_run("commit", "-m", f"etc[{group_count}]: {len(group)} hunk(s) — {group_names}")
 
@@ -271,7 +263,7 @@ def main() -> None:
     log_info("Metrics log         : patches/metrics.log")
     log_info("Run:  python3 scripts/metrics.py patches/metrics.log  for a summary.")
 
-    # ----- Step 8: Cleanup (uncomment when happy with results) -----
+    # ----- Step 8: Cleanup -----
     # git_run("checkout", _original_branch)
     # git_run("branch", "-d", "detangling")
     # log_success(f"Returned to '{_original_branch}' and deleted 'detangling' branch.")

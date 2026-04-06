@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Groups hunks into the smallest buildable set for ETC.
 
