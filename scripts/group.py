@@ -15,7 +15,8 @@ Arguments:
 import subprocess
 import sys
 
-from scripts.ddmin import delta_debug
+import sys, os; sys.path.insert(0, os.path.dirname(__file__))
+from ddmin import delta_debug
 
 
 # ------------------------------------------------------------------ #
@@ -57,13 +58,46 @@ def git_apply(patches: list[str], check_only: bool = False) -> bool:
     return result.returncode == 0
 
 
+def _files_in_patches(patches: list[str]) -> list[str]:
+    """Return deduplicated list of files modified by the given patches."""
+    seen: dict[str, None] = {}
+    for patch in patches:
+        with open(patch) as f:
+            for line in f:
+                if line.startswith("+++ b/"):
+                    seen[line[6:].strip()] = None
+    return list(seen)
+
+
 def git_revert(patches: list[str]) -> None:
-    """Revert previously applied patches in reverse order."""
-    for patch in reversed(patches):
+    """Restore files touched by patches back to their index state.
+
+    Tracked files are restored via 'git restore'; new files created by
+    patches (not yet in the index) are simply deleted.
+    """
+    files = _files_in_patches(patches)
+    if not files:
+        return
+
+    tracked = set(
         subprocess.run(
-            ["git", "apply", "--unidiff-zero", "-R", patch],
-            capture_output=True,
+            ["git", "ls-files", "--"] + files,
+            capture_output=True, text=True,
+        ).stdout.splitlines()
+    )
+
+    restore = [f for f in files if f in tracked]
+    if restore:
+        result = subprocess.run(
+            ["git", "restore", "--"] + restore,
+            capture_output=True, text=True,
         )
+        if result.returncode != 0:
+            log(f"git restore failed: {result.stderr.strip()}")
+
+    for f in files:
+        if f not in tracked and os.path.exists(f):
+            os.remove(f)
 
 
 # ------------------------------------------------------------------ #
@@ -118,7 +152,7 @@ def find_buildable_group(
 
     def predicate(companions: list[str]) -> bool:
         result = test_group(companions, build_cmd)
-        log(f"    probe {len(companions)} hunk(s) -> {'PASS' if result else 'fail'}")
+        log(f"    test {len(companions)} hunk(s) -> {f'PASS: {names(companions)}' if result else 'fail'}")
         return result
 
     group = delta_debug(predicate, pending)

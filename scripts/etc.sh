@@ -3,13 +3,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ORIGINAL_BRANCH=$(git branch --show-current)
 
-if [ -z "$1" ]; then
-    echo "Usage: ./etc.sh <build_command>"
-    echo "  e.g. ./etc.sh \"dotnet build src/CommandLine/CommandLine.csproj --no-restore\""
-    echo "  e.g. ./etc.sh \"npx tsc --noEmit\""
-    exit 1
-fi
-BUILD_CMD="$1"
+BUILD_CMD="dotnet build --no-restore"
 
 # ----- Metrics log setup -----
 # Structured event log consumed by metrics.py after the run.
@@ -19,18 +13,17 @@ METRICS_LOG="patches/metrics.log"
 metrics_event() {
     local event="$1"
     local data="$2"
-    echo "$(date +%s%3N)|${event}|${data}" >> "$METRICS_LOG"
+    echo "$(python3 -c "import time; print(int(time.time()*1000))")|${event}|${data}" >> "$METRICS_LOG"
 }
 
 cleanup() {
     echo ""
     log_warning "Interrupted. Cleaning up..."
     metrics_event "INTERRUPTED" ""
-    git reset --hard HEAD 2>/dev/null
+    git reset --hard "$TANGLED_SHA" 2>/dev/null
     git checkout "$ORIGINAL_BRANCH" 2>/dev/null
     git branch -D detangling 2>/dev/null
-    git stash pop 2>/dev/null
-    log_info "Restored to branch '$ORIGINAL_BRANCH' with original changes."
+    log_info "Restored to branch '$ORIGINAL_BRANCH'."
     exit 1
 }
 trap cleanup INT TERM
@@ -93,77 +86,66 @@ mkdir -p patches
 git diff -U0 > patches/full.patch
 log_info "Full patch saved to patches/full.patch"
 
-# ----- Step 4: Stash all changes — working tree is now clean -----
-log_info "Stashing original working directory changes..."
-git stash --include-untracked
-log_success "Changes stashed. Working tree is clean."
+# ----- Step 4: Temporarily commit all changes as the tangled state, then reset back -----
+log_info "Creating temporary tangled commit..."
+git add -A
+git commit -m "tangled changes"
+TANGLED_SHA=$(git rev-parse HEAD) # store SHA for later diffing
+log_info "Tangled SHA: $TANGLED_SHA"
+
+# Reset back to the clean state (before tangled commit)
+git reset --hard HEAD~1
+log_success "Reset to clean state. Working tree is clean."
 
 # ----- Step 5: Initialise metrics log and patch dirs -----
 HUNKS_DIR="patches/hunks"
-mkdir -p "$HUNKS_DIR"
-echo "" > "$METRICS_LOG"   # overwrite any previous run
+GROUPS_DIR="patches/groups"
+mkdir -p "$HUNKS_DIR" "$GROUPS_DIR"
+echo "" > "$METRICS_LOG"
 
-# Count total hunks from the original full patch for reference
 TOTAL_HUNK_COUNT=$(grep -c "^@@" patches/full.patch || echo 0)
 log_info "Total hunks in full patch: $TOTAL_HUNK_COUNT"
 metrics_event "RUN_START" "total_hunks=${TOTAL_HUNK_COUNT},build_cmd=${BUILD_CMD}"
 
-# ----- Step 6: Grouping and commit loop -----
-#
-# Every iteration:
-#   1. Pop the stash into the working tree
-#   2. Re-diff against current HEAD -> fresh, correctly-offset hunks
-#   3. Re-stash
-#   4. Re-split into hunk files
-#   5. If no hunks remain, we are done
-#   6. Pass all current hunks to group.py -> ddmin finds minimal buildable subset
-#   7. group.py leaves the winning group applied; commit it
-#   8. Loop (next iteration re-diffs against the newly updated HEAD)
-#
-log_info "Starting grouping and commit loop (build: $BUILD_CMD)..."
+# ----- Step 6: Grouping loop -----
+log_info "Starting grouping loop..."
 
-COMMITTED_COUNT=0
+GROUP_COUNT=0
 ITERATION=0
 
 while true; do
     (( ITERATION++ ))
-    ITER_START=$(date +%s%3N)
+    ITER_START=$(python3 -c "import time; print(int(time.time()*1000))")
 
-    # --- 6.1  Pop stash and regenerate diff relative to current HEAD ---
-    git stash pop
-    git add -N .
-    git diff -U0 > "patches/remaining_iter_${ITERATION}.patch"
+    # Re-diff HEAD against tangled SHA
+    REMAINING_PATCH="patches/remaining_iter_${ITERATION}.patch"
+    git diff -U0 HEAD "$TANGLED_SHA" > "$REMAINING_PATCH"
 
-    REMAINING_LINES=$(wc -l < "patches/remaining_iter_${ITERATION}.patch")
-    if [ "$REMAINING_LINES" -eq 0 ]; then
-        # Diff is empty — all changes have been committed
-        log_success "All changes have been committed."
-        rm -f "patches/remaining_iter_${ITERATION}.patch"
+    REMAINING_HUNK_COUNT=$(grep -c "^@@" "$REMAINING_PATCH" 2>/dev/null || echo 0)
+    if [ "$REMAINING_HUNK_COUNT" -eq 0 ]; then
+        log_success "All changes have been grouped."
+        rm -f "$REMAINING_PATCH"
         break
     fi
 
-    HUNK_COUNT=$(grep -c "^@@" "patches/remaining_iter_${ITERATION}.patch" || echo 0)
-    log_info "── Iteration ${ITERATION}: ${HUNK_COUNT} hunk(s) remaining ──"
-    metrics_event "ITER_START" "iteration=${ITERATION},pending=${HUNK_COUNT}"
+    log_info "── Iteration ${ITERATION}: ${REMAINING_HUNK_COUNT} hunk(s) remaining ──"
+    metrics_event "ITER_START" "iteration=${ITERATION},pending=${REMAINING_HUNK_COUNT}"
 
-    # Re-stash so the working tree is clean for group.py to apply/revert patches
-    git stash --include-untracked
-
-    # --- 6.2  Split the fresh remaining patch into individual hunk files ---
-    split_hunks "patches/remaining_iter_${ITERATION}.patch" "$HUNKS_DIR"
+    # Split new diff into individual hunk files
+    split_hunks "$REMAINING_PATCH" "$HUNKS_DIR"
 
     PENDING=()
     while IFS= read -r f; do
         PENDING+=("$f")
     done < <(find "$HUNKS_DIR" -maxdepth 1 -type f -name 'hunk_*.patch' | sort)
 
-    # --- 6.3  Call group.py with all current hunks ---
-    GROUP_OUTPUT=$(python3 "$SCRIPT_DIR/scripts/group.py" "$BUILD_CMD" "${PENDING[@]}" \
+    # Call group.py with all current hunks
+    GROUP_OUTPUT=$(python3 "$SCRIPT_DIR/group.py" "$BUILD_CMD" "${PENDING[@]}" \
         2>"patches/iter_${ITERATION}_invocations.log")
     GROUP_EXIT=$?
 
-    INVOCATIONS=$(grep -c "probe" "patches/iter_${ITERATION}_invocations.log" 2>/dev/null || echo 0)
-    cat "patches/iter_${ITERATION}_invocations.log" >&2   # echo probes to terminal
+    INVOCATIONS=$(grep -c "test" "patches/iter_${ITERATION}_invocations.log" 2>/dev/null || echo 0)
+    cat "patches/iter_${ITERATION}_invocations.log" >&2
 
     GROUP=()
     if [ $GROUP_EXIT -eq 0 ] && [ -n "$GROUP_OUTPUT" ]; then
@@ -172,41 +154,43 @@ while true; do
         done <<< "$GROUP_OUTPUT"
     fi
 
-    ITER_END=$(date +%s%3N)
+    ITER_END=$(python3 -c "import time; print(int(time.time()*1000))")
     ITER_DURATION=$(( ITER_END - ITER_START ))
 
-    # --- 6.4  Handle failure: ddmin found no buildable subset ---
+    # Handle failure
     if [ ${#GROUP[@]} -eq 0 ]; then
-        log_warning "No buildable group found for the remaining ${HUNK_COUNT} hunk(s)."
-        log_warning "Leaving remaining changes in the stash — inspect manually."
+        log_warning "No buildable group found for the remaining ${REMAINING_HUNK_COUNT} hunk(s)."
         metrics_event "ITER_FAILED" \
-            "iteration=${ITERATION},invocations=${INVOCATIONS},duration_ms=${ITER_DURATION},remaining=${HUNK_COUNT}"
+            "iteration=${ITERATION},invocations=${INVOCATIONS},duration_ms=${ITER_DURATION},remaining=${REMAINING_HUNK_COUNT}"
         break
     fi
 
-    # --- 6.5  Commit the winning group (group.py already left it applied) ---
+    # Save the group as a merged patch file
+    (( GROUP_COUNT++ ))
+    GROUP_FILE=$(printf "%s/group_%04d.patch" "$GROUPS_DIR" "$GROUP_COUNT")
+    cat "${GROUP[@]}" > "$GROUP_FILE"
+
     GROUP_NAMES=""
     for g in "${GROUP[@]}"; do
         [[ -n "$GROUP_NAMES" ]] && GROUP_NAMES+=", "
         GROUP_NAMES+=$(basename "$g")
     done
-    log_success "Committing group (${#GROUP[@]} hunk(s)): $GROUP_NAMES"
+    log_success "Group ${GROUP_COUNT} (${#GROUP[@]} hunk(s)) → $GROUP_FILE  [$GROUP_NAMES]"
 
+    # Commit the group so HEAD advances and re-diff shrinks next iteration
     git add -A
-    git commit -m "etc[${ITERATION}]: ${#GROUP[@]} hunk(s) — $GROUP_NAMES"
-    (( COMMITTED_COUNT++ ))
+    git commit -m "etc[${GROUP_COUNT}]: ${#GROUP[@]} hunk(s) — $GROUP_NAMES"
 
-    metrics_event "ITER_COMMIT" \
-        "iteration=${ITERATION},group_size=${#GROUP[@]},invocations=${INVOCATIONS},duration_ms=${ITER_DURATION},hunks=${GROUP_NAMES}"
-
-    # Loop: next iteration pops the stash and re-diffs against the new HEAD
+    metrics_event "ITER_GROUP" \
+        "iteration=${ITERATION},group=${GROUP_COUNT},group_size=${#GROUP[@]},invocations=${INVOCATIONS},duration_ms=${ITER_DURATION},hunks=${GROUP_NAMES}"
 done
 
 # ----- Step 7: Results -----
-metrics_event "RUN_END" "commits=${COMMITTED_COUNT}"
+metrics_event "RUN_END" "groups=${GROUP_COUNT}"
 
-log_success "Done: $COMMITTED_COUNT commit(s) produced from $TOTAL_HUNK_COUNT hunk(s)."
+log_success "Done: ${GROUP_COUNT} group(s) produced from ${TOTAL_HUNK_COUNT} hunk(s)."
 log_info "Full original patch : patches/full.patch"
+log_info "Group patches       : patches/groups/group_*.patch"
 log_info "Per-iteration diffs : patches/remaining_iter_*.patch"
 log_info "Per-iteration probes: patches/iter_*_invocations.log"
 log_info "Metrics log         : patches/metrics.log"
