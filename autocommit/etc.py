@@ -1,3 +1,5 @@
+import csv
+import os
 import re
 import signal
 import subprocess
@@ -7,7 +9,18 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 BUILD_CMD = "dotnet build --no-restore"
+APPROACH = "programmatic"
 METRICS_LOG = Path("patches/metrics.log")
+RESULTS_DIR = Path("results")
+RUNS_CSV = RESULTS_DIR / "runs.csv"
+GROUPS_CSV = RESULTS_DIR / "groups.csv"
+
+RUNS_HEADER = [
+    "run_id", "timestamp", "approach", "repo", "original_branch",
+    "tangled_sha", "total_hunks", "groups_produced",
+    "total_invocations", "total_duration_ms", "build_cmd", "notes",
+]
+GROUPS_HEADER = ["run_id", "group_num", "hunk_count", "hunks"]
 
 # Global state for cleanup
 _original_branch: str = ""
@@ -91,6 +104,46 @@ def metrics_event(event: str, data: str = "") -> None:
     with open(METRICS_LOG, "a") as f:
         f.write(f"{ts}|{event}|{data}\n")
         
+# endregion
+
+# region Results CSV
+def _ensure_csv(path: Path, header: list[str]) -> None:
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", newline="") as f:
+            csv.writer(f).writerow(header)
+
+
+def write_results(
+    run_id: str,
+    tangled_sha: str,
+    original_branch: str,
+    total_hunks: int,
+    groups: list[list[str]],
+    total_invocations: int,
+    total_duration_ms: int,
+) -> None:
+    _ensure_csv(RUNS_CSV, RUNS_HEADER)
+    _ensure_csv(GROUPS_CSV, GROUPS_HEADER)
+
+    repo = os.path.basename(os.getcwd())
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(RUNS_CSV, "a", newline="") as f:
+        csv.writer(f).writerow([
+            run_id, timestamp, APPROACH, repo, original_branch,
+            tangled_sha, total_hunks, len(groups),
+            total_invocations, total_duration_ms, BUILD_CMD, "",
+        ])
+
+    with open(GROUPS_CSV, "a", newline="") as f:
+        writer = csv.writer(f)
+        for i, group in enumerate(groups, start=1):
+            hunk_names = ", ".join(Path(h).name for h in group)
+            writer.writerow([run_id, i, len(group), hunk_names])
+
+    log_info(f"Results appended → {RUNS_CSV}, {GROUPS_CSV}")
+
 # endregion
 
 # region Cleanup
@@ -179,8 +232,12 @@ def main() -> None:
 
     # ----- Step 6: Grouping loop -----
     log_info("Starting grouping with delta debugging...")
+    run_id = time.strftime("%Y%m%d_%H%M%S")
     group_count = 0
     iteration = 0
+    total_invocations = 0
+    total_duration_ms = 0
+    committed_groups: list[list[str]] = []
 
     while True:
         iteration += 1
@@ -221,6 +278,8 @@ def main() -> None:
 
         iter_end = int(time.time() * 1000)
         iter_duration = iter_end - iter_start
+        total_invocations += invocations
+        total_duration_ms += iter_duration
 
         # Handle failure
         if not group or result.returncode != 0:
@@ -242,6 +301,8 @@ def main() -> None:
         group_names = ", ".join(Path(g).name for g in group)
         log_success(f"Group {group_count} ({len(group)} hunk(s)) → {group_file}  [{group_names}]")
 
+        committed_groups.append(group)
+
         # Commit the group so HEAD advances and re-diff has only the remaining hunks
         git_run("add", "-A")
         git_run("commit", "-m", f"etc[{group_count}]: {len(group)} hunk(s) — {group_names}")
@@ -261,6 +322,16 @@ def main() -> None:
     if group_count == 0:
         log_warning("No groups were produced — skipping merge and PR.")
         return
+
+    write_results(
+        run_id=run_id,
+        tangled_sha=_tangled_sha,
+        original_branch=_original_branch,
+        total_hunks=total_hunk_count,
+        groups=committed_groups,
+        total_invocations=total_invocations,
+        total_duration_ms=total_duration_ms,
+    )
 
     # Merge the detangling branch back into the original branch, which will move the atomic commits there
     git_run("checkout", _original_branch)
