@@ -10,7 +10,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 BUILD_CMD = "dotnet build --no-restore"
 APPROACH = "programmatic"
-METRICS_LOG = Path("patches/metrics.log")
+METRICS_LOG = SCRIPT_DIR / "metrics.log"
 RESULTS_DIR = Path("results")
 RUNS_CSV = RESULTS_DIR / "runs.csv"
 GROUPS_CSV = RESULTS_DIR / "groups.csv"
@@ -205,10 +205,9 @@ def main() -> None:
         return
 
     # ----- Step 3: Save the full original patch for reference -----
-    Path("patches").mkdir(exist_ok=True)
-    git_diff_to_file(Path("patches/full.patch"))
-    _log_file = open("patches/run.log", "w")
-    log_info("Full patch saved to patches/full.patch")
+    git_diff_to_file(SCRIPT_DIR / "full.patch")
+    _log_file = open(SCRIPT_DIR / "run.log", "w")
+    log_info("Full patch saved to autocommit/full.patch")
 
     # ----- Step 4: Temporarily commit all changes as the tangled state, then reset -----
     log_info("Creating temporary tangled commit...")
@@ -220,13 +219,13 @@ def main() -> None:
     log_success("Reset to clean state. Working tree is clean.")
 
     # ----- Step 5: Initialise metrics log and patch dirs -----
-    hunks_dir = Path("patches/hunks")
-    groups_dir = Path("patches/groups")
+    hunks_dir = SCRIPT_DIR / "hunks"
+    groups_dir = SCRIPT_DIR / "groups"
     hunks_dir.mkdir(parents=True, exist_ok=True)
     groups_dir.mkdir(parents=True, exist_ok=True)
     METRICS_LOG.write_text("")
 
-    total_hunk_count = count_hunks(Path("patches/full.patch"))
+    total_hunk_count = count_hunks(SCRIPT_DIR / "full.patch")
     log_info(f"Total hunks in full patch: {total_hunk_count}")
     metrics_event("RUN_START", f"total_hunks={total_hunk_count},build_cmd={BUILD_CMD}")
 
@@ -244,7 +243,7 @@ def main() -> None:
         iter_start = int(time.time() * 1000)
 
         # Re-diff HEAD against tangled SHA
-        remaining_patch = Path(f"patches/remaining_iter_{iteration}.patch")
+        remaining_patch = SCRIPT_DIR / f"remaining_iter_{iteration}.patch"
         git_diff_to_file(remaining_patch, "HEAD", _tangled_sha)
 
         remaining_hunk_count = count_hunks(remaining_patch)
@@ -261,7 +260,7 @@ def main() -> None:
         pending = sorted(str(p) for p in hunks_dir.glob("hunk_*.patch"))
 
         # Call group.py with all current hunks
-        invocations_log = Path(f"patches/iter_{iteration}_invocations.log")
+        invocations_log = SCRIPT_DIR / f"iter_{iteration}_invocations.log"
         result = subprocess.run(
             [sys.executable, str(SCRIPT_DIR / "group.py"), BUILD_CMD, *pending],
             capture_output=True, text=True,

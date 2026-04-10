@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Parses the structured metrics log produced by etc.sh and prints a run summary.
+Parses the structured metrics log produced by etc.py and prints a run summary.
 
 Usage:
     python3 metrics.py patches/metrics.log
