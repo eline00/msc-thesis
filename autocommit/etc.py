@@ -10,8 +10,9 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent
 BUILD_CMD = "dotnet build --no-restore"
 APPROACH = "programmatic"
-METRICS_LOG = SCRIPT_DIR / "metrics.log"
-RESULTS_DIR = Path("results")
+LOGGING_DIR = SCRIPT_DIR / "logging"
+METRICS_LOG = LOGGING_DIR / "metrics.log"
+RESULTS_DIR = SCRIPT_DIR / "results"
 RUNS_CSV = RESULTS_DIR / "runs.csv"
 GROUPS_CSV = RESULTS_DIR / "groups.csv"
 
@@ -100,7 +101,7 @@ def log_warning(msg: str) -> None: print(f"\033[1;33m[WARNING]\033[0m {msg}"); _
 # region Metrics
 def metrics_event(event: str, data: str = "") -> None:
     ts = int(time.time() * 1000)
-    METRICS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    LOGGING_DIR.mkdir(parents=True, exist_ok=True)
     with open(METRICS_LOG, "a") as f:
         f.write(f"{ts}|{event}|{data}\n")
         
@@ -206,7 +207,8 @@ def main() -> None:
 
     # ----- Step 3: Save the full original patch for reference -----
     git_diff_to_file(SCRIPT_DIR / "full.patch")
-    _log_file = open(SCRIPT_DIR / "run.log", "w")
+    LOGGING_DIR.mkdir(parents=True, exist_ok=True)
+    _log_file = open(LOGGING_DIR / "run.log", "w")
     log_info("Full patch saved to autocommit/full.patch")
 
     # ----- Step 4: Temporarily commit all changes as the tangled state, then reset -----
@@ -260,7 +262,7 @@ def main() -> None:
         pending = sorted(str(p) for p in hunks_dir.glob("hunk_*.patch"))
 
         # Call group.py with all current hunks
-        invocations_log = SCRIPT_DIR / f"iter_{iteration}_invocations.log"
+        invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
         result = subprocess.run(
             [sys.executable, str(SCRIPT_DIR / "group.py"), BUILD_CMD, *pending],
             capture_output=True, text=True,
@@ -312,12 +314,16 @@ def main() -> None:
             f"invocations={invocations},duration_ms={iter_duration},hunks={group_names}",
         )
 
-    # ----- Step 7: Results -----
+    # ----- Step 7: Clean up iteration patch files -----
+    for p in SCRIPT_DIR.glob("remaining_iter_*.patch"):
+        p.unlink(missing_ok=True)
+
+    # ----- Step 8: Results -----
     metrics_event("RUN_END", f"groups={group_count}")
 
     log_success(f"Done: {group_count} group(s) produced from {total_hunk_count} hunk(s).")
 
-    # ----- Step 8: Move atomic commits to original branch and open PR -----
+    # ----- Step 9: Move atomic commits to original branch and open PR -----
     if group_count == 0:
         log_warning("No groups were produced — skipping merge and PR.")
         return
