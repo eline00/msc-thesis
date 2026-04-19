@@ -98,7 +98,7 @@ def find_buildable_group(
     build_cmd: str,
 ) -> list[str] | None:
 
-    # test if the entire group is buildable before starting delta debugging
+    # interesting test function for delta debugging
     def build_test(companions: list[str]) -> bool:
         result = test_group(companions, build_cmd)
         log(f"    test {len(companions)} hunk(s) -> {f'PASS: {names(companions)}' if result else 'fail'}")
