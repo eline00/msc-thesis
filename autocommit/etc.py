@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-BUILD_CMD = "dotnet build --no-restore"
+BUILD_CMD = "dotnet build --no-restore --no-incremental"
 APPROACH = "programmatic"
 LOGGING_DIR = SCRIPT_DIR / "logging"
 METRICS_LOG = LOGGING_DIR / "metrics.log"
@@ -30,9 +30,12 @@ _log_file = None  # file handle for run.log, opened in main()
 
 # region Hunk splitting
 def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
-    """Split a unified diff into one file per hunk under hunks_dir."""
-    for f in hunks_dir.glob("hunk_*.patch"):
-        f.unlink()
+    """Split a unified diff into one file per hunk under hunks_dir.
+
+    hunks_dir is expected to be an iteration-specific directory (e.g. hunks/iter_0001/).
+    Files are never deleted — old iterations remain on disk for post-run inspection.
+    """
+    hunks_dir.mkdir(parents=True, exist_ok=True)
 
     diff_header: list[str] = []
     file_minus = ""
@@ -191,11 +194,37 @@ def git_diff_to_file(output_path: Path, *extra_args: str) -> None:
 def main() -> None:
     global _original_branch, _tangled_sha, _log_file
 
+    # ----- Optional test argument -----
+    test_name = sys.argv[1] if len(sys.argv) > 1 else None
+    test_dir: Path | None = None
+    if test_name:
+        test_dir = SCRIPT_DIR / "tests" / test_name
+        if not test_dir.exists():
+            log_error(f"Test folder not found: {test_dir}")
+            sys.exit(1)
+        tangled_patch = test_dir / "tangled.patch"
+        if not tangled_patch.exists():
+            log_error(f"No tangled.patch in {test_dir}")
+            sys.exit(1)
+
     _original_branch = git_output("branch", "--show-current")
 
     # ----- Step 1: Create new detangling branch -----
     git_run("checkout", "-b", "detangling")
     log_info("Created and switched to 'detangling' branch.")
+
+    # ----- Step 1b: Apply tangled patch if running a test -----
+    if test_dir:
+        result = subprocess.run(
+            ["git", "apply", "--unidiff-zero", str(tangled_patch)],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            log_error(f"Failed to apply tangled.patch:\n{result.stderr.strip()}")
+            git_run("checkout", _original_branch)
+            git_run("branch", "-D", "detangling")
+            sys.exit(1)
+        log_info(f"Applied tangled patch from test: {test_name}")
 
     # ----- Step 2: Check for changes -----
     git_run("add", "-N", ".")  # temporarily track untracked files so they appear in diff
@@ -221,8 +250,13 @@ def main() -> None:
     log_success("Reset to clean state. Working tree is clean.")
 
     # ----- Step 5: Initialise metrics log and patch dirs -----
-    hunks_dir = SCRIPT_DIR / "hunks"
-    groups_dir = SCRIPT_DIR / "groups"
+    run_id = time.strftime("%Y%m%d_%H%M%S")
+    if test_dir:
+        run_dir = test_dir / "runs" / run_id
+    else:
+        run_dir = SCRIPT_DIR / "runs" / run_id
+    hunks_dir = run_dir / "hunks"
+    groups_dir = run_dir / "groups"
     hunks_dir.mkdir(parents=True, exist_ok=True)
     groups_dir.mkdir(parents=True, exist_ok=True)
     METRICS_LOG.write_text("")
@@ -233,12 +267,12 @@ def main() -> None:
 
     # ----- Step 6: Grouping loop -----
     log_info("Starting grouping with delta debugging...")
-    run_id = time.strftime("%Y%m%d_%H%M%S")
     group_count = 0
     iteration = 0
     total_invocations = 0
     total_duration_ms = 0
     committed_groups: list[list[str]] = []
+    prev_remaining_hunk_count: int | None = None
 
     while True:
         iteration += 1
@@ -254,28 +288,50 @@ def main() -> None:
             remaining_patch.unlink(missing_ok=True)
             break
 
+        # After each commit the remaining count must decrease. If it hasn't, it's stuck.
+        if prev_remaining_hunk_count is not None and remaining_hunk_count >= prev_remaining_hunk_count:
+            log_warning(
+                f"No progress — remaining hunk count did not decrease after last commit "
+                f"({prev_remaining_hunk_count} → {remaining_hunk_count}). "
+                f"Stopping with {remaining_hunk_count} unresolvable hunk(s)."
+            )
+            remaining_patch.unlink(missing_ok=True)
+            break
+        prev_remaining_hunk_count = remaining_hunk_count
+
         log_info(f"── Iteration {iteration}: {remaining_hunk_count} hunk(s) remaining ──")
         metrics_event("ITER_START", f"iteration={iteration},pending={remaining_hunk_count}")
 
-        # Split new diff into individual hunk files
-        split_hunks(remaining_patch, hunks_dir)
-        pending = sorted(str(p) for p in hunks_dir.glob("hunk_*.patch"))
+        # Split new diff into per-iteration subdirectory so all hunks are preserved for debugging
+        iter_hunks_dir = hunks_dir / f"iter_{iteration:04d}"
+        split_hunks(remaining_patch, iter_hunks_dir)
+        pending = sorted(str(p) for p in iter_hunks_dir.glob("hunk_*.patch"))
 
-        # Call group.py with all current hunks
+        # Call group.py with all current hunks, streaming stderr live
         invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
-        result = subprocess.run(
+        proc = subprocess.Popen(
             [sys.executable, str(SCRIPT_DIR / "group.py"), BUILD_CMD, *pending],
-            capture_output=True, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
-        invocations_log.write_text(result.stderr)
-        print(result.stderr, end="", file=sys.stderr)
-        if _log_file and result.stderr:
-            _log_file.write(result.stderr)
-            _log_file.flush()
+        assert proc.stderr is not None and proc.stdout is not None
+        stderr_lines: list[str] = []
+        for line in proc.stderr:
+            print(line, end="", file=sys.stderr, flush=True)
+            if _log_file:
+                _log_file.write(line)
+                _log_file.flush()
+            stderr_lines.append(line)
+        stdout_output = proc.stdout.read()
+        proc.wait()
 
-        invocations = sum(1 for line in result.stderr.splitlines() if "test" in line)
+        stderr_text = "".join(stderr_lines)
+        invocations_log.write_text(stderr_text)
 
-        group = [line for line in result.stdout.splitlines() if line.strip()]
+        result = subprocess.CompletedProcess(proc.args, proc.returncode, stdout_output, stderr_text)
+
+        invocations = sum(1 for line in stderr_lines if "test" in line)
+
+        group = [line for line in stdout_output.splitlines() if line.strip()]
 
         iter_end = int(time.time() * 1000)
         iter_duration = iter_end - iter_start

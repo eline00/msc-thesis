@@ -85,7 +85,9 @@ def run_build(build_cmd: str) -> bool:
 
 def test_group(hunks: list[str], build_cmd: str) -> bool:
     """Apply hunks, run the build, revert."""
-    if not git_apply(hunks):
+    applied = git_apply(hunks)
+    if not applied:
+        git_revert(hunks)  # clean up any partial application
         return False
     result = run_build(build_cmd)
     git_revert(hunks)
@@ -93,25 +95,51 @@ def test_group(hunks: list[str], build_cmd: str) -> bool:
 # endregion
 
 
+def _group_by_file(patches: list[str]) -> list[list[str]]:
+    """Group patch files by their source file"""
+    file_order: list[str] = []
+    by_file: dict[str, list[str]] = {}
+    for patch in patches:
+        target = None
+        with open(patch) as f:
+            for line in f:
+                if line.startswith("+++ b/"):
+                    target = line[6:].strip()
+                    break
+        if target is None:
+            target = patch  # fallback: treat as its own group
+        if target not in by_file:
+            file_order.append(target)
+            by_file[target] = []
+        by_file[target].append(patch)
+    return [by_file[t] for t in file_order]
+
+
 def find_buildable_group(
     pending: list[str],
     build_cmd: str,
 ) -> list[str] | None:
 
-    # interesting test function for delta debugging
-    def build_test(companions: list[str]) -> bool:
-        result = test_group(companions, build_cmd)
-        log(f"    test {len(companions)} hunk(s) -> {f'PASS: {names(companions)}' if result else 'fail'}")
+    file_groups = _group_by_file(pending)
+
+    def build_test(selected_groups: list[list[str]]) -> bool:
+        patches = [p for g in selected_groups for p in g]
+        hunk_names = " + ".join(name(p) for g in selected_groups for p in g)
+        result = test_group(patches, build_cmd)
+        log(f"    test {len(selected_groups)} file(s) [{len(patches)} hunk(s)] -> {'PASS: ' + hunk_names if result else 'fail'}")
         return result
 
-    # run delta debugging to find a minimal buildable group
+    # run delta debugging over file-groups to find a minimal buildable set
     try:
-        group = delta_debug(build_test, pending)
+        winning_groups = delta_debug(build_test, file_groups)
     except Exception as e:
         log(f"Delta debugging failed with exception: {e}")
         return None
 
-    # apply group and return it if successful
+    # flatten winning file-groups back to a list of patch paths
+    group = [p for g in winning_groups for p in g]
+
+    # apply and return
     try:
         if not git_apply(group):
             log("Failed to apply final group.")
@@ -119,7 +147,6 @@ def find_buildable_group(
     except Exception as e:
         log(f"Failed to apply final group with exception: {e}")
         return None
-        
 
     return group
 
