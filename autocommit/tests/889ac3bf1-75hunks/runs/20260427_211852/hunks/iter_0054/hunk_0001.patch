@@ -1,0 +1,37 @@
+diff --git a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+index 2798661..c3e9378 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+@@ -123,0 +124,32 @@ namespace CommandLine.Tests.Unit.Core
++        [Theory]
++        [MemberData(nameof(ChangeType_flagCounters_source))]
++        public void ChangeType_flagCounters(string[] testValue, Type destinationType, bool expectFail, object expectedResult)
++        {
++            Maybe<object> result = TypeConverter.ChangeType(testValue, destinationType, true, true, CultureInfo.InvariantCulture, true);
++
++            if (expectFail)
++            {
++                result.MatchNothing().Should().BeTrue("should fail parsing");
++            }
++            else
++            {
++                result.MatchJust(out object matchedValue).Should().BeTrue("should parse successfully");
++                Assert.Equal(matchedValue, expectedResult);
++            }
++        }
++
++        public static IEnumerable<object[]> ChangeType_flagCounters_source
++        {
++            get
++            {
++                return new[]
++                {
++                    new object[] {new string[0], typeof (int), false, 0},
++                    new object[] {new[] {"true"}, typeof (int), false, 1},
++                    new object[] {new[] {"true", "true"}, typeof (int), false, 2},
++                    new object[] {new[] {"true", "true", "true"}, typeof (int), false, 3},
++                    new object[] {new[] {"true", "x"}, typeof (int), true, 0},
++                };
++            }
++        }
++

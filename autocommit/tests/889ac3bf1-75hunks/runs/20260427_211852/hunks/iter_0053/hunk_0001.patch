@@ -1,0 +1,13 @@
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index 3a1a066..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -18,3 +18,5 @@ namespace CommandLine.Core
+-            return scalar
+-                ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
+-                : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);
++            return isFlag
++                ? ChangeTypeFlagCounter(values, conversionType, conversionCulture, ignoreValueCase)
++                : scalar
++                    ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
++                    : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);

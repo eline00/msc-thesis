@@ -1,0 +1,7 @@
+diff --git a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+index 63bf22f..0a948ce 100644
+--- a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+@@ -75 +75 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),

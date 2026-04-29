@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -253 +260 @@ namespace CommandLine
+-                    .Append(spec.FormatName(settings))
++                    .Append(spec.FormatName(value, settings))

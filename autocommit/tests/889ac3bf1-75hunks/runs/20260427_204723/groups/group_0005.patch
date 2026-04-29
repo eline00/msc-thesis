@@ -1,0 +1,10 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index a1d7a09..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -171,0 +177,5 @@ namespace CommandLine.Core
++        public static bool IsValueFromSeparator(this Token token)
++        {
++            return token.IsValue() && ((Value)token).FromSeparator;
++        }
++

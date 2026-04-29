@@ -1,0 +1,9 @@
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index e264c47..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -29 +29,3 @@ namespace CommandLine
+-        private bool allowMultiInstance;
++        private Maybe<bool> allowMultiInstance;
++        private bool getoptMode;
++        private Maybe<bool> posixlyCorrect;

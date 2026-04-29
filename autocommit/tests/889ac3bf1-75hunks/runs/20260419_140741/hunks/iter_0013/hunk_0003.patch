@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Core/NameLookup.cs b/src/CommandLine/Core/NameLookup.cs
+index 3605d1a..ccb24ea 100644
+--- a/src/CommandLine/Core/NameLookup.cs
++++ b/src/CommandLine/Core/NameLookup.cs
+@@ -23 +23 @@ namespace CommandLine.Core
+-            return option.ConversionType == typeof(bool)
++            return option.ConversionType == typeof(bool) || (option.ConversionType == typeof(int) && option.FlagCounter)

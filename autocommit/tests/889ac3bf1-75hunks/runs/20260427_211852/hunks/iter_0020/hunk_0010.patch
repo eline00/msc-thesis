@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 7609f1b..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -55 +57 @@ namespace CommandLine.Core
+-                '\0', Maybe.Nothing<object>(), helpText, metaValue, Enumerable.Empty<string>(), typeof(bool), TargetType.Switch, string.Empty, hidden);
++                '\0', Maybe.Nothing<object>(), helpText, metaValue, Enumerable.Empty<string>(), typeof(bool), TargetType.Switch, string.Empty, false, hidden);

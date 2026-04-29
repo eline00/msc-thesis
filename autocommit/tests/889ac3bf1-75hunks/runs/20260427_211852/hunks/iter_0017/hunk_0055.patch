@@ -1,0 +1,22 @@
+diff --git a/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs b/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
+index 50cb329..7e878f3 100644
+--- a/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
++++ b/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
+@@ -256,0 +257,17 @@ namespace CommandLine.Tests.Unit
++
++        [Theory]
++        [InlineData(false, false, 0, "")]
++        [InlineData(false, false, 1, "-v")]  // default but not skipped
++        [InlineData(false, false, 2, "-v -v")]
++        [InlineData(false, true, 2, "-vv")]
++        [InlineData(false, false, 3, "-v -v -v")]
++        [InlineData(false, true, 3, "-vvv")]
++        [InlineData(true, false, 1, "")]  // default, skipped
++        public static void UnParsing_instance_with_flag_counter(bool skipDefault, bool groupSwitches, int value, string expected)
++        {
++            var options = new Option_FlagCounter { VerboseLevel = value };
++            var result = new Parser()
++                .FormatCommandLine(options, x => { x.SkipDefault = skipDefault; x.GroupSwitches = groupSwitches; })
++                .Should().BeEquivalentTo(expected);
++        }
++

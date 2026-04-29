@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index 72c6614..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -92 +97 @@ namespace CommandLine.Core
+-            : this(text, false, false)
++            : this(text, false, false, false)

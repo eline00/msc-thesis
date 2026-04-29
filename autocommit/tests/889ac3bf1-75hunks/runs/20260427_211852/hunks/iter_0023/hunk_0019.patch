@@ -1,0 +1,9 @@
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index e264c47..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -41,0 +44,4 @@ namespace CommandLine
++            getoptMode = false;
++            enableDashDash = Maybe.Nothing<bool>();
++            allowMultiInstance = Maybe.Nothing<bool>();
++            posixlyCorrect = Maybe.Nothing<bool>();

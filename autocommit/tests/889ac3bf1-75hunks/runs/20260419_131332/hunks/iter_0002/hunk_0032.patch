@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -7,0 +8 @@ using CommandLine.Infrastructure;
++using CSharpx;

@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index 553fcc0..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -99 +99,0 @@ namespace CommandLine.Core
+-        private readonly bool fromSeparator;

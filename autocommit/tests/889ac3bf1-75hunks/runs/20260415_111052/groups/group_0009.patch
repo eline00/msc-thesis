@@ -1,0 +1,52 @@
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -16,0 +17 @@ namespace CommandLine.Core
++        private readonly bool flagCounter;
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -20 +21 @@ namespace CommandLine.Core
+-            Type conversionType, TargetType targetType, string group, bool hidden = false)
++            Type conversionType, TargetType targetType, string group, bool flagCounter = false, bool hidden = false)
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -22 +23 @@ namespace CommandLine.Core
+-                 required, min, max, defaultValue, helpText, metaValue, enumValues, conversionType, targetType, hidden)
++                 required, min, max, defaultValue, helpText, metaValue, enumValues, conversionType, conversionType == typeof(int) && flagCounter ? TargetType.Switch : targetType, hidden)
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -28,0 +30 @@ namespace CommandLine.Core
++            this.flagCounter = flagCounter;
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -47,0 +50 @@ namespace CommandLine.Core
++                attribute.FlagCounter,
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -54 +57 @@ namespace CommandLine.Core
+-                '\0', Maybe.Nothing<object>(), helpText, metaValue, Enumerable.Empty<string>(), typeof(bool), TargetType.Switch, string.Empty, hidden);
++                '\0', Maybe.Nothing<object>(), helpText, metaValue, Enumerable.Empty<string>(), typeof(bool), TargetType.Switch, string.Empty, false, hidden);
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -80,0 +84,8 @@ namespace CommandLine.Core
++
++        /// <summary>
++        /// Whether this is an int option that counts how many times a flag was set rather than taking a value on the command line
++        /// </summary>
++        public bool FlagCounter
++        {
++            get { return flagCounter; }
++        }

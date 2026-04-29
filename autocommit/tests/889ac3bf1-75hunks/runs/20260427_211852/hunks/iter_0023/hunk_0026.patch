@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 647fedc..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -263 +265 @@ namespace CommandLine
+-        private static string FormatName(this OptionSpecification optionSpec, UnParserSettings settings)
++        private static string FormatName(this OptionSpecification optionSpec, object value, UnParserSettings settings)

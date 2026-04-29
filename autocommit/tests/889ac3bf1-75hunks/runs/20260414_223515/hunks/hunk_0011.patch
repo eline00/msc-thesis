@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 6185e8c..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -182,0 +188 @@ namespace CommandLine
++        /// If GetoptMode is true, this defaults to true, but can be turned off by explicitly specifying AllowMultiInstance = false.

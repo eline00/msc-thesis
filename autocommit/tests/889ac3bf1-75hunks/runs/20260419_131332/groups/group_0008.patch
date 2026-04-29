@@ -1,0 +1,21 @@
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index 7448b69..6ae51da 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -17,0 +18 @@ namespace CommandLine
++        private bool flagCounter;
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index 7448b69..6ae51da 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -98,0 +100,10 @@ namespace CommandLine
++        /// <summary>
++        /// If true, this is an int option that counts how many times a flag was set (e.g. "-v -v -v" or "-vvv" would return 3).
++        /// The property must be of type int (signed 32-bit integer).
++        /// </summary>
++        public bool FlagCounter
++        {
++            get { return flagCounter; }
++            set { flagCounter = value; }
++        }
++

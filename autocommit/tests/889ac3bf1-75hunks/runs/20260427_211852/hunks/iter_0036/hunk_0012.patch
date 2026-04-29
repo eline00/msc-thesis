@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 8cd88f9..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -164,0 +169 @@ namespace CommandLine
++        /// If GetoptMode is true, this defaults to true, but can be turned off by explicitly specifying EnableDashDash = false.

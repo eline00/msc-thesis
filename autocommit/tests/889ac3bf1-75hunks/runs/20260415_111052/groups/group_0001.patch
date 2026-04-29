@@ -1,0 +1,79 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -37 +37,6 @@ namespace CommandLine.Core
+-            return new Value(text, false, true);
++            return new Value(text, false, true, false);
++        }
++
++        public static Token ValueFromSeparator(string text)
++        {
++            return new Value(text, false, false, true);
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -88,0 +94 @@ namespace CommandLine.Core
++        private readonly bool fromSeparator;
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -91 +97 @@ namespace CommandLine.Core
+-            : this(text, false, false)
++            : this(text, false, false, false)
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -96 +102 @@ namespace CommandLine.Core
+-            : this(text, explicitlyAssigned, false)
++            : this(text, explicitlyAssigned, false, false)
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -100 +106 @@ namespace CommandLine.Core
+-        public Value(string text, bool explicitlyAssigned, bool forced)
++        public Value(string text, bool explicitlyAssigned, bool forced, bool fromSeparator)
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -104,0 +111 @@ namespace CommandLine.Core
++            this.fromSeparator = fromSeparator;
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -106,0 +114,3 @@ namespace CommandLine.Core
++        /// <summary>
++        /// Whether this value came from a long option with "=" separating the name from the value
++        /// </summary>
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -111,0 +122,11 @@ namespace CommandLine.Core
++        /// <summary>
++        /// Whether this value came from a sequence specified with a separator (e.g., "--files a.txt,b.txt,c.txt")
++        /// </summary>
++        public bool FromSeparator
++        {
++            get { return fromSeparator; }
++        }
++
++        /// <summary>
++        /// Whether this value came from args after the -- separator (when EnableDashDash = true)
++        /// </summary>
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -155,0 +177,5 @@ namespace CommandLine.Core
++        public static bool IsValueFromSeparator(this Token token)
++        {
++            return token.IsValue() && ((Value)token).FromSeparator;
++        }
++

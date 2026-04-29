@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/Core/SpecificationExtensions.cs b/src/CommandLine/Core/SpecificationExtensions.cs
+index e223e98..c080e98 100644
+--- a/src/CommandLine/Core/SpecificationExtensions.cs
++++ b/src/CommandLine/Core/SpecificationExtensions.cs
+@@ -37,0 +38 @@ namespace CommandLine.Core
++                specification.FlagCounter,

@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index e03bfea..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -29,0 +30 @@ namespace CommandLine.Core
++            this.flagCounter = flagCounter;

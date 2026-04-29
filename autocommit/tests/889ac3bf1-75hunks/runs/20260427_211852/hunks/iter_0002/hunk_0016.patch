@@ -1,0 +1,12 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index bb82706..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -37 +37,6 @@ namespace CommandLine.Core
+-            return new Value(text, false, true);
++            return new Value(text, false, true, false);
++        }
++
++        public static Token ValueFromSeparator(string text)
++        {
++            return new Value(text, false, false, true);

@@ -1,0 +1,9 @@
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 3ad69c6..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -166,2 +173,2 @@ namespace CommandLine
+-            get { return enableDashDash; }
+-            set { PopsicleSetter.Set(Consumed, ref enableDashDash, value); }
++            get => enableDashDash.MatchJust(out bool value) ? value : getoptMode;
++            set => PopsicleSetter.Set(Consumed, ref enableDashDash, Maybe.Just(value));
