@@ -30,9 +30,9 @@ _log_file = None  # file handle for run.log, opened in main()
 
 # region Hunk splitting
 def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
-    """Split a unified diff into one file per hunk under hunks_dir."""
-    for f in hunks_dir.glob("hunk_*.patch"):
-        f.unlink()
+    """
+    Split a unified diff into one file per hunk under hunks_dir.
+    """
 
     diff_header: list[str] = []
     file_minus = ""
@@ -42,7 +42,7 @@ def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
 
     with open(patch_file, newline="") as f:
         for raw_line in f:
-            line = raw_line.rstrip("\n")
+            line = raw_line.rstrip("\r\n")
 
             if line.startswith("diff --git"):
                 if current_fh:
@@ -78,9 +78,125 @@ def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
 
 
 def count_hunks(patch_file: Path) -> int:
+    """Return the number of hunks in a patch file."""
     if not patch_file.exists():
         return 0
     return sum(1 for line in patch_file.read_text().splitlines() if line.startswith("@@"))
+
+
+def remove_drift_hunks(patch_file: Path, full_patch: Path) -> int:
+    """
+    Remove position-drift hunks from a re-diff patch.
+    Returns the number of hunks removed.
+    """
+
+    # Build content sets from the original tangled commit.
+    inserted_in_original: set[str] = set()
+    deleted_in_original: set[str] = set()
+    for line in full_patch.read_text().splitlines():
+        if line.startswith("+") and not line.startswith("+++"):
+            inserted_in_original.add(line[1:])
+        elif line.startswith("-") and not line.startswith("---"):
+            deleted_in_original.add(line[1:])
+
+    text = patch_file.read_text()
+    lines = text.splitlines(keepends=True)
+
+    # Parse into file segments, each with a header block and a list of hunks.
+    segments: list[dict] = []
+    current_file: dict | None = None
+    current_hunk: dict | None = None
+
+    for line in lines:
+        if line.startswith("diff --git"):
+            current_file = {"header": [line], "hunks": []}
+            segments.append(current_file)
+            current_hunk = None
+        elif current_file is None:
+            pass
+        elif line.startswith(("index ", "old mode", "new mode", "new file", "deleted file", "--- ", "+++ ")):
+            current_file["header"].append(line)
+            current_hunk = None
+        elif line.startswith("@@"):
+            current_hunk = {"header": line, "body": []}
+            current_file["hunks"].append(current_hunk)
+        elif current_hunk is not None:
+            current_hunk["body"].append(line)
+
+    # Cache of HEAD file contents, keyed by repo-relative path.
+    _head_cache: dict[str, list[str]] = {}
+
+    def _already_in_head(file_path: str, plus_lines: list[str]) -> bool:
+        """Return True if plus_lines appear consecutively in the HEAD version of file_path."""
+        import sys as _sys
+        if file_path not in _head_cache:
+            result = subprocess.run(
+                ["git", "show", f"HEAD:{file_path}"],
+                capture_output=True, text=True,
+            )
+            if result.returncode != 0:
+                _head_cache[file_path] = []
+            else:
+                _head_cache[file_path] = result.stdout.splitlines()
+        head_lines = _head_cache[file_path]
+        n = len(plus_lines)
+        if n == 0 or len(head_lines) < n:
+            return False
+        found = any(head_lines[i:i + n] == plus_lines for i in range(len(head_lines) - n + 1))
+        if not found and n >= 3:
+            print(f"  [drift-dbg] NOT IN HEAD: {file_path!r} +{n} lines, first={plus_lines[0]!r}", file=_sys.stderr)
+            # Check if any single line matches to detect encoding/whitespace issues
+            for pl in plus_lines[:3]:
+                matches = [i for i, hl in enumerate(head_lines) if hl == pl]
+                print(f"  [drift-dbg]   line {plus_lines.index(pl)}: {len(matches)} exact matches in HEAD", file=_sys.stderr)
+                if not matches and head_lines:
+                    # Show repr of first head line with similar content
+                    candidates = [hl for hl in head_lines if pl.strip() and pl.strip() in hl]
+                    if candidates:
+                        print(f"  [drift-dbg]   repr(plus)={pl!r}", file=_sys.stderr)
+                        print(f"  [drift-dbg]   repr(head)={candidates[0]!r}", file=_sys.stderr)
+        return found
+
+    removed = 0
+    output_parts: list[str] = []
+
+    for seg in segments:
+        # Extract file path from segment header ("+++ b/<path>" line).
+        file_path = ""
+        for h in seg["header"]:
+            if h.startswith("+++ b/"):
+                file_path = h[6:].rstrip("\r\n")
+                break
+
+        kept: list[dict] = []
+        for hunk in seg["hunks"]:
+            minus = [l[1:].rstrip("\r\n") for l in hunk["body"] if l.startswith("-")]
+            plus  = [l[1:].rstrip("\r\n") for l in hunk["body"] if l.startswith("+")]
+
+            # Pure move hunks where the same lines were removed and re-added at a different position are drift hunks and can be removed.
+            if minus and plus and minus == plus:
+                removed += 1
+                continue
+
+            if minus and all(line in inserted_in_original for line in minus) \
+                    and not any(line in deleted_in_original for line in minus):
+                removed += 1
+                continue
+
+            if not minus and plus and file_path and _already_in_head(file_path, plus):
+                removed += 1
+                continue
+
+            kept.append(hunk)
+
+        if kept:
+            output_parts.extend(seg["header"])
+            for hunk in kept:
+                output_parts.append(hunk["header"])
+                output_parts.extend(hunk["body"])
+
+    patch_file.write_text("".join(output_parts))
+    return removed
 
 # endregion
 
@@ -187,15 +303,41 @@ def git_diff_to_file(output_path: Path, *extra_args: str) -> None:
 
 # endregion
 
-# Main
+# region Main
 def main() -> None:
     global _original_branch, _tangled_sha, _log_file
+
+    # ----- Optional test argument -----
+    test_name = sys.argv[1] if len(sys.argv) > 1 else None
+    test_dir: Path | None = None
+    if test_name:
+        test_dir = SCRIPT_DIR / "tests" / test_name
+        if not test_dir.exists():
+            log_error(f"Test folder not found: {test_dir}")
+            sys.exit(1)
+        tangled_patch = test_dir / "tangled.patch"
+        if not tangled_patch.exists():
+            log_error(f"No tangled.patch in {test_dir}")
+            sys.exit(1)
 
     _original_branch = git_output("branch", "--show-current")
 
     # ----- Step 1: Create new detangling branch -----
     git_run("checkout", "-b", "detangling")
     log_info("Created and switched to 'detangling' branch.")
+
+    # ----- Step 1b: Apply tangled patch if running a test -----
+    if test_dir:
+        result = subprocess.run(
+            ["git", "apply", "--unidiff-zero", str(tangled_patch)],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            log_error(f"Failed to apply tangled.patch:\n{result.stderr.strip()}")
+            git_run("checkout", _original_branch)
+            git_run("branch", "-D", "detangling")
+            sys.exit(1)
+        log_info(f"Applied tangled patch from test: {test_name}")
 
     # ----- Step 2: Check for changes -----
     git_run("add", "-N", ".")  # temporarily track untracked files so they appear in diff
@@ -221,9 +363,14 @@ def main() -> None:
     log_success("Reset to clean state. Working tree is clean.")
 
     # ----- Step 5: Initialise metrics log and patch dirs -----
-    hunks_dir = SCRIPT_DIR / "hunks"
-    groups_dir = SCRIPT_DIR / "groups"
-    hunks_dir.mkdir(parents=True, exist_ok=True)
+    run_id = time.strftime("%Y%m%d_%H%M%S")
+    if test_dir:
+        run_dir = test_dir / "runs" / run_id
+    else:
+        run_dir = SCRIPT_DIR / "runs" / run_id
+    hunks_root = run_dir / "hunks"
+    groups_dir = run_dir / "groups"
+    hunks_root.mkdir(parents=True, exist_ok=True)
     groups_dir.mkdir(parents=True, exist_ok=True)
     METRICS_LOG.write_text("")
 
@@ -233,12 +380,12 @@ def main() -> None:
 
     # ----- Step 6: Grouping loop -----
     log_info("Starting grouping with delta debugging...")
-    run_id = time.strftime("%Y%m%d_%H%M%S")
     group_count = 0
     iteration = 0
     total_invocations = 0
     total_duration_ms = 0
     committed_groups: list[list[str]] = []
+    prev_remaining_hunk_count: int | None = None
 
     while True:
         iteration += 1
@@ -254,28 +401,59 @@ def main() -> None:
             remaining_patch.unlink(missing_ok=True)
             break
 
+        # Check if the hunk count did not decrease compared to the previous iteration
+        if prev_remaining_hunk_count is not None and remaining_hunk_count >= prev_remaining_hunk_count:
+            n_removed = remove_drift_hunks(remaining_patch, SCRIPT_DIR / "full.patch")
+            if n_removed > 0:
+                remaining_hunk_count = count_hunks(remaining_patch)
+                log_info(
+                    f"Removed {n_removed} drift hunk(s) "
+                    f"(position-drift artifacts); {remaining_hunk_count} remaining."
+                )
+            if remaining_hunk_count >= prev_remaining_hunk_count:
+                log_warning(
+                    f"No progress — remaining hunk count did not decrease after last commit "
+                    f"({prev_remaining_hunk_count} → {remaining_hunk_count}). "
+                    f"Stopping with {remaining_hunk_count} unresolvable hunk(s)."
+                )
+                remaining_patch.unlink(missing_ok=True)
+                break
+        prev_remaining_hunk_count = remaining_hunk_count
+
         log_info(f"── Iteration {iteration}: {remaining_hunk_count} hunk(s) remaining ──")
         metrics_event("ITER_START", f"iteration={iteration},pending={remaining_hunk_count}")
 
-        # Split new diff into individual hunk files
-        split_hunks(remaining_patch, hunks_dir)
-        pending = sorted(str(p) for p in hunks_dir.glob("hunk_*.patch"))
+        # Split new diff into individual hunk files for this iteration
+        iter_hunks_dir = hunks_root / f"iter_{iteration:04d}"
+        iter_hunks_dir.mkdir(parents=True, exist_ok=True)
+        split_hunks(remaining_patch, iter_hunks_dir)
+        pending = sorted(str(p) for p in iter_hunks_dir.glob("hunk_*.patch"))
 
-        # Call group.py with all current hunks
+        # Call group.py with all current hunks, streaming stderr live
         invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
-        result = subprocess.run(
+        grouping_process = subprocess.Popen(
             [sys.executable, str(SCRIPT_DIR / "group.py"), BUILD_CMD, *pending],
-            capture_output=True, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
-        invocations_log.write_text(result.stderr)
-        print(result.stderr, end="", file=sys.stderr)
-        if _log_file and result.stderr:
-            _log_file.write(result.stderr)
-            _log_file.flush()
+        assert grouping_process.stderr is not None and grouping_process.stdout is not None
+        stderr_lines: list[str] = []
+        for line in grouping_process.stderr:
+            print(line, end="", file=sys.stderr, flush=True)
+            if _log_file:
+                _log_file.write(line)
+                _log_file.flush()
+            stderr_lines.append(line)
+        stdout_output = grouping_process.stdout.read()
+        grouping_process.wait()
 
-        invocations = sum(1 for line in result.stderr.splitlines() if "test" in line)
+        stderr_text = "".join(stderr_lines)
+        invocations_log.write_text(stderr_text)
 
-        group = [line for line in result.stdout.splitlines() if line.strip()]
+        result = subprocess.CompletedProcess(grouping_process.args, grouping_process.returncode, stdout_output, stderr_text)
+
+        invocations = sum(1 for line in stderr_lines if "test" in line)
+
+        group = [line for line in stdout_output.splitlines() if line.strip()]
 
         iter_end = int(time.time() * 1000)
         iter_duration = iter_end - iter_start
@@ -315,8 +493,8 @@ def main() -> None:
         )
 
     # ----- Step 7: Clean up iteration patch files -----
-    for p in SCRIPT_DIR.glob("remaining_iter_*.patch"):
-        p.unlink(missing_ok=True)
+    #for p in SCRIPT_DIR.glob("remaining_iter_*.patch"):
+        #p.unlink(missing_ok=True)
 
     # ----- Step 8: Results -----
     metrics_event("RUN_END", f"groups={group_count}")
@@ -374,3 +552,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    
+# endregion
