@@ -432,7 +432,7 @@ def main() -> None:
         # Call group.py with all current hunks, streaming stderr live
         invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
         grouping_process = subprocess.Popen(
-            [sys.executable, str(SCRIPT_DIR / "group.py"), BUILD_CMD, *pending],
+            [sys.executable, "-m", "autocommit.group", BUILD_CMD, *pending],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
         assert grouping_process.stderr is not None and grouping_process.stdout is not None

@@ -2,8 +2,8 @@ import re
 import subprocess
 import sys
 
-import sys, os; sys.path.insert(0, os.path.dirname(__file__))
-from ddmin import delta_debug
+import os
+from autocommit.ddmin import delta_debug
 
 
 
