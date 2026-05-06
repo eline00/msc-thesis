@@ -1,0 +1,2 @@
+1777919873329|RUN_START|total_hunks=75,build_cmd=dotnet build --no-restore
+1777919895672|ITER_START|iteration=1,pending=75

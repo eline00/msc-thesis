@@ -1,4 +1,6 @@
+import argparse
 import csv
+import json
 import os
 import re
 import signal
@@ -15,6 +17,7 @@ METRICS_LOG = LOGGING_DIR / "metrics.log"
 RESULTS_DIR = SCRIPT_DIR / "results"
 RUNS_CSV = RESULTS_DIR / "runs.csv"
 GROUPS_CSV = RESULTS_DIR / "groups.csv"
+STATE_FILE = SCRIPT_DIR / "run_state.json"
 
 RUNS_HEADER = [
     "run_id", "timestamp", "approach", "repo", "original_branch",
@@ -26,7 +29,7 @@ GROUPS_HEADER = ["run_id", "group_num", "hunk_count", "hunks"]
 # Global state for cleanup
 _original_branch: str = ""
 _tangled_sha: str = ""
-_log_file = None  # file handle for run.log, opened in main()
+_log_file = None  # file handle for run.log
 
 # region Hunk splitting
 def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
@@ -71,7 +74,8 @@ def split_hunks(patch_file: Path, hunks_dir: Path) -> None:
                 current_fh.write(file_plus + "\n")
                 current_fh.write(line + "\n")
             elif current_fh is not None:
-                current_fh.write(line + "\n")
+                # Preserve \r for CRLF repositories; only strip the trailing \n
+                current_fh.write(raw_line.rstrip("\n") + "\n")
 
     if current_fh:
         current_fh.close()
@@ -201,6 +205,13 @@ def remove_drift_hunks(patch_file: Path, full_patch: Path) -> int:
 # endregion
 
 # region Logging
+def _init_log(mode: str = "a") -> None:
+    global _log_file
+    if _log_file:
+        _log_file.close()
+    LOGGING_DIR.mkdir(parents=True, exist_ok=True)
+    _log_file = open(LOGGING_DIR / "run.log", mode)
+
 def _log_to_file(level: str, msg: str) -> None:
     if _log_file:
         ts = time.strftime("%H:%M:%S")
@@ -220,7 +231,7 @@ def metrics_event(event: str, data: str = "") -> None:
     LOGGING_DIR.mkdir(parents=True, exist_ok=True)
     with open(METRICS_LOG, "a") as f:
         f.write(f"{ts}|{event}|{data}\n")
-        
+
 # endregion
 
 # region Results CSV
@@ -303,12 +314,32 @@ def git_diff_to_file(output_path: Path, *extra_args: str) -> None:
 
 # endregion
 
-# region Main
-def main() -> None:
-    global _original_branch, _tangled_sha, _log_file
+# region State persistence
+def _load_state() -> dict:
+    if not STATE_FILE.exists():
+        log_error("No active run state found. Run with --setup first.")
+        sys.exit(1)
+    return json.loads(STATE_FILE.read_text())
 
-    # ----- Optional test argument -----
-    test_name = sys.argv[1] if len(sys.argv) > 1 else None
+
+def _save_state(state: dict) -> None:
+    STATE_FILE.write_text(json.dumps(state, indent=2))
+
+# endregion
+
+# region Steps
+
+def step_setup(test_name: str | None) -> None:
+    """--setup: Create detangling branch, save the tangled state, initialise run dirs."""
+    global _original_branch, _tangled_sha
+
+    if STATE_FILE.exists():
+        log_error(
+            "A run_state.json already exists — a run may already be in progress.\n"
+            "  Finish it with --merge, or delete autocommit/run_state.json to start fresh."
+        )
+        sys.exit(1)
+
     test_dir: Path | None = None
     if test_name:
         test_dir = SCRIPT_DIR / "tests" / test_name
@@ -321,12 +352,9 @@ def main() -> None:
             sys.exit(1)
 
     _original_branch = git_output("branch", "--show-current")
-
-    # ----- Step 1: Create new detangling branch -----
     git_run("checkout", "-b", "detangling")
     log_info("Created and switched to 'detangling' branch.")
 
-    # ----- Step 1b: Apply tangled patch if running a test -----
     if test_dir:
         result = subprocess.run(
             ["git", "apply", "--unidiff-zero", str(tangled_patch)],
@@ -339,21 +367,17 @@ def main() -> None:
             sys.exit(1)
         log_info(f"Applied tangled patch from test: {test_name}")
 
-    # ----- Step 2: Check for changes -----
-    git_run("add", "-N", ".")  # temporarily track untracked files so they appear in diff
+    git_run("add", "-N", ".")
     if not git_output("diff", "-U0"):
         log_warning("No changes found.")
         git_run("checkout", _original_branch)
         git_run("branch", "-d", "detangling")
         return
 
-    # ----- Step 3: Save the full original patch for reference -----
     git_diff_to_file(SCRIPT_DIR / "full.patch")
-    LOGGING_DIR.mkdir(parents=True, exist_ok=True)
-    _log_file = open(LOGGING_DIR / "run.log", "w")
+    _init_log("w")
     log_info("Full patch saved to autocommit/full.patch")
 
-    # ----- Step 4: Temporarily commit all changes as the tangled state, then reset -----
     log_info("Creating temporary tangled commit...")
     git_run("add", "-A")
     git_run("commit", "-m", "tangled changes")
@@ -362,148 +386,268 @@ def main() -> None:
     git_run("reset", "--hard", "HEAD~1")
     log_success("Reset to clean state. Working tree is clean.")
 
-    # ----- Step 5: Initialise metrics log and patch dirs -----
     run_id = time.strftime("%Y%m%d_%H%M%S")
-    if test_dir:
-        run_dir = test_dir / "runs" / run_id
-    else:
-        run_dir = SCRIPT_DIR / "runs" / run_id
-    hunks_root = run_dir / "hunks"
-    groups_dir = run_dir / "groups"
-    hunks_root.mkdir(parents=True, exist_ok=True)
-    groups_dir.mkdir(parents=True, exist_ok=True)
+    run_dir = (test_dir / "runs" / run_id) if test_dir else (SCRIPT_DIR / "runs" / run_id)
+    (run_dir / "hunks").mkdir(parents=True, exist_ok=True)
+    (run_dir / "groups").mkdir(parents=True, exist_ok=True)
     METRICS_LOG.write_text("")
 
     total_hunk_count = count_hunks(SCRIPT_DIR / "full.patch")
     log_info(f"Total hunks in full patch: {total_hunk_count}")
     metrics_event("RUN_START", f"total_hunks={total_hunk_count},build_cmd={BUILD_CMD}")
 
-    # ----- Step 6: Grouping loop -----
-    log_info("Starting grouping with delta debugging...")
-    group_count = 0
-    iteration = 0
-    total_invocations = 0
-    total_duration_ms = 0
-    committed_groups: list[list[str]] = []
-    prev_remaining_hunk_count: int | None = None
+    _save_state({
+        "run_id": run_id,
+        "tangled_sha": _tangled_sha,
+        "original_branch": _original_branch,
+        "test_name": test_name,
+        "run_dir": str(run_dir),
+        "total_hunk_count": total_hunk_count,
+        "iteration": 0,
+        "group_count": 0,
+        "total_invocations": 0,
+        "total_duration_ms": 0,
+        "committed_groups": [],
+        "prev_remaining_hunk_count": None,
+        "iter_hunks_dir": None,
+        "iter_start_ms": None,
+        "last_found_group": None,
+        "last_invocations": 0,
+        "last_iter_duration_ms": 0,
+    })
+    log_success(f"Setup complete. Run ID: {run_id}")
+    log_info("Next: run with --split-hunks")
 
-    while True:
-        iteration += 1
-        iter_start = int(time.time() * 1000)
 
-        # Re-diff HEAD against tangled SHA
-        remaining_patch = SCRIPT_DIR / f"remaining_iter_{iteration}.patch"
-        git_diff_to_file(remaining_patch, "HEAD", _tangled_sha)
+def step_split_hunks() -> None:
+    """--split-hunks: Re-diff against the tangled SHA and split remaining changes into hunk files."""
+    global _original_branch, _tangled_sha
 
-        remaining_hunk_count = count_hunks(remaining_patch)
-        if remaining_hunk_count == 0:
-            log_success("All changes have been grouped.")
-            remaining_patch.unlink(missing_ok=True)
-            break
+    state = _load_state()
+    _original_branch = state["original_branch"]
+    _tangled_sha = state["tangled_sha"]
+    _init_log()
 
-        # Check if the hunk count did not decrease compared to the previous iteration
-        if prev_remaining_hunk_count is not None and remaining_hunk_count >= prev_remaining_hunk_count:
-            n_removed = remove_drift_hunks(remaining_patch, SCRIPT_DIR / "full.patch")
-            if n_removed > 0:
-                remaining_hunk_count = count_hunks(remaining_patch)
-                log_info(
-                    f"Removed {n_removed} drift hunk(s) "
-                    f"(position-drift artifacts); {remaining_hunk_count} remaining."
-                )
-            if remaining_hunk_count >= prev_remaining_hunk_count:
-                log_warning(
-                    f"No progress — remaining hunk count did not decrease after last commit "
-                    f"({prev_remaining_hunk_count} → {remaining_hunk_count}). "
-                    f"Stopping with {remaining_hunk_count} unresolvable hunk(s)."
-                )
-                remaining_patch.unlink(missing_ok=True)
-                break
-        prev_remaining_hunk_count = remaining_hunk_count
+    run_dir = Path(state["run_dir"])
+    iteration = state["iteration"] + 1
+    state["iteration"] = iteration
+    state["iter_start_ms"] = int(time.time() * 1000)
 
-        log_info(f"── Iteration {iteration}: {remaining_hunk_count} hunk(s) remaining ──")
-        metrics_event("ITER_START", f"iteration={iteration},pending={remaining_hunk_count}")
+    remaining_patch = SCRIPT_DIR / f"remaining_iter_{iteration}.patch"
+    git_diff_to_file(remaining_patch, "HEAD", _tangled_sha)
+    remaining_hunk_count = count_hunks(remaining_patch)
 
-        # Split new diff into individual hunk files for this iteration
-        iter_hunks_dir = hunks_root / f"iter_{iteration:04d}"
-        iter_hunks_dir.mkdir(parents=True, exist_ok=True)
-        split_hunks(remaining_patch, iter_hunks_dir)
-        pending = sorted(str(p) for p in iter_hunks_dir.glob("hunk_*.patch"))
+    if remaining_hunk_count == 0:
+        log_success("All changes have been grouped.")
+        remaining_patch.unlink(missing_ok=True)
+        state["remaining_hunk_count"] = 0
+        _save_state(state)
+        log_info("Next: run with --merge to finish.")
+        return
 
-        # Call group.py with all current hunks, streaming stderr live
-        invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
-        grouping_process = subprocess.Popen(
-            [sys.executable, "-m", "autocommit.group", BUILD_CMD, *pending],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-        )
-        assert grouping_process.stderr is not None and grouping_process.stdout is not None
-        stderr_lines: list[str] = []
-        for line in grouping_process.stderr:
-            print(line, end="", file=sys.stderr, flush=True)
-            if _log_file:
-                _log_file.write(line)
-                _log_file.flush()
-            stderr_lines.append(line)
-        stdout_output = grouping_process.stdout.read()
-        grouping_process.wait()
-
-        stderr_text = "".join(stderr_lines)
-        invocations_log.write_text(stderr_text)
-
-        result = subprocess.CompletedProcess(grouping_process.args, grouping_process.returncode, stdout_output, stderr_text)
-
-        invocations = sum(1 for line in stderr_lines if "test" in line)
-
-        group = [line for line in stdout_output.splitlines() if line.strip()]
-
-        iter_end = int(time.time() * 1000)
-        iter_duration = iter_end - iter_start
-        total_invocations += invocations
-        total_duration_ms += iter_duration
-
-        # Handle failure
-        if not group or result.returncode != 0:
-            log_warning(f"No buildable group found for the remaining {remaining_hunk_count} hunk(s).")
-            metrics_event(
-                "ITER_FAILED",
-                f"iteration={iteration},invocations={invocations},"
-                f"duration_ms={iter_duration},remaining={remaining_hunk_count}",
+    prev = state["prev_remaining_hunk_count"]
+    if prev is not None and remaining_hunk_count >= prev:
+        n_removed = remove_drift_hunks(remaining_patch, SCRIPT_DIR / "full.patch")
+        if n_removed > 0:
+            remaining_hunk_count = count_hunks(remaining_patch)
+            log_info(
+                f"Removed {n_removed} drift hunk(s) "
+                f"(position-drift artifacts); {remaining_hunk_count} remaining."
             )
-            break
+        if remaining_hunk_count >= prev:
+            log_warning(
+                f"No progress — remaining hunk count did not decrease after last commit "
+                f"({prev} → {remaining_hunk_count}). "
+                f"Stopping with {remaining_hunk_count} unresolvable hunk(s)."
+            )
+            remaining_patch.unlink(missing_ok=True)
+            state["remaining_hunk_count"] = remaining_hunk_count
+            state["stalled"] = True
+            _save_state(state)
+            return
 
-        # Save the group as a merged patch file
-        group_count += 1
-        group_file = groups_dir / f"group_{group_count:04d}.patch"
-        with open(group_file, "w") as out:
-            for hunk_path in group:
-                out.write(Path(hunk_path).read_text())
+    state["prev_remaining_hunk_count"] = remaining_hunk_count
+    state["stalled"] = False
 
-        group_names = ", ".join(Path(g).name for g in group)
-        log_success(f"Group {group_count} ({len(group)} hunk(s)) → {group_file}  [{group_names}]")
+    log_info(f"── Iteration {iteration}: {remaining_hunk_count} hunk(s) remaining ──")
+    metrics_event("ITER_START", f"iteration={iteration},pending={remaining_hunk_count}")
 
-        committed_groups.append(group)
+    iter_hunks_dir = run_dir / "hunks" / f"iter_{iteration:04d}"
+    iter_hunks_dir.mkdir(parents=True, exist_ok=True)
+    split_hunks(remaining_patch, iter_hunks_dir)
 
-        # Commit the group so HEAD advances and re-diff has only the remaining hunks
-        git_run("add", "-A")
-        git_run("commit", "-m", f"etc[{group_count}]: {len(group)} hunk(s) — {group_names}")
+    pending_count = len(list(iter_hunks_dir.glob("hunk_*.patch")))
+    log_info(f"Split into {pending_count} hunk file(s) in {iter_hunks_dir}")
 
+    state["remaining_hunk_count"] = remaining_hunk_count
+    state["iter_hunks_dir"] = str(iter_hunks_dir)
+    _save_state(state)
+    log_info("Next: run with --find-group")
+
+
+def step_find_group() -> None:
+    """--find-group: Run ddmin on the current hunk files to find a minimal buildable group."""
+    global _original_branch, _tangled_sha
+
+    state = _load_state()
+    _original_branch = state["original_branch"]
+    _tangled_sha = state["tangled_sha"]
+    _init_log()
+
+    iter_hunks_dir = state.get("iter_hunks_dir")
+    if not iter_hunks_dir:
+        log_error("No hunk directory in state. Run --split-hunks first.")
+        sys.exit(1)
+
+    iter_hunks_dir_path = Path(iter_hunks_dir)
+    pending = sorted(str(p) for p in iter_hunks_dir_path.glob("hunk_*.patch"))
+    if not pending:
+        log_error(f"No hunk files found in {iter_hunks_dir_path}. Run --split-hunks first.")
+        sys.exit(1)
+
+    iteration = state["iteration"]
+    run_dir = Path(state["run_dir"])
+    groups_dir = run_dir / "groups"
+
+    invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
+    grouping_process = subprocess.Popen(
+        [sys.executable, "-m", "autocommit.group", BUILD_CMD, *pending],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    )
+    assert grouping_process.stderr is not None and grouping_process.stdout is not None
+    stderr_lines: list[str] = []
+    for line in grouping_process.stderr:
+        print(line, end="", file=sys.stderr, flush=True)
+        if _log_file:
+            _log_file.write(line)
+            _log_file.flush()
+        stderr_lines.append(line)
+    stdout_output = grouping_process.stdout.read()
+    grouping_process.wait()
+
+    stderr_text = "".join(stderr_lines)
+    invocations_log.write_text(stderr_text)
+
+    invocations = sum(1 for line in stderr_lines if "test" in line)
+    group = [line for line in stdout_output.splitlines() if line.strip()]
+
+    iter_start = state.get("iter_start_ms") or int(time.time() * 1000)
+    iter_duration = int(time.time() * 1000) - iter_start
+
+    state["last_invocations"] = invocations
+    state["last_iter_duration_ms"] = iter_duration
+
+    if not group or grouping_process.returncode != 0:
+        remaining_hunk_count = state["remaining_hunk_count"]
+        log_warning(f"No buildable group found for the remaining {remaining_hunk_count} hunk(s).")
         metrics_event(
-            "ITER_GROUP",
-            f"iteration={iteration},group={group_count},group_size={len(group)},"
-            f"invocations={invocations},duration_ms={iter_duration},hunks={group_names}",
+            "ITER_FAILED",
+            f"iteration={iteration},invocations={invocations},"
+            f"duration_ms={iter_duration},remaining={remaining_hunk_count}",
         )
+        state["last_found_group"] = None
+        _save_state(state)
+        return
 
-    # ----- Step 7: Clean up iteration patch files -----
-    #for p in SCRIPT_DIR.glob("remaining_iter_*.patch"):
-        #p.unlink(missing_ok=True)
+    # Write the merged group patch file so it can be inspected before committing
+    next_group_num = state["group_count"] + 1
+    group_file = groups_dir / f"group_{next_group_num:04d}.patch"
+    with open(group_file, "w") as out:
+        for hunk_path in group:
+            out.write(Path(hunk_path).read_text())
 
-    # ----- Step 8: Results -----
+    group_names = ", ".join(Path(g).name for g in group)
+    log_success(f"Found group {next_group_num} ({len(group)} hunk(s)) → {group_file}  [{group_names}]")
+
+    state["last_found_group"] = group
+    _save_state(state)
+    log_info("Next: run with --commit-group (or inspect the group patch first)")
+
+
+def step_commit_group() -> None:
+    """--commit-group: Commit the group found by --find-group."""
+    global _original_branch, _tangled_sha
+
+    state = _load_state()
+    _original_branch = state["original_branch"]
+    _tangled_sha = state["tangled_sha"]
+    _init_log()
+
+    group = state.get("last_found_group")
+    if not group:
+        log_error("No group ready to commit. Run --find-group first.")
+        sys.exit(1)
+
+    iteration = state["iteration"]
+    invocations = state["last_invocations"]
+    iter_duration = state["last_iter_duration_ms"]
+    group_count = state["group_count"] + 1
+    group_names = ", ".join(Path(g).name for g in group)
+
+    git_run("add", "-A")
+    git_run("commit", "-m", f"etc[{group_count}]: {len(group)} hunk(s) — {group_names}")
+
+    state["group_count"] = group_count
+    state["committed_groups"].append(group)
+    state["total_invocations"] += invocations
+    state["total_duration_ms"] += iter_duration
+    state["last_found_group"] = None
+
+    metrics_event(
+        "ITER_GROUP",
+        f"iteration={iteration},group={group_count},group_size={len(group)},"
+        f"invocations={invocations},duration_ms={iter_duration},hunks={group_names}",
+    )
+
+    _save_state(state)
+    log_success(f"Committed group {group_count}.")
+    log_info("Next: run with --split-hunks for the next iteration, or --merge when done.")
+
+
+def step_one_iteration() -> None:
+    """--one-iteration: Run one full cycle: --split-hunks + --find-group + --commit-group."""
+    step_split_hunks()
+
+    state = json.loads(STATE_FILE.read_text())
+    if state.get("remaining_hunk_count", 1) == 0:
+        log_info("All changes grouped — run with --merge to finish.")
+        return
+    if state.get("stalled"):
+        return
+
+    step_find_group()
+
+    state = json.loads(STATE_FILE.read_text())
+    if not state.get("last_found_group"):
+        return
+
+    step_commit_group()
+
+
+def step_merge() -> None:
+    """--merge: Fast-forward the original branch over the detangling branch and write results."""
+    global _original_branch, _tangled_sha
+
+    state = _load_state()
+    _original_branch = state["original_branch"]
+    _tangled_sha = state["tangled_sha"]
+    _init_log()
+
+    group_count = state["group_count"]
+    total_hunk_count = state["total_hunk_count"]
+    committed_groups = state["committed_groups"]
+    total_invocations = state["total_invocations"]
+    total_duration_ms = state["total_duration_ms"]
+    run_id = state["run_id"]
+
     metrics_event("RUN_END", f"groups={group_count}")
-
     log_success(f"Done: {group_count} group(s) produced from {total_hunk_count} hunk(s).")
 
-    # ----- Step 9: Move atomic commits to original branch and open PR -----
     if group_count == 0:
-        log_warning("No groups were produced — skipping merge and PR.")
+        log_warning("No groups were produced — skipping merge.")
+        git_run("checkout", _original_branch)
+        git_run("branch", "-D", "detangling")
+        STATE_FILE.unlink(missing_ok=True)
         return
 
     write_results(
@@ -516,7 +660,6 @@ def main() -> None:
         total_duration_ms=total_duration_ms,
     )
 
-    # Merge the detangling branch back into the original branch, which will move the atomic commits there
     git_run("checkout", _original_branch)
     if git_run("merge", "--ff-only", "detangling") != 0:
         log_error("Merge failed. The detangling branch has been left intact.")
@@ -525,32 +668,109 @@ def main() -> None:
     git_run("branch", "-D", "detangling")
     log_success(f"Moved {group_count} atomic commit(s) onto '{_original_branch}' and deleted 'detangling'.")
 
-    # TODO: uncomment to test push + PR creation
-    # log_info(f"Pushing '{_original_branch}' and opening pull request...")
-    # if git_run("push", "-u", "origin", _original_branch) != 0:
-    #     log_error("Push failed. PR not created.")
-    #     return
-    # pr_body = (
-    #     f"Automatically generated by ETC.\n\n"
-    #     f"This PR contains {group_count} atomic commit(s) extracted from {total_hunk_count} hunk(s).\n"
-    #     f"Each commit is independently buildable."
-    # )
-    # result = subprocess.run(
-    #     ["gh", "pr", "create",
-    #      "--base", "master",
-    #      "--head", _original_branch,
-    #      "--title", f"etc: {group_count} atomic commit(s) from {total_hunk_count} hunk(s)",
-    #      "--body", pr_body],
-    #     capture_output=True, text=True,
-    # )
-    # if result.returncode == 0:
-    #     pr_url = result.stdout.strip()
-    #     log_success(f"PR created: {pr_url}")
-    # else:
-    #     log_error(f"gh pr create failed: {result.stderr.strip()}")
+    STATE_FILE.unlink(missing_ok=True)
+
+# endregion
+
+# region Full automatic run
+
+def run_all(test_name: str | None) -> None:
+    """Default: run all steps automatically end-to-end."""
+    step_setup(test_name)
+
+    while True:
+        state = json.loads(STATE_FILE.read_text())
+
+        step_split_hunks()
+
+        state = json.loads(STATE_FILE.read_text())
+        if state.get("remaining_hunk_count", 1) == 0:
+            break
+        if state.get("stalled"):
+            break
+
+        step_find_group()
+
+        state = json.loads(STATE_FILE.read_text())
+        if not state.get("last_found_group"):
+            break
+
+        step_commit_group()
+
+    step_merge()
+
+# endregion
+
+# region Main
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="etc",
+        description="ETC — Extract Test Commits. Splits staged changes into atomic, build-verified commits.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Step-by-step usage:\n"
+            "  etc --setup [test_name]   Initialise a detangling run\n"
+            "  etc --split-hunks         Re-diff and split remaining changes into hunk files\n"
+            "  etc --find-group          Run ddmin to find a minimal buildable group\n"
+            "  etc --commit-group        Commit the group found by --find-group\n"
+            "  etc --one-iteration       Run one full iteration (extract → test → commit)\n"
+            "  etc --merge               Merge the detangling branch and write results\n"
+            "\n"
+            "Full automatic run (default):\n"
+            "  etc [test_name]           Run all steps end-to-end\n"
+        ),
+    )
+    parser.add_argument(
+        "test_name", nargs="?",
+        help="Test folder name under autocommit/tests/ (used with --setup or default run)",
+    )
+
+    steps = parser.add_mutually_exclusive_group()
+    steps.add_argument(
+        "--setup", action="store_true",
+        help="Create the detangling branch, snapshot the tangled state, initialise run dirs",
+    )
+    steps.add_argument(
+        "--split-hunks", dest="split_hunks", action="store_true",
+        help="Re-diff against the tangled SHA and split remaining changes into hunk files",
+    )
+    steps.add_argument(
+        "--find-group", dest="find_group", action="store_true",
+        help="Run ddmin on the current hunk files to find a minimal buildable group",
+    )
+    steps.add_argument(
+        "--commit-group", dest="commit_group", action="store_true",
+        help="Commit the group identified by --find-group",
+    )
+    steps.add_argument(
+        "--one-iteration", dest="one_iteration", action="store_true",
+        help="Run one full iteration: --split-hunks then --find-group then --commit-group",
+    )
+    steps.add_argument(
+        "--merge", action="store_true",
+        help="Fast-forward the original branch over the detangling branch and write results",
+    )
+
+    args = parser.parse_args()
+
+    if args.setup:
+        step_setup(args.test_name)
+    elif args.split_hunks:
+        step_split_hunks()
+    elif args.find_group:
+        step_find_group()
+    elif args.commit_group:
+        step_commit_group()
+    elif args.one_iteration:
+        step_one_iteration()
+    elif args.merge:
+        step_merge()
+    else:
+        run_all(args.test_name)
 
 
 if __name__ == "__main__":
     main()
-    
+
 # endregion
