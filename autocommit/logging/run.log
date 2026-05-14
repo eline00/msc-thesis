@@ -1,13 +1,13 @@
-20:37:52 [INFO] Full patch saved to autocommit/full.patch
-20:37:52 [INFO] Creating temporary tangled commit...
-20:37:53 [INFO] Tangled SHA: ae2cf15834588d4179f1c882ac083625b00666cf
-20:37:53 [SUCCESS] Reset to clean state. Working tree is clean.
-20:37:53 [INFO] Total hunks in full patch: 75
-20:37:53 [SUCCESS] Setup complete. Run ID: 20260504_203753
-20:37:53 [INFO] Next: run with --split-hunks
-20:38:15 [INFO] ── Iteration 1: 75 hunk(s) remaining ──
-20:38:15 [INFO] Split into 75 hunk file(s) in /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260504_203753/hunks/iter_0001
-20:38:15 [INFO] Next: run with --find-group
+13:56:22 [INFO] Full patch saved to autocommit/full.patch
+13:56:22 [INFO] Creating temporary tangled commit...
+13:56:24 [INFO] Tangled SHA: 79a5f84e2a7ef3150a81c9f837206a5a360ef414
+13:56:25 [SUCCESS] Reset to clean state. Working tree is clean.
+13:56:25 [INFO] Total hunks in full patch: 75
+13:56:25 [SUCCESS] Setup complete. Run ID: 20260506_135625
+13:56:25 [INFO] Next: run with --split-hunks
+13:57:06 [INFO] ── Iteration 1: 75 hunk(s) remaining ──
+13:57:07 [INFO] Split into 75 hunk file(s) in /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260506_135625/hunks/iter_0001
+13:57:07 [INFO] Next: run with --find-group
   [group]     test 75 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch + hunk_0012.patch + hunk_0013.patch + hunk_0014.patch + hunk_0015.patch + hunk_0016.patch + hunk_0017.patch + hunk_0018.patch + hunk_0019.patch + hunk_0020.patch + hunk_0021.patch + hunk_0022.patch + hunk_0023.patch + hunk_0024.patch + hunk_0025.patch + hunk_0026.patch + hunk_0027.patch + hunk_0028.patch + hunk_0029.patch + hunk_0030.patch + hunk_0031.patch + hunk_0032.patch + hunk_0033.patch + hunk_0034.patch + hunk_0035.patch + hunk_0036.patch + hunk_0037.patch + hunk_0038.patch + hunk_0039.patch + hunk_0040.patch + hunk_0041.patch + hunk_0042.patch + hunk_0043.patch + hunk_0044.patch + hunk_0045.patch + hunk_0046.patch + hunk_0047.patch + hunk_0048.patch + hunk_0049.patch + hunk_0050.patch + hunk_0051.patch + hunk_0052.patch + hunk_0053.patch + hunk_0054.patch + hunk_0055.patch + hunk_0056.patch + hunk_0057.patch + hunk_0058.patch + hunk_0059.patch + hunk_0060.patch + hunk_0061.patch + hunk_0062.patch + hunk_0063.patch + hunk_0064.patch + hunk_0065.patch + hunk_0066.patch + hunk_0067.patch + hunk_0068.patch + hunk_0069.patch + hunk_0070.patch + hunk_0071.patch + hunk_0072.patch + hunk_0073.patch + hunk_0074.patch + hunk_0075.patch
   [group]     test 38 hunk(s) -> fail
   [group]     test 37 hunk(s) -> fail
@@ -57,5 +57,5 @@
   [group]     test 5 hunk(s) -> PASS: hunk_0016.patch + hunk_0017.patch + hunk_0018.patch + hunk_0019.patch + hunk_0020.patch
   [group]     test 1 hunk(s) -> fail
   [group]     test 1 hunk(s) -> PASS: hunk_0017.patch
-20:41:17 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260504_203753/groups/group_0001.patch  [hunk_0017.patch]
-20:41:17 [INFO] Next: run with --commit-group (or inspect the group patch first)
+14:05:54 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260506_135625/groups/group_0001.patch  [hunk_0017.patch]
+14:05:54 [INFO] Next: run with --commit-group (or inspect the group patch first)
