@@ -11,7 +11,6 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 BUILD_CMD = "dotnet build --no-restore"
-APPROACH = "programmatic"
 LOGGING_DIR = SCRIPT_DIR / "logging"
 METRICS_LOG = LOGGING_DIR / "metrics.log"
 RESULTS_DIR = SCRIPT_DIR / "results"
@@ -130,6 +129,7 @@ def _ensure_csv(path: Path, header: list[str]) -> None:
 
 def write_results(
     run_id: str,
+    approach: str,
     tangled_sha: str,
     original_branch: str,
     total_hunks: int,
@@ -145,7 +145,7 @@ def write_results(
 
     with open(RUNS_CSV, "a", newline="") as f:
         csv.writer(f).writerow([
-            run_id, timestamp, APPROACH, repo, original_branch,
+            run_id, timestamp, approach, repo, original_branch,
             tangled_sha, total_hunks, len(groups),
             total_invocations, total_duration_ms, BUILD_CMD, "",
         ])
@@ -215,7 +215,7 @@ def _save_state(state: dict) -> None:
 
 # region Steps
 
-def step_setup(test_name: str | None) -> None:
+def step_setup(test_name: str | None, approach: str = "programmatic") -> None:
     """--setup: Create detangling branch, save the tangled state, initialise run dirs."""
     global _original_branch, _tangled_sha
 
@@ -289,6 +289,7 @@ def step_setup(test_name: str | None) -> None:
 
     _save_state({
         "run_id": run_id,
+        "approach": approach,
         "tangled_sha": _tangled_sha,
         "original_branch": _original_branch,
         "test_name": test_name,
@@ -306,6 +307,8 @@ def step_setup(test_name: str | None) -> None:
         "last_found_group": None,
         "last_invocations": 0,
         "last_iter_duration_ms": 0,
+        "llm_proposed_groups": None,
+        "llm_group_cursor": 0,
     })
     log_success(f"Setup complete. Run ID: {run_id}")
     log_info("Next: run with --split-hunks")
@@ -367,8 +370,51 @@ def step_split_hunks() -> None:
     log_info("Next: run with --find-group")
 
 
+def _run_ddmin_subprocess(
+    pending: list[str],
+    committed_paths: list[str],
+    iteration: int,
+    append_log: bool = False,
+) -> tuple[list[str] | None, int, int]:
+    """
+    Run group.py (ddmin) on *pending* and return (group, invocations, duration_ms).
+    group is None if ddmin found nothing buildable.
+    """
+    iter_start = int(time.time() * 1000)
+    invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
+
+    committed_args = ["--committed", *committed_paths, "--"] if committed_paths else []
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "autocommit.group", BUILD_CMD, *committed_args, *pending],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    )
+    assert proc.stderr is not None and proc.stdout is not None
+
+    stderr_lines: list[str] = []
+    for line in proc.stderr:
+        print(line, end="", file=sys.stderr, flush=True)
+        if _log_file:
+            _log_file.write(line)
+            _log_file.flush()
+        stderr_lines.append(line)
+    stdout_output = proc.stdout.read()
+    proc.wait()
+
+    mode = "a" if append_log else "w"
+    with open(invocations_log, mode) as f:
+        f.write("".join(stderr_lines))
+
+    invocations = sum(1 for line in stderr_lines if "test" in line)
+    duration_ms = int(time.time() * 1000) - iter_start
+    group = [line for line in stdout_output.splitlines() if line.strip()]
+
+    if not group or proc.returncode != 0:
+        return None, invocations, duration_ms
+    return group, invocations, duration_ms
+
+
 def step_find_group() -> None:
-    """--find-group: Run ddmin on the current hunk files to find a minimal buildable group."""
+    """--find-group: Find a minimal buildable group using the configured approach."""
     global _original_branch, _tangled_sha
 
     state = _load_state()
@@ -384,44 +430,105 @@ def step_find_group() -> None:
     iteration = state["iteration"]
     run_dir = Path(state["run_dir"])
     groups_dir = run_dir / "groups"
-
     committed_paths = [h for group in state["committed_groups"] for h in group]
-
-    invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
-    committed_args = ["--committed", *committed_paths, "--"] if committed_paths else []
-    grouping_process = subprocess.Popen(
-        [sys.executable, "-m", "autocommit.group", BUILD_CMD, *committed_args, *pending],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-    )
-    assert grouping_process.stderr is not None and grouping_process.stdout is not None
-    stderr_lines: list[str] = []
-    for line in grouping_process.stderr:
-        print(line, end="", file=sys.stderr, flush=True)
-        if _log_file:
-            _log_file.write(line)
-            _log_file.flush()
-        stderr_lines.append(line)
-    stdout_output = grouping_process.stdout.read()
-    grouping_process.wait()
-
-    stderr_text = "".join(stderr_lines)
-    invocations_log.write_text(stderr_text)
-
-    invocations = sum(1 for line in stderr_lines if "test" in line)
-    group = [line for line in stdout_output.splitlines() if line.strip()]
-
+    approach = state.get("approach", "programmatic")
     iter_start = state.get("iter_start_ms") or int(time.time() * 1000)
-    iter_duration = int(time.time() * 1000) - iter_start
 
+    # ── Programmatic: pure ddmin ──────────────────────────────────────────────
+    if approach == "programmatic":
+        group, invocations, iter_duration = _run_ddmin_subprocess(
+            pending, committed_paths, iteration,
+        )
+
+    # ── LLM / Hybrid ─────────────────────────────────────────────────────────
+    elif approach in ("llm", "hybrid"):
+        from autocommit.llm_group import propose_groups
+        from autocommit.group import git_apply, run_build
+        from autocommit.group import git_revert as _revert
+
+        hunks_dir = Path(state["hunks_dir"])
+        invocations = 0
+
+        # Make the LLM call to propose groups
+        if state.get("llm_proposed_groups") is None:
+            metrics_event("LLM_CALL_START", f"pending={len(pending)}")
+            call_start = int(time.time() * 1000)
+            proposed = propose_groups(pending)  # list[list[hunk_name]]
+            call_ms = int(time.time() * 1000) - call_start
+            state["llm_proposed_groups"] = proposed
+            state["llm_group_cursor"] = 0
+            metrics_event("LLM_CALL_END", f"groups={len(proposed)},duration_ms={call_ms}")
+            _save_state(state)
+            log_info(f"LLM proposed {len(proposed)} group(s): sizes={[len(g) for g in proposed]}")
+
+        proposed = state["llm_proposed_groups"]
+        cursor = state.get("llm_group_cursor", 0)
+        pending_names = {Path(p).name for p in pending}
+        group = None
+
+        # Iterate through LLM-proposed groups until one is verified
+        while cursor < len(proposed) and group is None:
+            candidate_names = [n for n in proposed[cursor] if n in pending_names]
+            cursor += 1
+            state["llm_group_cursor"] = cursor
+            _save_state(state)
+
+            if not candidate_names:
+                continue  # all hunks in this proposed group already committed
+
+            candidate_paths = [str(hunks_dir / n) for n in candidate_names]
+            log_info(f"Trying LLM group {cursor}/{len(proposed)}: "
+                     f"{len(candidate_names)} hunk(s) — {', '.join(candidate_names)}")
+
+            if approach == "hybrid":
+                # ddmin finds the minimal buildable subset of the LLM-proposed group,
+                # giving it a much smaller search space than the full pending set
+                ddmin_group, ddmin_inv, _ = _run_ddmin_subprocess(
+                    candidate_paths, committed_paths, iteration, append_log=(cursor > 1),
+                )
+                invocations += ddmin_inv
+                if ddmin_group:
+                    group = ddmin_group
+
+            else:  # pure LLM: verify the proposed group as-is
+                applied = git_apply(candidate_paths, committed=committed_paths)
+                if not applied:
+                    _revert(candidate_paths)
+                    log_warning(f"LLM group {cursor} failed to apply — skipping")
+                    continue
+                built = run_build(BUILD_CMD)
+                if not built:
+                    _revert(candidate_paths)
+                    log_warning(f"LLM group {cursor} failed build — skipping")
+                    continue
+                # Verified: leave changes applied so --commit-group can stage them
+                group = candidate_paths
+
+        # Hybrid fallback: LLM groups exhausted but hunks remain → programmatic ddmin
+        if group is None and approach == "hybrid":
+            log_info("LLM groups exhausted — falling back to programmatic ddmin on remaining hunks")
+            fallback_group, fallback_inv, _ = _run_ddmin_subprocess(
+                pending, committed_paths, iteration, append_log=True,
+            )
+            invocations += fallback_inv
+            group = fallback_group
+
+        iter_duration = int(time.time() * 1000) - iter_start
+
+    else:
+        log_error(f"Unknown approach '{approach}'. Use: programmatic, llm, or hybrid.")
+        sys.exit(1)
+
+    # ── Shared outcome handling ───────────────────────────────────────────────
     state["last_invocations"] = invocations
     state["last_iter_duration_ms"] = iter_duration
 
-    if not group or grouping_process.returncode != 0:
+    if not group:
         remaining_hunk_count = state["remaining_hunk_count"]
         log_warning(f"No buildable group found for the remaining {remaining_hunk_count} hunk(s).")
         metrics_event(
             "ITER_FAILED",
-            f"iteration={iteration},invocations={invocations},"
+            f"iteration={iteration},approach={approach},invocations={invocations},"
             f"duration_ms={iter_duration},remaining={remaining_hunk_count}",
         )
         state["last_found_group"] = None
@@ -531,6 +638,7 @@ def step_merge() -> None:
 
     write_results(
         run_id=run_id,
+        approach=state.get("approach", "programmatic"),
         tangled_sha=_tangled_sha,
         original_branch=_original_branch,
         total_hunks=total_hunk_count,
@@ -553,9 +661,9 @@ def step_merge() -> None:
 
 # region Full automatic run
 
-def run_all(test_name: str | None) -> None:
+def run_all(test_name: str | None, approach: str = "programmatic") -> None:
     """Default: run all steps automatically end-to-end."""
-    step_setup(test_name)
+    step_setup(test_name, approach=approach)
 
     while True:
         state = json.loads(STATE_FILE.read_text())
@@ -604,6 +712,11 @@ def main() -> None:
         "test_name", nargs="?",
         help="Test folder name under autocommit/tests/ (used with --setup or default run)",
     )
+    parser.add_argument(
+        "--approach", choices=["programmatic", "llm", "hybrid"], default="programmatic",
+        help="Grouping strategy: programmatic (ddmin only), llm (LLM only), or hybrid (LLM + ddmin). "
+             "Only used with --setup or a full run. Ignored by other steps (approach is read from state).",
+    )
 
     steps = parser.add_mutually_exclusive_group()
     steps.add_argument(
@@ -634,7 +747,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.setup:
-        step_setup(args.test_name)
+        step_setup(args.test_name, approach=args.approach)
     elif args.split_hunks:
         step_split_hunks()
     elif args.find_group:
@@ -646,7 +759,7 @@ def main() -> None:
     elif args.merge:
         step_merge()
     else:
-        run_all(args.test_name)
+        run_all(args.test_name, approach=args.approach)
 
 
 if __name__ == "__main__":
