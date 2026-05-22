@@ -1,9 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
-index d222c10..ded42c4 100644
---- a/src/CommandLine/Core/OptionMapper.cs
-+++ b/src/CommandLine/Core/OptionMapper.cs
-@@ -39 +39,3 @@ namespace CommandLine.Core
--                            return converter(values, pt.Property.PropertyType, pt.Specification.TargetType != TargetType.Sequence)
-+                            bool isFlag = pt.Specification.Tag == SpecificationType.Option && ((OptionSpecification)pt.Specification).FlagCounter;
-+
-+                            return converter(values, isFlag ? typeof(bool) : pt.Property.PropertyType, pt.Specification.TargetType != TargetType.Sequence, isFlag)

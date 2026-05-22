@@ -1,6 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
-index 77e7977..1c2e4f8 100644
---- a/src/CommandLine/Core/OptionSpecification.cs
-+++ b/src/CommandLine/Core/OptionSpecification.cs
-@@ -16,0 +17 @@ namespace CommandLine.Core
-+        private readonly bool flagCounter;

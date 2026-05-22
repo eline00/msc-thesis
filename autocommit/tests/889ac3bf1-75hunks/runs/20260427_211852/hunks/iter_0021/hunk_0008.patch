@@ -1,6 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
-index adb45ad..1c2e4f8 100644
---- a/src/CommandLine/Core/OptionSpecification.cs
-+++ b/src/CommandLine/Core/OptionSpecification.cs
-@@ -48,0 +50 @@ namespace CommandLine.Core
-+                attribute.FlagCounter,

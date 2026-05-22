@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
-index 77e7977..1c2e4f8 100644
---- a/src/CommandLine/Core/OptionSpecification.cs
-+++ b/src/CommandLine/Core/OptionSpecification.cs
-@@ -20 +21 @@ namespace CommandLine.Core
--            Type conversionType, TargetType targetType, string group, bool hidden = false)
-+            Type conversionType, TargetType targetType, string group, bool flagCounter = false, bool hidden = false)

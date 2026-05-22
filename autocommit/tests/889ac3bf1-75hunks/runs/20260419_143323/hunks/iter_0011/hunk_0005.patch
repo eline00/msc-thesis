@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
-index d222c10..ded42c4 100644
---- a/src/CommandLine/Core/OptionMapper.cs
-+++ b/src/CommandLine/Core/OptionMapper.cs
-@@ -30 +30 @@ namespace CommandLine.Core
--                            var values = new HashSet<string>();
-+                            var values = new List<string>();

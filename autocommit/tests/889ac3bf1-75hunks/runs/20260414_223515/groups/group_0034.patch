@@ -1,6 +1,0 @@
-diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
-index 3066fe2..e823a7f 100644
---- a/src/CommandLine/UnParserExtensions.cs
-+++ b/src/CommandLine/UnParserExtensions.cs
-@@ -270,0 +278 @@ namespace CommandLine
-+            return optionSpec.FlagCounter ? String.Join(" ", Enumerable.Repeat(formattedName, (int)value)) : formattedName;

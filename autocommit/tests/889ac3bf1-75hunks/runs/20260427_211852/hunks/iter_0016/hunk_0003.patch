@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Core/InstanceBuilder.cs b/src/CommandLine/Core/InstanceBuilder.cs
-index ffd6250..f48127b 100644
---- a/src/CommandLine/Core/InstanceBuilder.cs
-+++ b/src/CommandLine/Core/InstanceBuilder.cs
-@@ -98 +98 @@ namespace CommandLine.Core
--                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, parsingCulture, ignoreValueCase));
-+                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, false, parsingCulture, ignoreValueCase));

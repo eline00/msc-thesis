@@ -1,7 +1,0 @@
-diff --git a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
-index dc16dfd..c3e9378 100644
---- a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
-+++ b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
-@@ -30 +30 @@ namespace CommandLine.Tests.Unit.Core
--            Maybe<object> result = TypeConverter.ChangeType(new[] {testValue}, destinationType, true, CultureInfo.InvariantCulture, true);
-+            Maybe<object> result = TypeConverter.ChangeType(new[] {testValue}, destinationType, true, false, CultureInfo.InvariantCulture, true);

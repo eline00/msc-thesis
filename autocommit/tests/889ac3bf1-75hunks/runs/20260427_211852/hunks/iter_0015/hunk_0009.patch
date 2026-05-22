@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
-index b0226f7..1c2e4f8 100644
---- a/src/CommandLine/Core/OptionSpecification.cs
-+++ b/src/CommandLine/Core/OptionSpecification.cs
-@@ -22 +23 @@ namespace CommandLine.Core
--                 required, min, max, defaultValue, helpText, metaValue, enumValues, conversionType, targetType, hidden)
-+                 required, min, max, defaultValue, helpText, metaValue, enumValues, conversionType, conversionType == typeof(int) && flagCounter ? TargetType.Switch : targetType, hidden)

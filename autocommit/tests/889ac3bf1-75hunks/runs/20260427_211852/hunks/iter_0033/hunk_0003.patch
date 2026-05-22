@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
-index f41a19c..ded42c4 100644
---- a/src/CommandLine/Core/OptionMapper.cs
-+++ b/src/CommandLine/Core/OptionMapper.cs
-@@ -18 +18 @@ namespace CommandLine.Core
--                Func<IEnumerable<string>, Type, bool, Maybe<object>> converter,
-+                Func<IEnumerable<string>, Type, bool, bool, Maybe<object>> converter,

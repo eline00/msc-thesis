@@ -1,6 +1,0 @@
-diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
-index c28826b..4dc25f7 100644
---- a/src/CommandLine/Core/TokenPartitioner.cs
-+++ b/src/CommandLine/Core/TokenPartitioner.cs
-@@ -130,0 +147 @@ namespace CommandLine.Core
-+                                separatorSeen = false;

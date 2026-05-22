@@ -1,9 +1,0 @@
-diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
-index 559823c..e823a7f 100644
---- a/src/CommandLine/UnParserExtensions.cs
-+++ b/src/CommandLine/UnParserExtensions.cs
-@@ -156 +156,3 @@ namespace CommandLine
--                              where o.TargetType != TargetType.Switch || (o.TargetType == TargetType.Switch && ((bool)info.Value))
-+                              where o.TargetType != TargetType.Switch ||
-+                                   (o.TargetType == TargetType.Switch && o.FlagCounter && ((int)info.Value > 0)) ||
-+                                   (o.TargetType == TargetType.Switch && ((bool)info.Value))

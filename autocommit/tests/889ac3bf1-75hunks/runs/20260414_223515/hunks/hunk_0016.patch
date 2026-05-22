@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
-index ce7b492..e823a7f 100644
---- a/src/CommandLine/UnParserExtensions.cs
-+++ b/src/CommandLine/UnParserExtensions.cs
-@@ -265 +272 @@ namespace CommandLine
--            return
-+            var formattedName =
