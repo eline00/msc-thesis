@@ -44,10 +44,9 @@ def parse_hunk(hunk_path: str) -> dict:
     }
 
 
-def adjusted_patch(hunks: list[dict]) -> str:
-    """ 
-    Adjust the new line numbers in the headers of the given hunks 
-    to account for missing hunks in the same file.
+def adjusted_patch(hunks: list[dict], committed: list[dict] | None = None) -> str:
+    """
+    Adjust line numbers in the headers of the given hunks.
     """
     # Group and order hunks by file
     hunks_by_file: dict[str, list[dict]] = {}
@@ -59,11 +58,26 @@ def adjusted_patch(hunks: list[dict]) -> str:
             file_order.append(f)
         hunks_by_file[f].append(h)
 
-    # Find adjusted new_start for each hunk
+    # Index committed hunks by file
+    committed_by_file: dict[str, list[dict]] = {}
+    for c in (committed or []):
+        f = c['file']
+        if f not in committed_by_file:
+            committed_by_file[f] = []
+        committed_by_file[f].append(c)
+
+    # Adjust both old_start (committed delta) and new_start (intra-group delta)
     for f in file_order:
+        committed_in_file = sorted(committed_by_file.get(f, []), key=lambda c: c['old_start'])
         line_offset = 0
         for h in sorted(hunks_by_file[f], key=lambda h: h['old_start']):
-            base = h['old_start'] + (1 if h['old_count'] == 0 else 0)
+            committed_delta = sum(
+                c['new_count'] - c['old_count']
+                for c in committed_in_file
+                if c['old_start'] < h['old_start']
+            )
+            h['adjusted_old_start'] = h['old_start'] + committed_delta
+            base = h['adjusted_old_start'] + (1 if h['old_count'] == 0 else 0)
             h['adjusted_new_start'] = base + line_offset
             line_offset += h['new_count'] - h['old_count']
 
@@ -77,10 +91,11 @@ def adjusted_patch(hunks: list[dict]) -> str:
                 continue
 
             old_c, new_c = h['old_count'], h['new_count']
-            adj = h['adjusted_new_start']
+            old_s = h['adjusted_old_start']
+            new_s = h['adjusted_new_start']
 
-            old_side = f"-{h['old_start']}" if old_c == 1 else f"-{h['old_start']},{old_c}"
-            new_side = f"+{adj}"            if new_c == 1 else f"+{adj},{new_c}"
+            old_side = f"-{old_s}" if old_c == 1 else f"-{old_s},{old_c}"
+            new_side = f"+{new_s}" if new_c == 1 else f"+{new_s},{new_c}"
             new_header = f"@@ {old_side} {new_side} @@{h['suffix']}"
 
             adjusted = h['content'][:m.start()] + new_header + h['content'][m.end():]
@@ -108,13 +123,14 @@ def _files_in_patches(patches: list[str]) -> list[str]:
 # endregion
 
 # region git
-def git_apply(patches: list[str], check_only: bool = False) -> bool:
+def git_apply(patches: list[str], check_only: bool = False, committed: list[str] | None = None) -> bool:
     """Apply one or more patch files."""
     if not patches:
         return True
 
     parsed = [parse_hunk(p) for p in patches]
-    patch_content = adjusted_patch(parsed)
+    parsed_committed = [parse_hunk(p) for p in (committed or [])]
+    patch_content = adjusted_patch(parsed, parsed_committed)
 
     cmd = ["git", "apply", "--unidiff-zero", "--ignore-whitespace"]
     if check_only:
@@ -179,11 +195,18 @@ def test_group(hunks: list[str], build_cmd: str) -> bool:
 def find_buildable_group(
     pending: list[str],
     build_cmd: str,
+    committed: list[str] | None = None,
 ) -> list[str] | None:
 
     # test if the entire group is buildable before starting delta debugging
     def build_test(companions: list[str]) -> bool:
-        result = test_group(companions, build_cmd)
+        applied = git_apply(companions, committed=committed)
+        if not applied:
+            git_revert(companions)
+            log(f"    test {len(companions)} hunk(s) -> fail")
+            return False
+        result = run_build(build_cmd)
+        git_revert(companions)
         log(f"    test {len(companions)} hunk(s) -> {f'PASS: {names(companions)}' if result else 'fail'}")
         return result
 
@@ -196,31 +219,27 @@ def find_buildable_group(
 
     # apply group and return it if successful
     try:
-        if not git_apply(group):
+        if not git_apply(group, committed=committed):
             log("Failed to apply final group.")
             return None
     except Exception as e:
         log(f"Failed to apply final group with exception: {e}")
         return None
-        
 
     return group
 
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(
-            "Usage: group.py <build_cmd> [pending_hunk ...]",
-            file=sys.stderr,
-        )
-        sys.exit(2)
-
-    build_cmd = sys.argv[1]
-    pending   = sys.argv[2:]
+    import argparse as _argparse
+    _parser = _argparse.ArgumentParser(prog="group")
+    _parser.add_argument("build_cmd")
+    _parser.add_argument("--committed", nargs="*", default=[], metavar="HUNK")
+    _parser.add_argument("pending", nargs="*")
+    _args = _parser.parse_args()
 
     try:
-        group = find_buildable_group(pending, build_cmd)
+        group = find_buildable_group(_args.pending, _args.build_cmd, committed=_args.committed or None)
     except KeyboardInterrupt:
         print("\n[group] Interrupted.", file=sys.stderr, flush=True)
         sys.exit(130)

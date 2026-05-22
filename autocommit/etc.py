@@ -88,120 +88,6 @@ def count_hunks(patch_file: Path) -> int:
     return sum(1 for line in patch_file.read_text().splitlines() if line.startswith("@@"))
 
 
-def remove_drift_hunks(patch_file: Path, full_patch: Path) -> int:
-    """
-    Remove position-drift hunks from a re-diff patch.
-    Returns the number of hunks removed.
-    """
-
-    # Build content sets from the original tangled commit.
-    inserted_in_original: set[str] = set()
-    deleted_in_original: set[str] = set()
-    for line in full_patch.read_text().splitlines():
-        if line.startswith("+") and not line.startswith("+++"):
-            inserted_in_original.add(line[1:])
-        elif line.startswith("-") and not line.startswith("---"):
-            deleted_in_original.add(line[1:])
-
-    text = patch_file.read_text()
-    lines = text.splitlines(keepends=True)
-
-    # Parse into file segments, each with a header block and a list of hunks.
-    segments: list[dict] = []
-    current_file: dict | None = None
-    current_hunk: dict | None = None
-
-    for line in lines:
-        if line.startswith("diff --git"):
-            current_file = {"header": [line], "hunks": []}
-            segments.append(current_file)
-            current_hunk = None
-        elif current_file is None:
-            pass
-        elif line.startswith(("index ", "old mode", "new mode", "new file", "deleted file", "--- ", "+++ ")):
-            current_file["header"].append(line)
-            current_hunk = None
-        elif line.startswith("@@"):
-            current_hunk = {"header": line, "body": []}
-            current_file["hunks"].append(current_hunk)
-        elif current_hunk is not None:
-            current_hunk["body"].append(line)
-
-    # Cache of HEAD file contents, keyed by repo-relative path.
-    _head_cache: dict[str, list[str]] = {}
-
-    def _already_in_head(file_path: str, plus_lines: list[str]) -> bool:
-        """Return True if plus_lines appear consecutively in the HEAD version of file_path."""
-        import sys as _sys
-        if file_path not in _head_cache:
-            result = subprocess.run(
-                ["git", "show", f"HEAD:{file_path}"],
-                capture_output=True, text=True,
-            )
-            if result.returncode != 0:
-                _head_cache[file_path] = []
-            else:
-                _head_cache[file_path] = result.stdout.splitlines()
-        head_lines = _head_cache[file_path]
-        n = len(plus_lines)
-        if n == 0 or len(head_lines) < n:
-            return False
-        found = any(head_lines[i:i + n] == plus_lines for i in range(len(head_lines) - n + 1))
-        if not found and n >= 3:
-            print(f"  [drift-dbg] NOT IN HEAD: {file_path!r} +{n} lines, first={plus_lines[0]!r}", file=_sys.stderr)
-            # Check if any single line matches to detect encoding/whitespace issues
-            for pl in plus_lines[:3]:
-                matches = [i for i, hl in enumerate(head_lines) if hl == pl]
-                print(f"  [drift-dbg]   line {plus_lines.index(pl)}: {len(matches)} exact matches in HEAD", file=_sys.stderr)
-                if not matches and head_lines:
-                    # Show repr of first head line with similar content
-                    candidates = [hl for hl in head_lines if pl.strip() and pl.strip() in hl]
-                    if candidates:
-                        print(f"  [drift-dbg]   repr(plus)={pl!r}", file=_sys.stderr)
-                        print(f"  [drift-dbg]   repr(head)={candidates[0]!r}", file=_sys.stderr)
-        return found
-
-    removed = 0
-    output_parts: list[str] = []
-
-    for seg in segments:
-        # Extract file path from segment header ("+++ b/<path>" line).
-        file_path = ""
-        for h in seg["header"]:
-            if h.startswith("+++ b/"):
-                file_path = h[6:].rstrip("\r\n")
-                break
-
-        kept: list[dict] = []
-        for hunk in seg["hunks"]:
-            minus = [l[1:].rstrip("\r\n") for l in hunk["body"] if l.startswith("-")]
-            plus  = [l[1:].rstrip("\r\n") for l in hunk["body"] if l.startswith("+")]
-
-            # Pure move hunks where the same lines were removed and re-added at a different position are drift hunks and can be removed.
-            if minus and plus and minus == plus:
-                removed += 1
-                continue
-
-            if minus and all(line in inserted_in_original for line in minus) \
-                    and not any(line in deleted_in_original for line in minus):
-                removed += 1
-                continue
-
-            if not minus and plus and file_path and _already_in_head(file_path, plus):
-                removed += 1
-                continue
-
-            kept.append(hunk)
-
-        if kept:
-            output_parts.extend(seg["header"])
-            for hunk in kept:
-                output_parts.append(hunk["header"])
-                output_parts.extend(hunk["body"])
-
-    patch_file.write_text("".join(output_parts))
-    return removed
-
 # endregion
 
 # region Logging
@@ -396,6 +282,11 @@ def step_setup(test_name: str | None) -> None:
     log_info(f"Total hunks in full patch: {total_hunk_count}")
     metrics_event("RUN_START", f"total_hunks={total_hunk_count},build_cmd={BUILD_CMD}")
 
+    initial_hunks_dir = run_dir / "hunks" / "initial"
+    initial_hunks_dir.mkdir(parents=True, exist_ok=True)
+    split_hunks(SCRIPT_DIR / "full.patch", initial_hunks_dir)
+    log_info(f"Split full patch into {total_hunk_count} initial hunk file(s).")
+
     _save_state({
         "run_id": run_id,
         "tangled_sha": _tangled_sha,
@@ -408,6 +299,7 @@ def step_setup(test_name: str | None) -> None:
         "total_invocations": 0,
         "total_duration_ms": 0,
         "committed_groups": [],
+        "initial_hunks_dir": str(initial_hunks_dir),
         "prev_remaining_hunk_count": None,
         "iter_hunks_dir": None,
         "iter_start_ms": None,
@@ -420,7 +312,7 @@ def step_setup(test_name: str | None) -> None:
 
 
 def step_split_hunks() -> None:
-    """--split-hunks: Re-diff against the tangled SHA and split remaining changes into hunk files."""
+    """--split-hunks: Determine remaining hunks from the initial split and copy them for this iteration."""
     global _original_branch, _tangled_sha
 
     state = _load_state()
@@ -433,13 +325,20 @@ def step_split_hunks() -> None:
     state["iteration"] = iteration
     state["iter_start_ms"] = int(time.time() * 1000)
 
-    remaining_patch = SCRIPT_DIR / f"remaining_iter_{iteration}.patch"
-    git_diff_to_file(remaining_patch, "HEAD", _tangled_sha)
-    remaining_hunk_count = count_hunks(remaining_patch)
+    initial_hunks_dir = Path(state["initial_hunks_dir"])
+    committed_names = {
+        Path(h).name
+        for group in state["committed_groups"]
+        for h in group
+    }
+    remaining_initial = sorted(
+        p for p in initial_hunks_dir.glob("hunk_*.patch")
+        if p.name not in committed_names
+    )
+    remaining_hunk_count = len(remaining_initial)
 
     if remaining_hunk_count == 0:
         log_success("All changes have been grouped.")
-        remaining_patch.unlink(missing_ok=True)
         state["remaining_hunk_count"] = 0
         _save_state(state)
         log_info("Next: run with --merge to finish.")
@@ -447,24 +346,15 @@ def step_split_hunks() -> None:
 
     prev = state["prev_remaining_hunk_count"]
     if prev is not None and remaining_hunk_count >= prev:
-        n_removed = remove_drift_hunks(remaining_patch, SCRIPT_DIR / "full.patch")
-        if n_removed > 0:
-            remaining_hunk_count = count_hunks(remaining_patch)
-            log_info(
-                f"Removed {n_removed} drift hunk(s) "
-                f"(position-drift artifacts); {remaining_hunk_count} remaining."
-            )
-        if remaining_hunk_count >= prev:
-            log_warning(
-                f"No progress — remaining hunk count did not decrease after last commit "
-                f"({prev} → {remaining_hunk_count}). "
-                f"Stopping with {remaining_hunk_count} unresolvable hunk(s)."
-            )
-            remaining_patch.unlink(missing_ok=True)
-            state["remaining_hunk_count"] = remaining_hunk_count
-            state["stalled"] = True
-            _save_state(state)
-            return
+        log_warning(
+            f"No progress — remaining hunk count did not decrease after last commit "
+            f"({prev} → {remaining_hunk_count}). "
+            f"Stopping with {remaining_hunk_count} unresolvable hunk(s)."
+        )
+        state["remaining_hunk_count"] = remaining_hunk_count
+        state["stalled"] = True
+        _save_state(state)
+        return
 
     state["prev_remaining_hunk_count"] = remaining_hunk_count
     state["stalled"] = False
@@ -472,12 +362,13 @@ def step_split_hunks() -> None:
     log_info(f"── Iteration {iteration}: {remaining_hunk_count} hunk(s) remaining ──")
     metrics_event("ITER_START", f"iteration={iteration},pending={remaining_hunk_count}")
 
+    import shutil
     iter_hunks_dir = run_dir / "hunks" / f"iter_{iteration:04d}"
     iter_hunks_dir.mkdir(parents=True, exist_ok=True)
-    split_hunks(remaining_patch, iter_hunks_dir)
+    for p in remaining_initial:
+        shutil.copy(p, iter_hunks_dir / p.name)
 
-    pending_count = len(list(iter_hunks_dir.glob("hunk_*.patch")))
-    log_info(f"Split into {pending_count} hunk file(s) in {iter_hunks_dir}")
+    log_info(f"Copied {remaining_hunk_count} hunk file(s) to {iter_hunks_dir}")
 
     state["remaining_hunk_count"] = remaining_hunk_count
     state["iter_hunks_dir"] = str(iter_hunks_dir)
@@ -509,9 +400,12 @@ def step_find_group() -> None:
     run_dir = Path(state["run_dir"])
     groups_dir = run_dir / "groups"
 
+    committed_paths = [h for group in state["committed_groups"] for h in group]
+
     invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
+    committed_args = ["--committed", *committed_paths, "--"] if committed_paths else []
     grouping_process = subprocess.Popen(
-        [sys.executable, "-m", "autocommit.group", BUILD_CMD, *pending],
+        [sys.executable, "-m", "autocommit.group", BUILD_CMD, *committed_args, *pending],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
     )
     assert grouping_process.stderr is not None and grouping_process.stdout is not None
@@ -711,7 +605,7 @@ def main() -> None:
         epilog=(
             "Step-by-step usage:\n"
             "  etc --setup [test_name]   Initialise a detangling run\n"
-            "  etc --split-hunks         Re-diff and split remaining changes into hunk files\n"
+            "  etc --split-hunks         Determine remaining hunks and copy them for this iteration\n"
             "  etc --find-group          Run ddmin to find a minimal buildable group\n"
             "  etc --commit-group        Commit the group found by --find-group\n"
             "  etc --one-iteration       Run one full iteration (extract → test → commit)\n"
@@ -733,7 +627,7 @@ def main() -> None:
     )
     steps.add_argument(
         "--split-hunks", dest="split_hunks", action="store_true",
-        help="Re-diff against the tangled SHA and split remaining changes into hunk files",
+        help="Determine remaining hunks from the initial split and copy them for this iteration",
     )
     steps.add_argument(
         "--find-group", dest="find_group", action="store_true",

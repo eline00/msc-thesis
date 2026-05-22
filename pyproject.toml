@@ -13,3 +13,8 @@ etc = "autocommit.etc:main"
 
 [tool.hatchling.build.targets.wheel]
 packages = ["autocommit"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

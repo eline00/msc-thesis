@@ -1,0 +1,8 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -106,0 +114,3 @@ namespace CommandLine.Core
++        /// <summary>
++        /// Whether this value came from a long option with "=" separating the name from the value
++        /// </summary>

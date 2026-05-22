@@ -1,0 +1,21 @@
+  [group]     test 15 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0005.patch + hunk_0007.patch + hunk_0033.patch + hunk_0034.patch + hunk_0059.patch + hunk_0060.patch + hunk_0061.patch + hunk_0062.patch + hunk_0064.patch + hunk_0065.patch + hunk_0066.patch + hunk_0067.patch + hunk_0069.patch
+  [group]     test 8 hunk(s) -> fail
+  [group]     test 7 hunk(s) -> fail
+  [group]     test 7 hunk(s) -> fail
+  [group]     test 8 hunk(s) -> fail
+  [group]     test 4 hunk(s) -> fail
+  [group]     test 4 hunk(s) -> fail
+  [group]     test 4 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 11 hunk(s) -> fail
+  [group]     test 11 hunk(s) -> fail
+  [group]     test 11 hunk(s) -> fail
+  [group]     test 12 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 2 hunk(s) -> fail
+  [group]     test 1 hunk(s) -> PASS: hunk_0069.patch

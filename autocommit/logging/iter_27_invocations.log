@@ -1,0 +1,62 @@
+  [group]     test 45 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0007.patch + hunk_0011.patch + hunk_0012.patch + hunk_0013.patch + hunk_0015.patch + hunk_0031.patch + hunk_0032.patch + hunk_0033.patch + hunk_0034.patch + hunk_0039.patch + hunk_0040.patch + hunk_0042.patch + hunk_0043.patch + hunk_0044.patch + hunk_0045.patch + hunk_0046.patch + hunk_0047.patch + hunk_0048.patch + hunk_0049.patch + hunk_0053.patch + hunk_0054.patch + hunk_0055.patch + hunk_0058.patch + hunk_0059.patch + hunk_0060.patch + hunk_0061.patch + hunk_0062.patch + hunk_0063.patch + hunk_0064.patch + hunk_0065.patch + hunk_0066.patch + hunk_0067.patch + hunk_0068.patch + hunk_0069.patch + hunk_0070.patch + hunk_0071.patch + hunk_0072.patch + hunk_0073.patch + hunk_0074.patch + hunk_0075.patch
+  [group]     test 23 hunk(s) -> fail
+  [group]     test 22 hunk(s) -> fail
+  [group]     test 22 hunk(s) -> fail
+  [group]     test 23 hunk(s) -> fail
+  [group]     test 12 hunk(s) -> fail
+  [group]     test 12 hunk(s) -> fail
+  [group]     test 12 hunk(s) -> fail
+  [group]     test 9 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 36 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 39 hunk(s) -> fail
+  [group]     test 39 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0007.patch + hunk_0033.patch + hunk_0034.patch + hunk_0039.patch + hunk_0040.patch + hunk_0042.patch + hunk_0043.patch + hunk_0044.patch + hunk_0045.patch + hunk_0046.patch + hunk_0047.patch + hunk_0048.patch + hunk_0049.patch + hunk_0053.patch + hunk_0054.patch + hunk_0055.patch + hunk_0058.patch + hunk_0059.patch + hunk_0060.patch + hunk_0061.patch + hunk_0062.patch + hunk_0063.patch + hunk_0064.patch + hunk_0065.patch + hunk_0066.patch + hunk_0067.patch + hunk_0068.patch + hunk_0069.patch + hunk_0070.patch + hunk_0071.patch + hunk_0072.patch + hunk_0073.patch + hunk_0074.patch + hunk_0075.patch
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 33 hunk(s) -> fail
+  [group]     test 36 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0007.patch + hunk_0033.patch + hunk_0034.patch + hunk_0039.patch + hunk_0040.patch + hunk_0042.patch + hunk_0043.patch + hunk_0044.patch + hunk_0045.patch + hunk_0046.patch + hunk_0047.patch + hunk_0048.patch + hunk_0049.patch + hunk_0053.patch + hunk_0054.patch + hunk_0055.patch + hunk_0058.patch + hunk_0059.patch + hunk_0060.patch + hunk_0061.patch + hunk_0062.patch + hunk_0063.patch + hunk_0064.patch + hunk_0065.patch + hunk_0066.patch + hunk_0067.patch + hunk_0068.patch + hunk_0069.patch + hunk_0070.patch + hunk_0071.patch + hunk_0072.patch
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 6 hunk(s) -> fail
+  [group]     test 30 hunk(s) -> fail
+  [group]     test 30 hunk(s) -> fail
+  [group]     test 30 hunk(s) -> fail
+  [group]     test 30 hunk(s) -> fail
+  [group]     test 30 hunk(s) -> fail
+  [group]     test 30 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> fail
+  [group]     test 3 hunk(s) -> PASS: hunk_0070.patch + hunk_0071.patch + hunk_0072.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0070.patch

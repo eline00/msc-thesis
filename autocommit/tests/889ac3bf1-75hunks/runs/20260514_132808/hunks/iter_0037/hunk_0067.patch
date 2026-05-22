@@ -1,0 +1,7 @@
+diff --git a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+index dc16dfd..c3e9378 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+@@ -128 +160 @@ namespace CommandLine.Tests.Unit.Core
+-            var result = TypeConverter.ChangeType(values, typeof(int), true, CultureInfo.InvariantCulture, true);
++            var result = TypeConverter.ChangeType(values, typeof(int), true, false, CultureInfo.InvariantCulture, true);
