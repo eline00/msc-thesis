@@ -282,10 +282,10 @@ def step_setup(test_name: str | None) -> None:
     log_info(f"Total hunks in full patch: {total_hunk_count}")
     metrics_event("RUN_START", f"total_hunks={total_hunk_count},build_cmd={BUILD_CMD}")
 
-    initial_hunks_dir = run_dir / "hunks" / "initial"
-    initial_hunks_dir.mkdir(parents=True, exist_ok=True)
-    split_hunks(SCRIPT_DIR / "full.patch", initial_hunks_dir)
-    log_info(f"Split full patch into {total_hunk_count} initial hunk file(s).")
+    hunks_dir = run_dir / "hunks"
+    hunks_dir.mkdir(parents=True, exist_ok=True)
+    split_hunks(SCRIPT_DIR / "full.patch", hunks_dir)
+    log_info(f"Split full patch into {total_hunk_count} hunk file(s).")
 
     _save_state({
         "run_id": run_id,
@@ -299,9 +299,9 @@ def step_setup(test_name: str | None) -> None:
         "total_invocations": 0,
         "total_duration_ms": 0,
         "committed_groups": [],
-        "initial_hunks_dir": str(initial_hunks_dir),
+        "hunks_dir": str(hunks_dir),
         "prev_remaining_hunk_count": None,
-        "iter_hunks_dir": None,
+        "pending_hunk_paths": [],
         "iter_start_ms": None,
         "last_found_group": None,
         "last_invocations": 0,
@@ -312,7 +312,7 @@ def step_setup(test_name: str | None) -> None:
 
 
 def step_split_hunks() -> None:
-    """--split-hunks: Determine remaining hunks from the initial split and copy them for this iteration."""
+    """--split-hunks: Determine remaining hunks from the initial split and save the list for this iteration."""
     global _original_branch, _tangled_sha
 
     state = _load_state()
@@ -320,22 +320,21 @@ def step_split_hunks() -> None:
     _tangled_sha = state["tangled_sha"]
     _init_log()
 
-    run_dir = Path(state["run_dir"])
     iteration = state["iteration"] + 1
     state["iteration"] = iteration
     state["iter_start_ms"] = int(time.time() * 1000)
 
-    initial_hunks_dir = Path(state["initial_hunks_dir"])
+    hunks_dir = Path(state["hunks_dir"])
     committed_names = {
         Path(h).name
         for group in state["committed_groups"]
         for h in group
     }
-    remaining_initial = sorted(
-        p for p in initial_hunks_dir.glob("hunk_*.patch")
+    remaining = sorted(
+        p for p in hunks_dir.glob("hunk_*.patch")
         if p.name not in committed_names
     )
-    remaining_hunk_count = len(remaining_initial)
+    remaining_hunk_count = len(remaining)
 
     if remaining_hunk_count == 0:
         log_success("All changes have been grouped.")
@@ -362,16 +361,8 @@ def step_split_hunks() -> None:
     log_info(f"── Iteration {iteration}: {remaining_hunk_count} hunk(s) remaining ──")
     metrics_event("ITER_START", f"iteration={iteration},pending={remaining_hunk_count}")
 
-    import shutil
-    iter_hunks_dir = run_dir / "hunks" / f"iter_{iteration:04d}"
-    iter_hunks_dir.mkdir(parents=True, exist_ok=True)
-    for p in remaining_initial:
-        shutil.copy(p, iter_hunks_dir / p.name)
-
-    log_info(f"Copied {remaining_hunk_count} hunk file(s) to {iter_hunks_dir}")
-
     state["remaining_hunk_count"] = remaining_hunk_count
-    state["iter_hunks_dir"] = str(iter_hunks_dir)
+    state["pending_hunk_paths"] = [str(p) for p in remaining]
     _save_state(state)
     log_info("Next: run with --find-group")
 
@@ -385,15 +376,9 @@ def step_find_group() -> None:
     _tangled_sha = state["tangled_sha"]
     _init_log()
 
-    iter_hunks_dir = state.get("iter_hunks_dir")
-    if not iter_hunks_dir:
-        log_error("No hunk directory in state. Run --split-hunks first.")
-        sys.exit(1)
-
-    iter_hunks_dir_path = Path(iter_hunks_dir)
-    pending = sorted(str(p) for p in iter_hunks_dir_path.glob("hunk_*.patch"))
+    pending = state.get("pending_hunk_paths")
     if not pending:
-        log_error(f"No hunk files found in {iter_hunks_dir_path}. Run --split-hunks first.")
+        log_error("No pending hunks in state. Run --split-hunks first.")
         sys.exit(1)
 
     iteration = state["iteration"]
