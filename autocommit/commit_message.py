@@ -1,0 +1,51 @@
+"""Google Gemini integration for commit message generation."""
+
+import os
+import sys
+
+# TODO: set GOOGLE_API_KEY in your environment or .env file
+# Get your key from Google AI Studio: https://aistudio.google.com/app/apikey
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+_MODEL = "gemini-2.0-flash"
+
+_SYSTEM_PROMPT = """\
+You are an expert software engineer writing git commit messages.
+Given a unified diff, write a single-line conventional commit message that summarises the change.
+Format: <type>(<scope>): <description>
+Types: feat, fix, refactor, test, docs, style, chore
+Keep it under 72 characters. Return ONLY the commit message, nothing else.\
+"""
+
+
+def generate(patch_content: str, group_num: int, hunk_count: int, hunk_names: str) -> str:
+    """
+    Generate a commit message for the given patch using Google Gemini.
+    Falls back to a template message if the API key is missing or the call fails.
+    """
+    fallback = f"etc[{group_num}]: {hunk_count} hunk(s) — {hunk_names}"
+
+    if not GOOGLE_API_KEY:
+        _log("GOOGLE_API_KEY not set — using template commit message")
+        return fallback
+
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=GOOGLE_API_KEY)
+        model = genai.GenerativeModel(
+            model_name=_MODEL,
+            system_instruction=_SYSTEM_PROMPT,
+        )
+        response = model.generate_content(patch_content)
+        message = response.text.strip()
+        if not message:
+            return fallback
+        _log(f"Generated commit message: {message}")
+        return message
+    except Exception as exc:
+        _log(f"WARNING: Gemini call failed ({exc}) — using template commit message")
+        return fallback
+
+
+def _log(msg: str) -> None:
+    print(f"  [commit_message] {msg}", file=sys.stderr, flush=True)

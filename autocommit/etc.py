@@ -9,6 +9,8 @@ import sys
 import time
 from pathlib import Path
 
+from autocommit.commit_message import generate as _generate_commit_message
+
 SCRIPT_DIR = Path(__file__).parent
 BUILD_CMD = "dotnet build --no-restore"
 LOGGING_DIR = SCRIPT_DIR / "logging"
@@ -570,8 +572,13 @@ def step_commit_group() -> None:
     group_count = state["group_count"] + 1
     group_names = ", ".join(Path(g).name for g in group)
 
+    run_dir = Path(state["run_dir"])
+    group_file = run_dir / "groups" / f"group_{group_count:04d}.patch"
+    patch_content = group_file.read_text() if group_file.exists() else ""
+    commit_msg = _generate_commit_message(patch_content, group_count, len(group), group_names)
+
     git_run("add", "-A")
-    git_run("commit", "-m", f"etc[{group_count}]: {len(group)} hunk(s) — {group_names}")
+    git_run("commit", "-m", commit_msg)
 
     state["group_count"] = group_count
     state["committed_groups"].append(group)
