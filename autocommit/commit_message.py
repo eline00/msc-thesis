@@ -3,8 +3,6 @@
 import os
 import sys
 
-# TODO: set GOOGLE_API_KEY in your environment or .env file
-# Get your key from Google AI Studio: https://aistudio.google.com/app/apikey
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 _MODEL = "gemini-2.0-flash"
@@ -26,17 +24,20 @@ def generate(patch_content: str, group_num: int, hunk_count: int, hunk_names: st
     fallback = f"etc[{group_num}]: {hunk_count} hunk(s) — {hunk_names}"
 
     if not GOOGLE_API_KEY:
-        _log("GOOGLE_API_KEY not set — using template commit message")
+        _log("GOOGLE_API_KEY not found — using template commit message")
         return fallback
 
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=GOOGLE_API_KEY)
-        model = genai.GenerativeModel(
-            model_name=_MODEL,
-            system_instruction=_SYSTEM_PROMPT,
+        from google import genai
+        from google.genai import types
+        client = genai.Client(api_key=GOOGLE_API_KEY)
+        response = client.models.generate_content(
+            model=_MODEL,
+            contents=patch_content,
+            config=types.GenerateContentConfig(
+                system_instruction=_SYSTEM_PROMPT,
+            ),
         )
-        response = model.generate_content(patch_content)
         message = response.text.strip()
         if not message:
             return fallback
