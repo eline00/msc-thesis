@@ -38,7 +38,7 @@ def generate(patch_content: str, group_num: int, hunk_count: int, hunk_names: st
                 system_instruction=_SYSTEM_PROMPT,
             ),
         )
-        message = response.text.strip()
+        message = (response.text or "").strip()
         if not message:
             return fallback
         _log(f"Generated commit message: {message}")
