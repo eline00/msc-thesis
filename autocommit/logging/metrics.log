@@ -1,4 +1,5 @@
-1779441176917|RUN_START|total_hunks=75,build_cmd=dotnet build --no-restore
-1779441198853|ITER_START|iteration=1,pending=75
-1779441475379|ITER_GROUP|iteration=1,group=1,group_size=1,invocations=49,duration_ms=153906,hunks=hunk_0017.patch
-1779441496723|ITER_START|iteration=2,pending=74
+1779720784932|RUN_START|total_hunks=75,build_cmd=dotnet build --no-restore
+1779720784948|ITER_START|iteration=1,pending=75
+1779720909886|ITER_GROUP|iteration=1,group=1,group_size=1,invocations=49,duration_ms=119192,hunks=hunk_0017.patch
+1779720909897|ITER_START|iteration=2,pending=74
+1779720911118|INTERRUPTED|

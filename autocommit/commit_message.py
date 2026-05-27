@@ -3,6 +3,9 @@
 import os
 import sys
 
+from dotenv import load_dotenv
+load_dotenv()
+
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 _MODEL = "gemini-2.0-flash"

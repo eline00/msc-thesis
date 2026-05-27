@@ -309,8 +309,6 @@ def step_setup(test_name: str | None, approach: str = "programmatic") -> None:
         "last_found_group": None,
         "last_invocations": 0,
         "last_iter_duration_ms": 0,
-        "llm_proposed_groups": None,
-        "llm_group_cursor": 0,
     })
     log_success(f"Setup complete. Run ID: {run_id}")
     log_info("Next: run with --split-hunks")
@@ -433,93 +431,10 @@ def step_find_group() -> None:
     run_dir = Path(state["run_dir"])
     groups_dir = run_dir / "groups"
     committed_paths = [h for group in state["committed_groups"] for h in group]
-    approach = state.get("approach", "programmatic")
-    iter_start = state.get("iter_start_ms") or int(time.time() * 1000)
 
-    # ── Programmatic: pure ddmin ──────────────────────────────────────────────
-    if approach == "programmatic":
-        group, invocations, iter_duration = _run_ddmin_subprocess(
-            pending, committed_paths, iteration,
-        )
-
-    # ── LLM / Hybrid ─────────────────────────────────────────────────────────
-    elif approach in ("llm", "hybrid"):
-        from autocommit.llm_group import propose_groups
-        from autocommit.group import git_apply, run_build
-        from autocommit.group import git_revert as _revert
-
-        hunks_dir = Path(state["hunks_dir"])
-        invocations = 0
-
-        # Make the LLM call to propose groups
-        if state.get("llm_proposed_groups") is None:
-            metrics_event("LLM_CALL_START", f"pending={len(pending)}")
-            call_start = int(time.time() * 1000)
-            proposed = propose_groups(pending)  # list[list[hunk_name]]
-            call_ms = int(time.time() * 1000) - call_start
-            state["llm_proposed_groups"] = proposed
-            state["llm_group_cursor"] = 0
-            metrics_event("LLM_CALL_END", f"groups={len(proposed)},duration_ms={call_ms}")
-            _save_state(state)
-            log_info(f"LLM proposed {len(proposed)} group(s): sizes={[len(g) for g in proposed]}")
-
-        proposed = state["llm_proposed_groups"]
-        cursor = state.get("llm_group_cursor", 0)
-        pending_names = {Path(p).name for p in pending}
-        group = None
-
-        # Iterate through LLM-proposed groups until one is verified
-        while cursor < len(proposed) and group is None:
-            candidate_names = [n for n in proposed[cursor] if n in pending_names]
-            cursor += 1
-            state["llm_group_cursor"] = cursor
-            _save_state(state)
-
-            if not candidate_names:
-                continue  # all hunks in this proposed group already committed
-
-            candidate_paths = [str(hunks_dir / n) for n in candidate_names]
-            log_info(f"Trying LLM group {cursor}/{len(proposed)}: "
-                     f"{len(candidate_names)} hunk(s) — {', '.join(candidate_names)}")
-
-            if approach == "hybrid":
-                # ddmin finds the minimal buildable subset of the LLM-proposed group,
-                # giving it a much smaller search space than the full pending set
-                ddmin_group, ddmin_inv, _ = _run_ddmin_subprocess(
-                    candidate_paths, committed_paths, iteration, append_log=(cursor > 1),
-                )
-                invocations += ddmin_inv
-                if ddmin_group:
-                    group = ddmin_group
-
-            else:  # pure LLM: verify the proposed group as-is
-                applied = git_apply(candidate_paths, committed=committed_paths)
-                if not applied:
-                    _revert(candidate_paths)
-                    log_warning(f"LLM group {cursor} failed to apply — skipping")
-                    continue
-                built = run_build(BUILD_CMD)
-                if not built:
-                    _revert(candidate_paths)
-                    log_warning(f"LLM group {cursor} failed build — skipping")
-                    continue
-                # Verified: leave changes applied so --commit-group can stage them
-                group = candidate_paths
-
-        # Hybrid fallback: LLM groups exhausted but hunks remain → programmatic ddmin
-        if group is None and approach == "hybrid":
-            log_info("LLM groups exhausted — falling back to programmatic ddmin on remaining hunks")
-            fallback_group, fallback_inv, _ = _run_ddmin_subprocess(
-                pending, committed_paths, iteration, append_log=True,
-            )
-            invocations += fallback_inv
-            group = fallback_group
-
-        iter_duration = int(time.time() * 1000) - iter_start
-
-    else:
-        log_error(f"Unknown approach '{approach}'. Use: programmatic, llm, or hybrid.")
-        sys.exit(1)
+    group, invocations, iter_duration = _run_ddmin_subprocess(
+        pending, committed_paths, iteration,
+    )
 
     # ── Shared outcome handling ───────────────────────────────────────────────
     state["last_invocations"] = invocations
@@ -530,7 +445,7 @@ def step_find_group() -> None:
         log_warning(f"No buildable group found for the remaining {remaining_hunk_count} hunk(s).")
         metrics_event(
             "ITER_FAILED",
-            f"iteration={iteration},approach={approach},invocations={invocations},"
+            f"iteration={iteration},approach=programmatic,invocations={invocations},"
             f"duration_ms={iter_duration},remaining={remaining_hunk_count}",
         )
         state["last_found_group"] = None
@@ -664,6 +579,48 @@ def step_merge() -> None:
 
     STATE_FILE.unlink(missing_ok=True)
 
+
+def step_analyze_deps() -> None:
+    """--analyze-deps: Analyse def-use relationships between committed groups."""
+    state = _load_state()
+    _init_log()
+
+    committed_groups = state.get("committed_groups", [])
+    if not committed_groups:
+        log_warning("No committed groups to analyse yet.")
+        return
+
+    run_dir = Path(state["run_dir"])
+    groups_dir = run_dir / "groups"
+
+    group_patches: list[tuple[str, str]] = []
+    for i in range(1, len(committed_groups) + 1):
+        patch_file = groups_dir / f"group_{i:04d}.patch"
+        if not patch_file.exists():
+            log_warning(f"Patch file not found: {patch_file}")
+            return
+        group_patches.append((f"group_{i:04d}", patch_file.read_text()))
+
+    from autocommit.dep_analysis import build_dep_graph, topological_order
+
+    edges = build_dep_graph(group_patches)
+    order = topological_order(len(group_patches), edges)
+
+    if not edges:
+        log_info("Dependency graph: no def-use edges found — all groups are independent.")
+    else:
+        seen: set[tuple[int, int, str]] = set()
+        log_info(f"Dependency graph ({len(edges)} edge(s)):")
+        for from_idx, to_idx, sym in edges:
+            key = (from_idx, to_idx, sym)
+            if key not in seen:
+                seen.add(key)
+                log_info(f"  group_{from_idx + 1:04d}  --({sym})-->  group_{to_idx + 1:04d}")
+
+    log_info("Suggested commit order:")
+    for rank, idx in enumerate(order, start=1):
+        log_info(f"  {rank}. group_{idx + 1:04d}")
+
 # endregion
 
 # region Full automatic run
@@ -705,11 +662,12 @@ def main() -> None:
         epilog=(
             "Step-by-step usage:\n"
             "  etc --setup [test_name]   Initialise a detangling run\n"
-            "  etc --split-hunks         Determine remaining hunks and copy them for this iteration\n"
+            "  etc --split-hunks         Determine remaining hunks for this iteration\n"
             "  etc --find-group          Run ddmin to find a minimal buildable group\n"
             "  etc --commit-group        Commit the group found by --find-group\n"
-            "  etc --one-iteration       Run one full iteration (extract → test → commit)\n"
+            "  etc --one-iteration       Run one full iteration (split → find → commit)\n"
             "  etc --merge               Merge the detangling branch and write results\n"
+            "  etc --analyze-deps        Analyse def-use relationships between committed groups\n"
             "\n"
             "Full automatic run (default):\n"
             "  etc [test_name]           Run all steps end-to-end\n"
@@ -720,9 +678,8 @@ def main() -> None:
         help="Test folder name under autocommit/tests/ (used with --setup or default run)",
     )
     parser.add_argument(
-        "--approach", choices=["programmatic", "llm", "hybrid"], default="programmatic",
-        help="Grouping strategy: programmatic (ddmin only), llm (LLM only), or hybrid (LLM + ddmin). "
-             "Only used with --setup or a full run. Ignored by other steps (approach is read from state).",
+        "--approach", choices=["programmatic"], default="programmatic",
+        help="Grouping strategy (currently only: programmatic — ddmin build-oracle).",
     )
 
     steps = parser.add_mutually_exclusive_group()
@@ -750,6 +707,10 @@ def main() -> None:
         "--merge", action="store_true",
         help="Fast-forward the original branch over the detangling branch and write results",
     )
+    steps.add_argument(
+        "--analyze-deps", dest="analyze_deps", action="store_true",
+        help="Analyse def-use relationships between committed groups and suggest commit ordering",
+    )
 
     args = parser.parse_args()
 
@@ -765,6 +726,8 @@ def main() -> None:
         step_one_iteration()
     elif args.merge:
         step_merge()
+    elif args.analyze_deps:
+        step_analyze_deps()
     else:
         run_all(args.test_name, approach=args.approach)
 
