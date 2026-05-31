@@ -452,12 +452,13 @@ def step_find_group() -> None:
         _save_state(state)
         return
 
-    # Write the merged group patch file so it can be inspected before committing
+    # Write the merged group patch file with line numbers adjusted for already-committed hunks
     next_group_num = state["group_count"] + 1
     group_file = groups_dir / f"group_{next_group_num:04d}.patch"
-    with open(group_file, "w") as out:
-        for hunk_path in group:
-            out.write(Path(hunk_path).read_text())
+    from autocommit.group import parse_hunk, adjusted_patch as _adjusted_patch
+    group_file.write_text(
+        _adjusted_patch([parse_hunk(p) for p in group], [parse_hunk(p) for p in committed_paths])
+    )
 
     group_names = ", ".join(Path(g).name for g in group)
     log_success(f"Found group {next_group_num} ({len(group)} hunk(s)) → {group_file}  [{group_names}]")
@@ -580,26 +581,87 @@ def step_merge() -> None:
     STATE_FILE.unlink(missing_ok=True)
 
 
-def step_analyze_deps() -> None:
+def _write_graph_dir(
+    groups_dir: Path,
+    group_patches: list[tuple[str, str]],
+    edges: list[tuple[int, int, str]],
+    order: list[int],
+) -> tuple[Path, int]:
+    """Create graph/ alongside groups/, merging def+use hunks into ordered patch files.
+
+    Each unique def-node in the dependency graph produces one file containing
+    the def-group patch concatenated with all its direct use-group patches,
+    members sorted by topological position.  Groups not involved in any edge
+    get their own single-group file.  Files are numbered in topological order
+    of their def-node (or of the independent group itself).
+
+    Returns (graph_dir, number_of_files_written).
+    """
+    from collections import defaultdict
+
+    graph_dir = groups_dir.parent / "graph"
+    graph_dir.mkdir(exist_ok=True)
+
+    # clusters[def_idx] = set of direct use indices
+    clusters: dict[int, set[int]] = defaultdict(set)
+    for from_idx, to_idx, _ in edges:
+        clusters[from_idx].add(to_idx)
+
+    def_nodes: set[int] = set(clusters.keys())
+    use_nodes: set[int] = {to_idx for _, to_idx, _ in edges}
+    independent: set[int] = set(range(len(group_patches))) - (def_nodes | use_nodes)
+
+    order_pos: dict[int, int] = {idx: rank for rank, idx in enumerate(order)}
+
+    # (sort_key, member_indices_in_topo_order)
+    items: list[tuple[int, list[int]]] = []
+    for def_idx, use_set in clusters.items():
+        members = sorted({def_idx} | use_set, key=lambda i: order_pos[i])
+        items.append((order_pos[def_idx], members))
+    for ind_idx in independent:
+        items.append((order_pos[ind_idx], [ind_idx]))
+
+    items.sort(key=lambda x: x[0])
+
+    for file_num, (_, indices) in enumerate(items, start=1):
+        content = "".join(group_patches[idx][1] for idx in indices)
+        (graph_dir / f"graph_{file_num:04d}.patch").write_text(content)
+
+    return graph_dir, len(items)
+
+
+def step_analyze_deps(run_dir_override: str | None = None) -> None:
     """--analyze-deps: Analyse def-use relationships between committed groups."""
-    state = _load_state()
     _init_log()
 
-    committed_groups = state.get("committed_groups", [])
-    if not committed_groups:
-        log_warning("No committed groups to analyse yet.")
-        return
-
-    run_dir = Path(state["run_dir"])
-    groups_dir = run_dir / "groups"
-
-    group_patches: list[tuple[str, str]] = []
-    for i in range(1, len(committed_groups) + 1):
-        patch_file = groups_dir / f"group_{i:04d}.patch"
-        if not patch_file.exists():
-            log_warning(f"Patch file not found: {patch_file}")
+    if run_dir_override:
+        p = Path(run_dir_override)
+        if not p.is_absolute():
+            p = SCRIPT_DIR / "tests" / p
+        groups_dir = p / "groups"
+        if not groups_dir.exists():
+            groups_dir = p
+        patch_files = sorted(groups_dir.glob("group_*.patch"))
+        if not patch_files:
+            log_error(f"No group_*.patch files found in {groups_dir}")
             return
-        group_patches.append((f"group_{i:04d}", patch_file.read_text()))
+        group_patches: list[tuple[str, str]] = [
+            (p.stem, p.read_text()) for p in patch_files
+        ]
+    else:
+        state = _load_state()
+        committed_groups = state.get("committed_groups", [])
+        if not committed_groups:
+            log_warning("No committed groups to analyse yet.")
+            return
+        groups_dir = Path(state["run_dir"]) / "groups"
+        group_patches = []
+        for i in range(1, len(committed_groups) + 1):
+            patch_file = groups_dir / f"group_{i:04d}.patch"
+            if not patch_file.exists():
+                log_warning(f"Patch file not found: {patch_file}")
+                return
+            group_patches.append((f"group_{i:04d}", patch_file.read_text()))
 
     from autocommit.dep_analysis import build_dep_graph, topological_order
 
@@ -620,6 +682,9 @@ def step_analyze_deps() -> None:
     log_info("Suggested commit order:")
     for rank, idx in enumerate(order, start=1):
         log_info(f"  {rank}. group_{idx + 1:04d}")
+
+    graph_dir, n_files = _write_graph_dir(groups_dir, group_patches, edges, order)
+    log_info(f"Graph folder written → {graph_dir}  ({n_files} file(s))")
 
 # endregion
 
@@ -667,7 +732,7 @@ def main() -> None:
             "  etc --commit-group        Commit the group found by --find-group\n"
             "  etc --one-iteration       Run one full iteration (split → find → commit)\n"
             "  etc --merge               Merge the detangling branch and write results\n"
-            "  etc --analyze-deps        Analyse def-use relationships between committed groups\n"
+            "  etc --analyze-deps [--run-dir PATH]  Analyse def-use relationships between groups\n"
             "\n"
             "Full automatic run (default):\n"
             "  etc [test_name]           Run all steps end-to-end\n"
@@ -711,6 +776,10 @@ def main() -> None:
         "--analyze-deps", dest="analyze_deps", action="store_true",
         help="Analyse def-use relationships between committed groups and suggest commit ordering",
     )
+    parser.add_argument(
+        "--run-dir",
+        help="Path to a completed run directory (for --analyze-deps on finished runs)",
+    )
 
     args = parser.parse_args()
 
@@ -727,7 +796,7 @@ def main() -> None:
     elif args.merge:
         step_merge()
     elif args.analyze_deps:
-        step_analyze_deps()
+        step_analyze_deps(run_dir_override=args.run_dir)
     else:
         run_all(args.test_name, approach=args.approach)
 

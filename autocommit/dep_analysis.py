@@ -46,7 +46,7 @@ def _defined_symbols(patch_text: str) -> set[str]:
     for line in _added_lines(patch_text):
         for m in _DECL.finditer(line):
             name = m.group(1) or m.group(2)
-            if name and name not in _SKIP:
+            if name and len(name) >= 3 and name not in _SKIP:
                 names.add(name)
     return names
 

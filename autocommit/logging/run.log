@@ -65,3 +65,337 @@
 16:55:09 [INFO] Next: run with --find-group
 16:55:11 [WARNING] Interrupted. Cleaning up...
 16:55:11 [INFO] Restored to branch 'testing'.
+11:34:24 [ERROR] No group_*.patch files found in autocommit/tests/889ac3bf1-75hunks/runs/20260525_174402
+11:34:37 [ERROR] No group_*.patch files found in autocommit/tests/889ac3bf1-75hunks/runs/20260525_174402/groups
+11:38:49 [INFO] Dependency graph (53 edge(s)):
+11:38:49 [INFO]   group_0005  --(IsValueFromSeparator)-->  group_0011
+11:38:49 [INFO]   group_0012  --(ToBooleanLoose)-->  group_0038
+11:38:49 [INFO]   group_0014  --(ChangeTypeFlagCounter)-->  group_0057
+11:38:49 [INFO]   group_0018  --(A)-->  group_0030
+11:38:49 [INFO]   group_0018  --(C)-->  group_0038
+11:38:49 [INFO]   group_0018  --(Options_For_Issue_617)-->  group_0047
+11:38:49 [INFO]   group_0018  --(ArchivePath)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Options_For_Issue_454)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Options_For_Issue_510)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Excluded)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Srcs)-->  group_0047
+11:38:49 [INFO]   group_0018  --(FMode)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Files)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Options_For_Issue_619)-->  group_0047
+11:38:49 [INFO]   group_0018  --(ModuleDirs)-->  group_0047
+11:38:49 [INFO]   group_0018  --(InputFileName)-->  group_0047
+11:38:49 [INFO]   group_0018  --(C)-->  group_0047
+11:38:49 [INFO]   group_0018  --(A)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Options_For_Issue_91)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Mode)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Channels)-->  group_0047
+11:38:49 [INFO]   group_0018  --(OutDir)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Included)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Ignores)-->  group_0047
+11:38:49 [INFO]   group_0018  --(Verbose)-->  group_0050
+11:38:49 [INFO]   group_0018  --(Verbose)-->  group_0053
+11:38:49 [INFO]   group_0019  --(Profile)-->  group_0047
+11:38:49 [INFO]   group_0019  --(Options_With_Similar_Names)-->  group_0047
+11:38:49 [INFO]   group_0019  --(Deploys)-->  group_0047
+11:38:49 [INFO]   group_0019  --(ConfigureProfile)-->  group_0047
+11:38:49 [INFO]   group_0019  --(Options_With_Similar_Names_And_Separator)-->  group_0047
+11:38:49 [INFO]   group_0022  --(ValueFromSeparator)-->  group_0030
+11:38:49 [INFO]   group_0022  --(ValueFromSeparator)-->  group_0042
+11:38:49 [INFO]   group_0030  --(GetoptTokenizer)-->  group_0039
+11:38:49 [INFO]   group_0030  --(GetoptTokenizer)-->  group_0054
+11:38:49 [INFO]   group_0030  --(ExplodeOptionList)-->  group_0054
+11:38:49 [INFO]   group_0030  --(Tokenize)-->  group_0054
+11:38:49 [INFO]   group_0032  --(BoolValue)-->  group_0041
+11:38:49 [INFO]   group_0032  --(StringValue)-->  group_0041
+11:38:49 [INFO]   group_0032  --(Simple_Options_WithExtraArgs)-->  group_0041
+11:38:49 [INFO]   group_0032  --(ShortAndLong)-->  group_0041
+11:38:49 [INFO]   group_0032  --(LongValue)-->  group_0041
+11:38:49 [INFO]   group_0032  --(IntSequence)-->  group_0041
+11:38:49 [INFO]   group_0032  --(ExtraArgs)-->  group_0041
+11:38:49 [INFO]   group_0048  --(VerboseLevel)-->  group_0049
+11:38:49 [INFO]   group_0048  --(Option_FlagCounter)-->  group_0049
+11:38:49 [INFO]   group_0050  --(Verbose)-->  group_0018
+11:38:49 [INFO]   group_0050  --(Silent)-->  group_0053
+11:38:49 [INFO]   group_0050  --(Verbose)-->  group_0053
+11:38:49 [INFO]   group_0050  --(Options_With_FlagCounter_Switches)-->  group_0053
+11:38:49 [INFO]   group_0054  --(Single_dash_as_a_value)-->  group_0055
+11:38:49 [INFO]   group_0055  --(Single_dash_as_a_value)-->  group_0054
+11:38:49 [INFO]   group_0056  --(ChangeType)-->  group_0058
+11:38:49 [INFO] Suggested commit order:
+11:38:49 [INFO]   1. group_0001
+11:38:49 [INFO]   2. group_0002
+11:38:49 [INFO]   3. group_0003
+11:38:49 [INFO]   4. group_0004
+11:38:49 [INFO]   5. group_0005
+11:38:49 [INFO]   6. group_0006
+11:38:49 [INFO]   7. group_0007
+11:38:49 [INFO]   8. group_0008
+11:38:49 [INFO]   9. group_0009
+11:38:49 [INFO]   10. group_0010
+11:38:49 [INFO]   11. group_0012
+11:38:49 [INFO]   12. group_0013
+11:38:49 [INFO]   13. group_0014
+11:38:49 [INFO]   14. group_0015
+11:38:49 [INFO]   15. group_0016
+11:38:49 [INFO]   16. group_0017
+11:38:49 [INFO]   17. group_0019
+11:38:49 [INFO]   18. group_0020
+11:38:49 [INFO]   19. group_0021
+11:38:49 [INFO]   20. group_0022
+11:38:49 [INFO]   21. group_0023
+11:38:49 [INFO]   22. group_0024
+11:38:49 [INFO]   23. group_0025
+11:38:49 [INFO]   24. group_0026
+11:38:49 [INFO]   25. group_0027
+11:38:49 [INFO]   26. group_0028
+11:38:49 [INFO]   27. group_0029
+11:38:49 [INFO]   28. group_0031
+11:38:49 [INFO]   29. group_0032
+11:38:49 [INFO]   30. group_0033
+11:38:49 [INFO]   31. group_0034
+11:38:49 [INFO]   32. group_0035
+11:38:49 [INFO]   33. group_0036
+11:38:49 [INFO]   34. group_0037
+11:38:49 [INFO]   35. group_0040
+11:38:49 [INFO]   36. group_0043
+11:38:49 [INFO]   37. group_0044
+11:38:49 [INFO]   38. group_0045
+11:38:49 [INFO]   39. group_0046
+11:38:49 [INFO]   40. group_0048
+11:38:49 [INFO]   41. group_0051
+11:38:49 [INFO]   42. group_0052
+11:38:49 [INFO]   43. group_0056
+11:38:49 [INFO]   44. group_0011
+11:38:49 [INFO]   45. group_0057
+11:38:49 [INFO]   46. group_0042
+11:38:49 [INFO]   47. group_0041
+11:38:49 [INFO]   48. group_0049
+11:38:49 [INFO]   49. group_0058
+11:38:49 [INFO]   50. group_0018
+11:38:49 [INFO]   51. group_0030
+11:38:49 [INFO]   52. group_0038
+11:38:49 [INFO]   53. group_0039
+11:38:49 [INFO]   54. group_0047
+11:38:49 [INFO]   55. group_0050
+11:38:49 [INFO]   56. group_0053
+11:38:49 [INFO]   57. group_0054
+11:38:49 [INFO]   58. group_0055
+12:33:47 [INFO] Dependency graph (49 edge(s)):
+12:33:47 [INFO]   group_0005  --(IsValueFromSeparator)-->  group_0011
+12:33:47 [INFO]   group_0012  --(ToBooleanLoose)-->  group_0038
+12:33:47 [INFO]   group_0014  --(ChangeTypeFlagCounter)-->  group_0057
+12:33:47 [INFO]   group_0018  --(Files)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Channels)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Options_For_Issue_617)-->  group_0047
+12:33:47 [INFO]   group_0018  --(FMode)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Options_For_Issue_454)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Srcs)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Options_For_Issue_510)-->  group_0047
+12:33:47 [INFO]   group_0018  --(ArchivePath)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Included)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Ignores)-->  group_0047
+12:33:47 [INFO]   group_0018  --(OutDir)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Excluded)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Options_For_Issue_619)-->  group_0047
+12:33:47 [INFO]   group_0018  --(InputFileName)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Options_For_Issue_91)-->  group_0047
+12:33:47 [INFO]   group_0018  --(ModuleDirs)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Mode)-->  group_0047
+12:33:47 [INFO]   group_0018  --(Verbose)-->  group_0050
+12:33:47 [INFO]   group_0018  --(Verbose)-->  group_0053
+12:33:47 [INFO]   group_0019  --(Deploys)-->  group_0047
+12:33:47 [INFO]   group_0019  --(Options_With_Similar_Names_And_Separator)-->  group_0047
+12:33:47 [INFO]   group_0019  --(ConfigureProfile)-->  group_0047
+12:33:47 [INFO]   group_0019  --(Profile)-->  group_0047
+12:33:47 [INFO]   group_0019  --(Options_With_Similar_Names)-->  group_0047
+12:33:47 [INFO]   group_0022  --(ValueFromSeparator)-->  group_0030
+12:33:47 [INFO]   group_0022  --(ValueFromSeparator)-->  group_0042
+12:33:47 [INFO]   group_0030  --(GetoptTokenizer)-->  group_0039
+12:33:47 [INFO]   group_0030  --(GetoptTokenizer)-->  group_0054
+12:33:47 [INFO]   group_0030  --(Tokenize)-->  group_0054
+12:33:47 [INFO]   group_0030  --(ExplodeOptionList)-->  group_0054
+12:33:47 [INFO]   group_0032  --(ExtraArgs)-->  group_0041
+12:33:47 [INFO]   group_0032  --(LongValue)-->  group_0041
+12:33:47 [INFO]   group_0032  --(Simple_Options_WithExtraArgs)-->  group_0041
+12:33:47 [INFO]   group_0032  --(StringValue)-->  group_0041
+12:33:47 [INFO]   group_0032  --(ShortAndLong)-->  group_0041
+12:33:47 [INFO]   group_0032  --(BoolValue)-->  group_0041
+12:33:47 [INFO]   group_0032  --(IntSequence)-->  group_0041
+12:33:47 [INFO]   group_0048  --(VerboseLevel)-->  group_0049
+12:33:47 [INFO]   group_0048  --(Option_FlagCounter)-->  group_0049
+12:33:47 [INFO]   group_0050  --(Verbose)-->  group_0018
+12:33:47 [INFO]   group_0050  --(Options_With_FlagCounter_Switches)-->  group_0053
+12:33:47 [INFO]   group_0050  --(Verbose)-->  group_0053
+12:33:47 [INFO]   group_0050  --(Silent)-->  group_0053
+12:33:47 [INFO]   group_0054  --(Single_dash_as_a_value)-->  group_0055
+12:33:47 [INFO]   group_0055  --(Single_dash_as_a_value)-->  group_0054
+12:33:47 [INFO]   group_0056  --(ChangeType)-->  group_0058
+12:33:47 [INFO] Suggested commit order:
+12:33:47 [INFO]   1. group_0001
+12:33:47 [INFO]   2. group_0002
+12:33:47 [INFO]   3. group_0003
+12:33:47 [INFO]   4. group_0004
+12:33:47 [INFO]   5. group_0005
+12:33:47 [INFO]   6. group_0006
+12:33:47 [INFO]   7. group_0007
+12:33:47 [INFO]   8. group_0008
+12:33:47 [INFO]   9. group_0009
+12:33:47 [INFO]   10. group_0010
+12:33:47 [INFO]   11. group_0012
+12:33:47 [INFO]   12. group_0013
+12:33:47 [INFO]   13. group_0014
+12:33:47 [INFO]   14. group_0015
+12:33:47 [INFO]   15. group_0016
+12:33:47 [INFO]   16. group_0017
+12:33:47 [INFO]   17. group_0019
+12:33:47 [INFO]   18. group_0020
+12:33:47 [INFO]   19. group_0021
+12:33:47 [INFO]   20. group_0022
+12:33:47 [INFO]   21. group_0023
+12:33:47 [INFO]   22. group_0024
+12:33:47 [INFO]   23. group_0025
+12:33:47 [INFO]   24. group_0026
+12:33:47 [INFO]   25. group_0027
+12:33:47 [INFO]   26. group_0028
+12:33:47 [INFO]   27. group_0029
+12:33:47 [INFO]   28. group_0031
+12:33:47 [INFO]   29. group_0032
+12:33:47 [INFO]   30. group_0033
+12:33:47 [INFO]   31. group_0034
+12:33:47 [INFO]   32. group_0035
+12:33:47 [INFO]   33. group_0036
+12:33:47 [INFO]   34. group_0037
+12:33:47 [INFO]   35. group_0040
+12:33:47 [INFO]   36. group_0043
+12:33:47 [INFO]   37. group_0044
+12:33:47 [INFO]   38. group_0045
+12:33:47 [INFO]   39. group_0046
+12:33:47 [INFO]   40. group_0048
+12:33:47 [INFO]   41. group_0051
+12:33:47 [INFO]   42. group_0052
+12:33:47 [INFO]   43. group_0056
+12:33:47 [INFO]   44. group_0011
+12:33:47 [INFO]   45. group_0038
+12:33:47 [INFO]   46. group_0057
+12:33:47 [INFO]   47. group_0030
+12:33:47 [INFO]   48. group_0042
+12:33:47 [INFO]   49. group_0041
+12:33:47 [INFO]   50. group_0049
+12:33:47 [INFO]   51. group_0058
+12:33:47 [INFO]   52. group_0039
+12:33:47 [INFO]   53. group_0018
+12:33:47 [INFO]   54. group_0047
+12:33:47 [INFO]   55. group_0050
+12:33:47 [INFO]   56. group_0053
+12:33:47 [INFO]   57. group_0054
+12:33:47 [INFO]   58. group_0055
+13:55:55 [INFO] Dependency graph (49 edge(s)):
+13:55:55 [INFO]   group_0005  --(IsValueFromSeparator)-->  group_0011
+13:55:55 [INFO]   group_0012  --(ToBooleanLoose)-->  group_0038
+13:55:55 [INFO]   group_0014  --(ChangeTypeFlagCounter)-->  group_0057
+13:55:55 [INFO]   group_0018  --(Srcs)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Mode)-->  group_0047
+13:55:55 [INFO]   group_0018  --(FMode)-->  group_0047
+13:55:55 [INFO]   group_0018  --(InputFileName)-->  group_0047
+13:55:55 [INFO]   group_0018  --(OutDir)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Options_For_Issue_510)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Channels)-->  group_0047
+13:55:55 [INFO]   group_0018  --(ArchivePath)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Options_For_Issue_454)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Ignores)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Options_For_Issue_617)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Options_For_Issue_619)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Options_For_Issue_91)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Included)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Excluded)-->  group_0047
+13:55:55 [INFO]   group_0018  --(ModuleDirs)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Files)-->  group_0047
+13:55:55 [INFO]   group_0018  --(Verbose)-->  group_0050
+13:55:55 [INFO]   group_0018  --(Verbose)-->  group_0053
+13:55:55 [INFO]   group_0019  --(Options_With_Similar_Names)-->  group_0047
+13:55:55 [INFO]   group_0019  --(Options_With_Similar_Names_And_Separator)-->  group_0047
+13:55:55 [INFO]   group_0019  --(ConfigureProfile)-->  group_0047
+13:55:55 [INFO]   group_0019  --(Profile)-->  group_0047
+13:55:55 [INFO]   group_0019  --(Deploys)-->  group_0047
+13:55:55 [INFO]   group_0022  --(ValueFromSeparator)-->  group_0030
+13:55:55 [INFO]   group_0022  --(ValueFromSeparator)-->  group_0042
+13:55:55 [INFO]   group_0030  --(GetoptTokenizer)-->  group_0039
+13:55:55 [INFO]   group_0030  --(Tokenize)-->  group_0054
+13:55:55 [INFO]   group_0030  --(GetoptTokenizer)-->  group_0054
+13:55:55 [INFO]   group_0030  --(ExplodeOptionList)-->  group_0054
+13:55:55 [INFO]   group_0032  --(Simple_Options_WithExtraArgs)-->  group_0041
+13:55:55 [INFO]   group_0032  --(StringValue)-->  group_0041
+13:55:55 [INFO]   group_0032  --(BoolValue)-->  group_0041
+13:55:55 [INFO]   group_0032  --(LongValue)-->  group_0041
+13:55:55 [INFO]   group_0032  --(ExtraArgs)-->  group_0041
+13:55:55 [INFO]   group_0032  --(ShortAndLong)-->  group_0041
+13:55:55 [INFO]   group_0032  --(IntSequence)-->  group_0041
+13:55:55 [INFO]   group_0048  --(VerboseLevel)-->  group_0049
+13:55:55 [INFO]   group_0048  --(Option_FlagCounter)-->  group_0049
+13:55:55 [INFO]   group_0050  --(Verbose)-->  group_0018
+13:55:55 [INFO]   group_0050  --(Verbose)-->  group_0053
+13:55:55 [INFO]   group_0050  --(Silent)-->  group_0053
+13:55:55 [INFO]   group_0050  --(Options_With_FlagCounter_Switches)-->  group_0053
+13:55:55 [INFO]   group_0054  --(Single_dash_as_a_value)-->  group_0055
+13:55:55 [INFO]   group_0055  --(Single_dash_as_a_value)-->  group_0054
+13:55:55 [INFO]   group_0056  --(ChangeType)-->  group_0058
+13:55:55 [INFO] Suggested commit order:
+13:55:55 [INFO]   1. group_0001
+13:55:55 [INFO]   2. group_0002
+13:55:55 [INFO]   3. group_0003
+13:55:55 [INFO]   4. group_0004
+13:55:55 [INFO]   5. group_0005
+13:55:55 [INFO]   6. group_0006
+13:55:55 [INFO]   7. group_0007
+13:55:55 [INFO]   8. group_0008
+13:55:55 [INFO]   9. group_0009
+13:55:55 [INFO]   10. group_0010
+13:55:55 [INFO]   11. group_0012
+13:55:55 [INFO]   12. group_0013
+13:55:55 [INFO]   13. group_0014
+13:55:55 [INFO]   14. group_0015
+13:55:55 [INFO]   15. group_0016
+13:55:55 [INFO]   16. group_0017
+13:55:55 [INFO]   17. group_0019
+13:55:55 [INFO]   18. group_0020
+13:55:55 [INFO]   19. group_0021
+13:55:55 [INFO]   20. group_0022
+13:55:55 [INFO]   21. group_0023
+13:55:55 [INFO]   22. group_0024
+13:55:55 [INFO]   23. group_0025
+13:55:55 [INFO]   24. group_0026
+13:55:55 [INFO]   25. group_0027
+13:55:55 [INFO]   26. group_0028
+13:55:55 [INFO]   27. group_0029
+13:55:55 [INFO]   28. group_0031
+13:55:55 [INFO]   29. group_0032
+13:55:55 [INFO]   30. group_0033
+13:55:55 [INFO]   31. group_0034
+13:55:55 [INFO]   32. group_0035
+13:55:55 [INFO]   33. group_0036
+13:55:55 [INFO]   34. group_0037
+13:55:55 [INFO]   35. group_0040
+13:55:55 [INFO]   36. group_0043
+13:55:55 [INFO]   37. group_0044
+13:55:55 [INFO]   38. group_0045
+13:55:55 [INFO]   39. group_0046
+13:55:55 [INFO]   40. group_0048
+13:55:55 [INFO]   41. group_0051
+13:55:55 [INFO]   42. group_0052
+13:55:55 [INFO]   43. group_0056
+13:55:55 [INFO]   44. group_0011
+13:55:55 [INFO]   45. group_0038
+13:55:55 [INFO]   46. group_0057
+13:55:55 [INFO]   47. group_0030
+13:55:55 [INFO]   48. group_0042
+13:55:55 [INFO]   49. group_0041
+13:55:55 [INFO]   50. group_0049
+13:55:55 [INFO]   51. group_0058
+13:55:55 [INFO]   52. group_0039
+13:55:55 [INFO]   53. group_0018
+13:55:55 [INFO]   54. group_0047
+13:55:55 [INFO]   55. group_0050
+13:55:55 [INFO]   56. group_0053
+13:55:55 [INFO]   57. group_0054
+13:55:55 [INFO]   58. group_0055
+13:55:55 [INFO] Graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260525_174402/graph  (48 file(s))
