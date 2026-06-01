@@ -373,15 +373,12 @@ def step_split_hunks() -> None:
 def _run_ddmin_subprocess(
     pending: list[str],
     committed_paths: list[str],
-    iteration: int,
-    append_log: bool = False,
 ) -> tuple[list[str] | None, int, int]:
     """
     Run group.py (ddmin) on *pending* and return (group, invocations, duration_ms).
     group is None if ddmin found nothing buildable.
     """
     iter_start = int(time.time() * 1000)
-    invocations_log = LOGGING_DIR / f"iter_{iteration}_invocations.log"
 
     committed_args = ["--committed", *committed_paths, "--"] if committed_paths else []
     proc = subprocess.Popen(
@@ -399,10 +396,6 @@ def _run_ddmin_subprocess(
         stderr_lines.append(line)
     stdout_output = proc.stdout.read()
     proc.wait()
-
-    mode = "a" if append_log else "w"
-    with open(invocations_log, mode) as f:
-        f.write("".join(stderr_lines))
 
     invocations = sum(1 for line in stderr_lines if "test" in line)
     duration_ms = int(time.time() * 1000) - iter_start
@@ -433,7 +426,7 @@ def step_find_group() -> None:
     committed_paths = [h for group in state["committed_groups"] for h in group]
 
     group, invocations, iter_duration = _run_ddmin_subprocess(
-        pending, committed_paths, iteration,
+        pending, committed_paths,
     )
 
     # ── Shared outcome handling ───────────────────────────────────────────────
@@ -668,23 +661,36 @@ def step_analyze_deps(run_dir_override: str | None = None) -> None:
     edges = build_dep_graph(group_patches)
     order = topological_order(len(group_patches), edges)
 
+    log_lines: list[str] = []
+
     if not edges:
-        log_info("Dependency graph: no def-use edges found — all groups are independent.")
+        msg = "Dependency graph: no def-use edges found — all groups are independent."
+        log_info(msg)
+        log_lines.append(msg)
     else:
         seen: set[tuple[int, int, str]] = set()
-        log_info(f"Dependency graph ({len(edges)} edge(s)):")
+        header = f"Dependency graph ({len(edges)} edge(s)):"
+        log_info(header)
+        log_lines.append(header)
         for from_idx, to_idx, sym in edges:
             key = (from_idx, to_idx, sym)
             if key not in seen:
                 seen.add(key)
-                log_info(f"  group_{from_idx + 1:04d}  --({sym})-->  group_{to_idx + 1:04d}")
+                line = f"  group_{from_idx + 1:04d}  --({sym})-->  group_{to_idx + 1:04d}"
+                log_info(line)
+                log_lines.append(line)
 
-    log_info("Suggested commit order:")
+    order_header = "Suggested commit order:"
+    log_info(order_header)
+    log_lines.append(order_header)
     for rank, idx in enumerate(order, start=1):
-        log_info(f"  {rank}. group_{idx + 1:04d}")
+        line = f"  {rank}. group_{idx + 1:04d}"
+        log_info(line)
+        log_lines.append(line)
 
     graph_dir, n_files = _write_graph_dir(groups_dir, group_patches, edges, order)
     log_info(f"Graph folder written → {graph_dir}  ({n_files} file(s))")
+    (graph_dir / "dep_graph.log").write_text("\n".join(log_lines) + "\n")
 
 # endregion
 

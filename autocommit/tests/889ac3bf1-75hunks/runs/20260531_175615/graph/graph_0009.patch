@@ -1,0 +1,722 @@
+diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
+index d222c10..ded42c4 100644
+--- a/src/CommandLine/Core/OptionMapper.cs
++++ b/src/CommandLine/Core/OptionMapper.cs
+@@ -30 +30 @@ namespace CommandLine.Core
+-                            var values = new HashSet<string>();
++                            var values = new List<string>();
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -27 +27 @@ namespace CommandLine
+-        private bool enableDashDash;
++        private Maybe<bool> enableDashDash;
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -29 +29,3 @@ namespace CommandLine
+-        private bool allowMultiInstance;
++        private Maybe<bool> allowMultiInstance;
++        private bool getoptMode;
++        private Maybe<bool> posixlyCorrect;
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -166,2 +168,2 @@ namespace CommandLine
+-            get { return enableDashDash; }
+-            set { PopsicleSetter.Set(Consumed, ref enableDashDash, value); }
++            get => enableDashDash.MatchJust(out bool value) ? value : getoptMode;
++            set => PopsicleSetter.Set(Consumed, ref enableDashDash, Maybe.Just(value));
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -185,2 +187,21 @@ namespace CommandLine
+-            get => allowMultiInstance;
+-            set => PopsicleSetter.Set(Consumed, ref allowMultiInstance, value);
++            get => allowMultiInstance.MatchJust(out bool value) ? value : getoptMode;
++            set => PopsicleSetter.Set(Consumed, ref allowMultiInstance, Maybe.Just(value));
++        }
++
++        /// <summary>
++        /// Whether strict getopt-like processing is applied to option values; if true, AllowMultiInstance and EnableDashDash will default to true as well.
++        /// </summary>
++        public bool GetoptMode
++        {
++            get => getoptMode;
++            set => PopsicleSetter.Set(Consumed, ref getoptMode, value);
++        }
++
++        /// <summary>
++        /// Whether getopt-like processing should follow the POSIX rules (the equivalent of using the "+" prefix in the C getopt() call).
++        /// If not explicitly set, will default to false unless the POSIXLY_CORRECT environment variable is set, in which case it will default to true.
++        /// </summary>
++        public bool PosixlyCorrect
++        {
++            get => posixlyCorrect.MapValueOrDefault(val => val, () => Environment.GetEnvironmentVariable("POSIXLY_CORRECT").ToBooleanLoose());
++            set => PopsicleSetter.Set(Consumed, ref posixlyCorrect, Maybe.Just(value));
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index ee69373..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -48,0 +49,8 @@ namespace CommandLine.Core
++        private static Maybe<object> ChangeTypeFlagCounter(IEnumerable<string> values, Type conversionType, CultureInfo conversionCulture, bool ignoreValueCase)
++        {
++            var converted = values.Select(value => ChangeTypeScalar(value, typeof(bool), conversionCulture, ignoreValueCase));
++            return converted.Any(maybe => maybe.MatchNothing())
++                ? Maybe.Nothing<object>()
++                : Maybe.Just((object)converted.Count(value => value.IsJust()));
++        }
++
+diff --git a/src/CommandLine/Core/GetoptTokenizer.cs b/src/CommandLine/Core/GetoptTokenizer.cs
+new file mode 100644
+index 0000000..b8c97fc
+--- /dev/null
++++ b/src/CommandLine/Core/GetoptTokenizer.cs
+@@ -0,0 +1,228 @@
++﻿// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using CommandLine.Infrastructure;
++using CSharpx;
++using RailwaySharp.ErrorHandling;
++using System.Text.RegularExpressions;
++
++namespace CommandLine.Core
++{
++    static class GetoptTokenizer
++    {
++        public static Result<IEnumerable<Token>, Error> Tokenize(
++            IEnumerable<string> arguments,
++            Func<string, NameLookupResult> nameLookup)
++        {
++            return GetoptTokenizer.Tokenize(arguments, nameLookup, ignoreUnknownArguments:false, allowDashDash:true, posixlyCorrect:false);
++        }
++
++        public static Result<IEnumerable<Token>, Error> Tokenize(
++            IEnumerable<string> arguments,
++            Func<string, NameLookupResult> nameLookup,
++            bool ignoreUnknownArguments,
++            bool allowDashDash,
++            bool posixlyCorrect)
++        {
++            var errors = new List<Error>();
++            Action<string> onBadFormatToken = arg => errors.Add(new BadFormatTokenError(arg));
++            Action<string> unknownOptionError = name => errors.Add(new UnknownOptionError(name));
++            Action<string> doNothing = name => {};
++            Action<string> onUnknownOption = ignoreUnknownArguments ? doNothing : unknownOptionError;
++
++            int consumeNext = 0;
++            Action<int> onConsumeNext = (n => consumeNext = consumeNext + n);
++            bool forceValues = false;
++
++            var tokens = new List<Token>();
++
++            var enumerator = arguments.GetEnumerator();
++            while (enumerator.MoveNext())
++            {
++                switch (enumerator.Current) {
++                    case null:
++                        break;
++
++                    case string arg when forceValues:
++                        tokens.Add(Token.ValueForced(arg));
++                        break;
++
++                    case string arg when consumeNext > 0:
++                        tokens.Add(Token.Value(arg));
++                        consumeNext = consumeNext - 1;
++                        break;
++
++                    case "--" when allowDashDash:
++                        forceValues = true;
++                        break;
++
++                    case "--":
++                        tokens.Add(Token.Value("--"));
++                        if (posixlyCorrect) forceValues = true;
++                        break;
++
++                    case "-":
++                        // A single hyphen is always a value (it usually means "read from stdin" or "write to stdout")
++                        tokens.Add(Token.Value("-"));
++                        if (posixlyCorrect) forceValues = true;
++                        break;
++
++                    case string arg when arg.StartsWith("--"):
++                        tokens.AddRange(TokenizeLongName(arg, nameLookup, onBadFormatToken, onUnknownOption, onConsumeNext));
++                        break;
++
++                    case string arg when arg.StartsWith("-"):
++                        tokens.AddRange(TokenizeShortName(arg, nameLookup, onUnknownOption, onConsumeNext));
++                        break;
++
++                    case string arg:
++                        // If we get this far, it's a plain value
++                        tokens.Add(Token.Value(arg));
++                        if (posixlyCorrect) forceValues = true;
++                        break;
++                }
++            }
++
++            return Result.Succeed<IEnumerable<Token>, Error>(tokens.AsEnumerable(), errors.AsEnumerable());
++        }
++
++        public static Result<IEnumerable<Token>, Error> ExplodeOptionList(
++            Result<IEnumerable<Token>, Error> tokenizerResult,
++            Func<string, Maybe<char>> optionSequenceWithSeparatorLookup)
++        {
++            var tokens = tokenizerResult.SucceededWith().Memoize();
++
++            var exploded = new List<Token>(tokens is ICollection<Token> coll ? coll.Count : tokens.Count());
++            var nothing = Maybe.Nothing<char>();  // Re-use same Nothing instance for efficiency
++            var separator = nothing;
++            foreach (var token in tokens) {
++                if (token.IsName()) {
++                    separator = optionSequenceWithSeparatorLookup(token.Text);
++                    exploded.Add(token);
++                } else {
++                    // Forced values are never considered option values, so they should not be split
++                    if (separator.MatchJust(out char sep) && sep != '\0' && !token.IsValueForced()) {
++                        if (token.Text.Contains(sep)) {
++                            exploded.AddRange(token.Text.Split(sep).Select(Token.ValueFromSeparator));
++                        } else {
++                            exploded.Add(token);
++                        }
++                    } else {
++                        exploded.Add(token);
++                    }
++                    separator = nothing;  // Only first value after a separator can possibly be split
++                }
++            }
++            return Result.Succeed(exploded as IEnumerable<Token>, tokenizerResult.SuccessMessages());
++        }
++
++        public static Func<
++                    IEnumerable<string>,
++                    IEnumerable<OptionSpecification>,
++                    Result<IEnumerable<Token>, Error>>
++            ConfigureTokenizer(
++                    StringComparer nameComparer,
++                    bool ignoreUnknownArguments,
++                    bool enableDashDash,
++                    bool posixlyCorrect)
++        {
++            return (arguments, optionSpecs) =>
++                {
++                    var tokens = GetoptTokenizer.Tokenize(arguments, name => NameLookup.Contains(name, optionSpecs, nameComparer), ignoreUnknownArguments, enableDashDash, posixlyCorrect);
++                    var explodedTokens = GetoptTokenizer.ExplodeOptionList(tokens, name => NameLookup.HavingSeparator(name, optionSpecs, nameComparer));
++                    return explodedTokens;
++                };
++        }
++
++        private static IEnumerable<Token> TokenizeShortName(
++            string arg,
++            Func<string, NameLookupResult> nameLookup,
++            Action<string> onUnknownOption,
++            Action<int> onConsumeNext)
++        {
++
++            // First option char that requires a value means we swallow the rest of the string as the value
++            // But if there is no rest of the string, then instead we swallow the next argument
++            string chars = arg.Substring(1);
++            int len = chars.Length;
++            if (len > 0 && Char.IsDigit(chars[0]))
++            {
++                // Assume it's a negative number
++                yield return Token.Value(arg);
++                yield break;
++            }
++            for (int i = 0; i < len; i++)
++            {
++                var s = new String(chars[i], 1);
++                switch(nameLookup(s))
++                {
++                    case NameLookupResult.OtherOptionFound:
++                        yield return Token.Name(s);
++
++                        if (i+1 < len)
++                        {
++                            // Rest of this is the value (e.g. "-sfoo" where "-s" is a string-consuming arg)
++                            yield return Token.Value(chars.Substring(i+1));
++                            yield break;
++                        }
++                        else
++                        {
++                            // Value is in next param (e.g., "-s foo")
++                            onConsumeNext(1);
++                        }
++                        break;
++
++                    case NameLookupResult.NoOptionFound:
++                        onUnknownOption(s);
++                        break;
++
++                    default:
++                        yield return Token.Name(s);
++                        break;
++                }
++            }
++        }
++
++        private static IEnumerable<Token> TokenizeLongName(
++            string arg,
++            Func<string, NameLookupResult> nameLookup,
++            Action<string> onBadFormatToken,
++            Action<string> onUnknownOption,
++            Action<int> onConsumeNext)
++        {
++            string[] parts = arg.Substring(2).Split(new char[] { '=' }, 2);
++            string name = parts[0];
++            string value = (parts.Length > 1) ? parts[1] : null;
++            // A parameter like "--stringvalue=" is acceptable, and makes stringvalue be the empty string
++            if (String.IsNullOrWhiteSpace(name) || name.Contains(" "))
++            {
++                onBadFormatToken(arg);
++                yield break;
++            }
++            switch(nameLookup(name))
++            {
++                case NameLookupResult.NoOptionFound:
++                    onUnknownOption(name);
++                    yield break;
++
++                case NameLookupResult.OtherOptionFound:
++                    yield return Token.Name(name);
++                    if (value == null) // NOT String.IsNullOrEmpty
++                    {
++                        onConsumeNext(1);
++                    }
++                    else
++                    {
++                        yield return Token.Value(value);
++                    }
++                    break;
++
++                default:
++                    yield return Token.Name(name);
++                    break;
++            }
++        }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/GetoptParserTests.cs b/tests/CommandLine.Tests/Unit/GetoptParserTests.cs
+new file mode 100644
+index 0000000..cd2a157
+--- /dev/null
++++ b/tests/CommandLine.Tests/Unit/GetoptParserTests.cs
+@@ -0,0 +1,284 @@
++using System;
++using Xunit;
++using FluentAssertions;
++using CommandLine.Core;
++using CommandLine.Tests.Fakes;
++using System.IO;
++using System.Linq;
++using System.Collections.Generic;
++
++namespace CommandLine.Tests.Unit
++{
++    public class GetoptParserTests
++    {
++        public GetoptParserTests()
++        {
++        }
++
++        public class SimpleArgsData : TheoryData<string[], Simple_Options_WithExtraArgs>
++        {
++            public SimpleArgsData()
++            {
++                // Options and values can be mixed by default
++                Add(new string [] { "--stringvalue=foo", "-x", "256" },
++                    new Simple_Options_WithExtraArgs {
++                        IntSequence = Enumerable.Empty<int>(),
++                        ShortAndLong = null,
++                        StringValue = "foo",
++                        BoolValue = true,
++                        LongValue = 256,
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                Add(new string [] { "256", "--stringvalue=foo", "-x" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        IntSequence = Enumerable.Empty<int>(),
++                        BoolValue = true,
++                        LongValue = 256,
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                Add(new string [] {"--stringvalue=foo", "256", "-x" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        IntSequence = Enumerable.Empty<int>(),
++                        BoolValue = true,
++                        LongValue = 256,
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++
++                // Sequences end at first non-value arg even if they haven't yet consumed their max
++                Add(new string [] {"--stringvalue=foo", "-i1", "2", "3", "-x", "256" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        IntSequence = new[] { 1, 2, 3 },
++                        BoolValue = true,
++                        LongValue = 256,
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                // Sequences also end after consuming their max even if there would be more parameters
++                Add(new string [] {"--stringvalue=foo", "-i1", "2", "3", "4", "256", "-x" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        IntSequence = new[] { 1, 2, 3, 4 },
++                        BoolValue = true,
++                        LongValue = 256,
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++
++                // The special -- option, if not consumed, turns off further option processing
++                Add(new string [] {"--stringvalue", "foo", "256", "-x", "-sbar" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = "bar",
++                        BoolValue = true,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                Add(new string [] {"--stringvalue", "foo", "--", "256", "-x", "-sbar" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        BoolValue = false,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = new [] { "-x", "-sbar" },
++                    });
++
++                // But if -- is specified as a value following an equal sign, it has no special meaning
++                Add(new string [] {"--stringvalue=--", "256", "-x", "-sbar" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "--",
++                        ShortAndLong = "bar",
++                        BoolValue = true,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++
++                // Options that take values will take the next arg whatever it looks like
++                Add(new string [] {"--stringvalue", "-x", "256" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "-x",
++                        BoolValue = false,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                Add(new string [] {"--stringvalue", "-x", "-x", "256" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "-x",
++                        BoolValue = true,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++
++                // That applies even if the next arg is -- which would normally stop option processing: if it's after an option that takes a value, it's consumed as the value
++                Add(new string [] {"--stringvalue", "--", "256", "-x", "-sbar" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "--",
++                        ShortAndLong = "bar",
++                        BoolValue = true,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++
++                // Options that take values will not swallow the next arg if a value was specified with =
++                Add(new string [] {"--stringvalue=-x", "256" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "-x",
++                        BoolValue = false,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                Add(new string [] {"--stringvalue=-x", "-x", "256" },
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "-x",
++                        BoolValue = true,
++                        LongValue = 256,
++                        IntSequence = Enumerable.Empty<int>(),
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++            }
++        }
++
++        [Theory]
++        [ClassData(typeof(SimpleArgsData))]
++        public void Getopt_parser_without_posixly_correct_allows_mixed_options_and_nonoptions(string[] args, Simple_Options_WithExtraArgs expected)
++        {
++            // Arrange
++            var sut = new Parser(config => {
++                config.GetoptMode = true;
++                config.PosixlyCorrect = false;
++            });
++
++            // Act
++            var result = sut.ParseArguments<Simple_Options_WithExtraArgs>(args);
++
++            // Assert
++            if (result is Parsed<Simple_Options_WithExtraArgs> parsed) {
++                parsed.Value.Should().BeEquivalentTo(expected);
++            } else if (result is NotParsed<Simple_Options_WithExtraArgs> notParsed) {
++                Console.WriteLine(String.Join(", ", notParsed.Errors.Select(err => err.Tag.ToString())));
++            }
++            result.Should().BeOfType<Parsed<Simple_Options_WithExtraArgs>>();
++            result.As<Parsed<Simple_Options_WithExtraArgs>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        public class SimpleArgsDataWithPosixlyCorrect : TheoryData<string[], Simple_Options_WithExtraArgs>
++        {
++            public SimpleArgsDataWithPosixlyCorrect()
++            {
++                Add(new string [] { "--stringvalue=foo", "-x", "256" },
++                    // Parses all options
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        IntSequence = Enumerable.Empty<int>(),
++                        BoolValue = true,
++                        LongValue = 256,
++                        ExtraArgs = Enumerable.Empty<string>(),
++                    });
++                Add(new string [] { "256", "--stringvalue=foo", "-x" },
++                    // Stops parsing after "256", so StringValue and BoolValue not set
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = null,
++                        ShortAndLong = null,
++                        IntSequence = Enumerable.Empty<int>(),
++                        BoolValue = false,
++                        LongValue = 256,
++                        ExtraArgs = new string[] { "--stringvalue=foo", "-x" },
++                    });
++                Add(new string [] {"--stringvalue=foo", "256", "-x" },
++                    // Stops parsing after "256", so StringValue is set but BoolValue is not
++                    new Simple_Options_WithExtraArgs {
++                        StringValue = "foo",
++                        ShortAndLong = null,
++                        IntSequence = Enumerable.Empty<int>(),
++                        BoolValue = false,
++                        LongValue = 256,
++                        ExtraArgs = new string[] { "-x" },
++                    });
++            }
++        }
++
++        [Theory]
++        [ClassData(typeof(SimpleArgsDataWithPosixlyCorrect))]
++        public void Getopt_parser_with_posixly_correct_stops_parsing_at_first_nonoption(string[] args, Simple_Options_WithExtraArgs expected)
++        {
++            // Arrange
++            var sut = new Parser(config => {
++                config.GetoptMode = true;
++                config.PosixlyCorrect = true;
++                config.EnableDashDash = true;
++            });
++
++            // Act
++            var result = sut.ParseArguments<Simple_Options_WithExtraArgs>(args);
++
++            // Assert
++            result.Should().BeOfType<Parsed<Simple_Options_WithExtraArgs>>();
++            result.As<Parsed<Simple_Options_WithExtraArgs>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        [Fact]
++        public void Getopt_mode_defaults_to_EnableDashDash_being_true()
++        {
++            // Arrange
++            var sut = new Parser(config => {
++                config.GetoptMode = true;
++                config.PosixlyCorrect = false;
++            });
++            var args = new string [] {"--stringvalue", "foo", "256", "--", "-x", "-sbar" };
++            var expected = new Simple_Options_WithExtraArgs {
++                    StringValue = "foo",
++                    ShortAndLong = null,
++                    BoolValue = false,
++                    LongValue = 256,
++                    IntSequence = Enumerable.Empty<int>(),
++                    ExtraArgs = new [] { "-x", "-sbar" },
++                };
++
++            // Act
++            var result = sut.ParseArguments<Simple_Options_WithExtraArgs>(args);
++
++            // Assert
++            result.Should().BeOfType<Parsed<Simple_Options_WithExtraArgs>>();
++            result.As<Parsed<Simple_Options_WithExtraArgs>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        [Fact]
++        public void Getopt_mode_can_have_EnableDashDash_expicitly_disabled()
++        {
++            // Arrange
++            var sut = new Parser(config => {
++                config.GetoptMode = true;
++                config.PosixlyCorrect = false;
++                config.EnableDashDash = false;
++            });
++            var args = new string [] {"--stringvalue", "foo", "256", "--", "-x", "-sbar" };
++            var expected = new Simple_Options_WithExtraArgs {
++                    StringValue = "foo",
++                    ShortAndLong = "bar",
++                    BoolValue = true,
++                    LongValue = 256,
++                    IntSequence = Enumerable.Empty<int>(),
++                    ExtraArgs = new [] { "--" },
++                };
++
++            // Act
++            var result = sut.ParseArguments<Simple_Options_WithExtraArgs>(args);
++
++            // Assert
++            result.Should().BeOfType<Parsed<Simple_Options_WithExtraArgs>>();
++            result.As<Parsed<Simple_Options_WithExtraArgs>>().Value.Should().BeEquivalentTo(expected);
++        }
++    }
++}
+diff --git a/src/CommandLine/Core/Tokenizer.cs b/src/CommandLine/Core/Tokenizer.cs
+index e35edc9..b71ec7e 100644
+--- a/src/CommandLine/Core/Tokenizer.cs
++++ b/src/CommandLine/Core/Tokenizer.cs
+@@ -65,13 +65,22 @@ namespace CommandLine.Core
+-            var replaces = tokens.Select((t, i) =>
+-                optionSequenceWithSeparatorLookup(t.Text)
+-                    .MapValueOrDefault(sep => Tuple.Create(i + 1, sep),
+-                        Tuple.Create(-1, '\0'))).SkipWhile(x => x.Item1 < 0).Memoize();
+-
+-            var exploded = tokens.Select((t, i) =>
+-                        replaces.FirstOrDefault(x => x.Item1 == i).ToMaybe()
+-                            .MapValueOrDefault(r => t.Text.Split(r.Item2).Select(Token.Value),
+-                                Enumerable.Empty<Token>().Concat(new[] { t })));
+-
+-            var flattened = exploded.SelectMany(x => x);
+-
+-            return Result.Succeed(flattened, tokenizerResult.SuccessMessages());
++            var exploded = new List<Token>(tokens is ICollection<Token> coll ? coll.Count : tokens.Count());
++            var nothing = Maybe.Nothing<char>();  // Re-use same Nothing instance for efficiency
++            var separator = nothing;
++            foreach (var token in tokens) {
++                if (token.IsName()) {
++                    separator = optionSequenceWithSeparatorLookup(token.Text);
++                    exploded.Add(token);
++                } else {
++                    // Forced values are never considered option values, so they should not be split
++                    if (separator.MatchJust(out char sep) && sep != '\0' && !token.IsValueForced()) {
++                        if (token.Text.Contains(sep)) {
++                            exploded.AddRange(token.Text.Split(sep).Select(Token.ValueFromSeparator));
++                        } else {
++                            exploded.Add(token);
++                        }
++                    } else {
++                        exploded.Add(token);
++                    }
++                    separator = nothing;  // Only first value after a separator can possibly be split
++                }
++            }
++            return Result.Succeed(exploded as IEnumerable<Token>, tokenizerResult.SuccessMessages());
+diff --git a/src/CommandLine/Core/InstanceBuilder.cs b/src/CommandLine/Core/InstanceBuilder.cs
+index ffd6250..f48127b 100644
+--- a/src/CommandLine/Core/InstanceBuilder.cs
++++ b/src/CommandLine/Core/InstanceBuilder.cs
+@@ -91 +91 @@ namespace CommandLine.Core
+-                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, parsingCulture, ignoreValueCase),
++                        (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, parsingCulture, ignoreValueCase),
+diff --git a/src/CommandLine/Core/InstanceBuilder.cs b/src/CommandLine/Core/InstanceBuilder.cs
+index ffd6250..f48127b 100644
+--- a/src/CommandLine/Core/InstanceBuilder.cs
++++ b/src/CommandLine/Core/InstanceBuilder.cs
+@@ -98 +98 @@ namespace CommandLine.Core
+-                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, parsingCulture, ignoreValueCase));
++                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, false, parsingCulture, ignoreValueCase));
+diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
+index d222c10..ded42c4 100644
+--- a/src/CommandLine/Core/OptionMapper.cs
++++ b/src/CommandLine/Core/OptionMapper.cs
+@@ -18 +18 @@ namespace CommandLine.Core
+-                Func<IEnumerable<string>, Type, bool, Maybe<object>> converter,
++                Func<IEnumerable<string>, Type, bool, bool, Maybe<object>> converter,
+diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
+index d222c10..ded42c4 100644
+--- a/src/CommandLine/Core/OptionMapper.cs
++++ b/src/CommandLine/Core/OptionMapper.cs
+@@ -39 +39,3 @@ namespace CommandLine.Core
+-                            return converter(values, pt.Property.PropertyType, pt.Specification.TargetType != TargetType.Sequence)
++                            bool isFlag = pt.Specification.Tag == SpecificationType.Option && ((OptionSpecification)pt.Specification).FlagCounter;
++
++                            return converter(values, isFlag ? typeof(bool) : pt.Property.PropertyType, pt.Specification.TargetType != TargetType.Sequence, isFlag)
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index ee69373..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -16 +16 @@ namespace CommandLine.Core
+-        public static Maybe<object> ChangeType(IEnumerable<string> values, Type conversionType, bool scalar, CultureInfo conversionCulture, bool ignoreValueCase)
++        public static Maybe<object> ChangeType(IEnumerable<string> values, Type conversionType, bool scalar, bool isFlag, CultureInfo conversionCulture, bool ignoreValueCase)
+diff --git a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+index 63bf22f..0a948ce 100644
+--- a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+@@ -40 +40 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),
+diff --git a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+index 63bf22f..0a948ce 100644
+--- a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+@@ -75 +75 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),
+diff --git a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+index 63bf22f..0a948ce 100644
+--- a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+@@ -104 +104 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),
+diff --git a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+index dc16dfd..c3e9378 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+@@ -30 +30 @@ namespace CommandLine.Tests.Unit.Core
+-            Maybe<object> result = TypeConverter.ChangeType(new[] {testValue}, destinationType, true, CultureInfo.InvariantCulture, true);
++            Maybe<object> result = TypeConverter.ChangeType(new[] {testValue}, destinationType, true, false, CultureInfo.InvariantCulture, true);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+index dc16dfd..c3e9378 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+@@ -128 +128 @@ namespace CommandLine.Tests.Unit.Core
+-            var result = TypeConverter.ChangeType(values, typeof(int), true, CultureInfo.InvariantCulture, true);
++            var result = TypeConverter.ChangeType(values, typeof(int), true, false, CultureInfo.InvariantCulture, true);
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index ee69373..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -18,3 +18,5 @@ namespace CommandLine.Core
+-            return scalar
+-                ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
+-                : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);
++            return isFlag
++                ? ChangeTypeFlagCounter(values, conversionType, conversionCulture, ignoreValueCase)
++                : scalar
++                    ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
++                    : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);

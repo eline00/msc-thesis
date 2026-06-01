@@ -1,0 +1,185 @@
+Dependency graph (125 edge(s)):
+  group_0001  --(fromSeparator)-->  group_0003
+  group_0001  --(fromSeparator)-->  group_0004
+  group_0001  --(fromSeparator)-->  group_0022
+  group_0005  --(IsValueFromSeparator)-->  group_0011
+  group_0006  --(separatorSeen)-->  group_0007
+  group_0006  --(separatorSeen)-->  group_0008
+  group_0006  --(separatorSeen)-->  group_0009
+  group_0006  --(separatorSeen)-->  group_0010
+  group_0006  --(separatorSeen)-->  group_0011
+  group_0006  --(separatorSeen)-->  group_0035
+  group_0012  --(ToBooleanLoose)-->  group_0038
+  group_0014  --(ChangeTypeFlagCounter)-->  group_0057
+  group_0016  --(flagCounter)-->  group_0013
+  group_0016  --(flagCounter)-->  group_0021
+  group_0016  --(flagCounter)-->  group_0023
+  group_0016  --(flagCounter)-->  group_0024
+  group_0016  --(flagCounter)-->  group_0033
+  group_0016  --(flagCounter)-->  group_0043
+  group_0018  --(Options_For_Issue_619)-->  group_0047
+  group_0018  --(Ignores)-->  group_0047
+  group_0018  --(Excluded)-->  group_0047
+  group_0018  --(ModuleDirs)-->  group_0047
+  group_0018  --(OutDir)-->  group_0047
+  group_0018  --(Options_For_Issue_510)-->  group_0047
+  group_0018  --(Mode)-->  group_0047
+  group_0018  --(Options_For_Issue_91)-->  group_0047
+  group_0018  --(Options_For_Issue_454)-->  group_0047
+  group_0018  --(FMode)-->  group_0047
+  group_0018  --(Files)-->  group_0047
+  group_0018  --(Included)-->  group_0047
+  group_0018  --(InputFileName)-->  group_0047
+  group_0018  --(Options_For_Issue_617)-->  group_0047
+  group_0018  --(Srcs)-->  group_0047
+  group_0018  --(ArchivePath)-->  group_0047
+  group_0018  --(Channels)-->  group_0047
+  group_0018  --(Verbose)-->  group_0050
+  group_0018  --(Verbose)-->  group_0053
+  group_0019  --(Profile)-->  group_0047
+  group_0019  --(Options_With_Similar_Names)-->  group_0047
+  group_0019  --(Options_With_Similar_Names_And_Separator)-->  group_0047
+  group_0019  --(ConfigureProfile)-->  group_0047
+  group_0019  --(Deploys)-->  group_0047
+  group_0020  --(values)-->  group_0014
+  group_0020  --(values)-->  group_0030
+  group_0020  --(values)-->  group_0038
+  group_0020  --(values)-->  group_0041
+  group_0020  --(values)-->  group_0042
+  group_0020  --(values)-->  group_0056
+  group_0020  --(values)-->  group_0057
+  group_0021  --(flagCounter)-->  group_0013
+  group_0021  --(flagCounter)-->  group_0016
+  group_0021  --(flagCounter)-->  group_0023
+  group_0021  --(flagCounter)-->  group_0024
+  group_0021  --(flagCounter)-->  group_0033
+  group_0021  --(flagCounter)-->  group_0043
+  group_0022  --(ValueFromSeparator)-->  group_0030
+  group_0022  --(ValueFromSeparator)-->  group_0042
+  group_0030  --(separator)-->  group_0004
+  group_0030  --(separator)-->  group_0011
+  group_0030  --(GetoptTokenizer)-->  group_0039
+  group_0030  --(separator)-->  group_0042
+  group_0030  --(exploded)-->  group_0042
+  group_0030  --(tokens)-->  group_0042
+  group_0030  --(nothing)-->  group_0042
+  group_0030  --(tokens)-->  group_0047
+  group_0030  --(GetoptTokenizer)-->  group_0054
+  group_0030  --(ExplodeOptionList)-->  group_0054
+  group_0030  --(errors)-->  group_0054
+  group_0030  --(Tokenize)-->  group_0054
+  group_0030  --(tokens)-->  group_0054
+  group_0032  --(ShortAndLong)-->  group_0041
+  group_0032  --(Simple_Options_WithExtraArgs)-->  group_0041
+  group_0032  --(IntSequence)-->  group_0041
+  group_0032  --(LongValue)-->  group_0041
+  group_0032  --(ExtraArgs)-->  group_0041
+  group_0032  --(StringValue)-->  group_0041
+  group_0032  --(BoolValue)-->  group_0041
+  group_0038  --(posixlyCorrect)-->  group_0030
+  group_0038  --(enableDashDash)-->  group_0030
+  group_0038  --(getoptMode)-->  group_0040
+  group_0038  --(allowMultiInstance)-->  group_0040
+  group_0038  --(posixlyCorrect)-->  group_0040
+  group_0038  --(enableDashDash)-->  group_0040
+  group_0041  --(expected)-->  group_0047
+  group_0041  --(sut)-->  group_0047
+  group_0041  --(expected)-->  group_0049
+  group_0041  --(sut)-->  group_0053
+  group_0042  --(separator)-->  group_0004
+  group_0042  --(separator)-->  group_0011
+  group_0042  --(separator)-->  group_0030
+  group_0042  --(exploded)-->  group_0030
+  group_0042  --(nothing)-->  group_0030
+  group_0047  --(tokenizerResult)-->  group_0030
+  group_0047  --(tokens)-->  group_0030
+  group_0047  --(expected)-->  group_0041
+  group_0047  --(sut)-->  group_0041
+  group_0047  --(tokenizerResult)-->  group_0042
+  group_0047  --(tokens)-->  group_0042
+  group_0047  --(expected)-->  group_0049
+  group_0047  --(sut)-->  group_0053
+  group_0047  --(tokens)-->  group_0054
+  group_0048  --(Option_FlagCounter)-->  group_0049
+  group_0048  --(VerboseLevel)-->  group_0049
+  group_0049  --(options)-->  group_0041
+  group_0050  --(Verbose)-->  group_0018
+  group_0050  --(Silent)-->  group_0053
+  group_0050  --(Verbose)-->  group_0053
+  group_0050  --(Options_With_FlagCounter_Switches)-->  group_0053
+  group_0053  --(sut)-->  group_0041
+  group_0053  --(sut)-->  group_0047
+  group_0054  --(errors)-->  group_0030
+  group_0054  --(tokens)-->  group_0030
+  group_0054  --(tokens)-->  group_0042
+  group_0054  --(tokens)-->  group_0047
+  group_0054  --(Single_dash_as_a_value)-->  group_0055
+  group_0055  --(Single_dash_as_a_value)-->  group_0054
+  group_0056  --(ChangeType)-->  group_0058
+  group_0058  --(typeof)-->  group_0014
+  group_0058  --(typeof)-->  group_0023
+  group_0058  --(typeof)-->  group_0031
+  group_0058  --(typeof)-->  group_0041
+  group_0058  --(typeof)-->  group_0047
+  group_0058  --(typeof)-->  group_0051
+  group_0058  --(typeof)-->  group_0054
+  group_0058  --(typeof)-->  group_0056
+Suggested commit order:
+  1. group_0001
+  2. group_0002
+  3. group_0005
+  4. group_0006
+  5. group_0012
+  6. group_0015
+  7. group_0017
+  8. group_0019
+  9. group_0020
+  10. group_0025
+  11. group_0026
+  12. group_0027
+  13. group_0028
+  14. group_0029
+  15. group_0032
+  16. group_0034
+  17. group_0036
+  18. group_0037
+  19. group_0044
+  20. group_0045
+  21. group_0046
+  22. group_0048
+  23. group_0052
+  24. group_0003
+  25. group_0022
+  26. group_0007
+  27. group_0008
+  28. group_0009
+  29. group_0010
+  30. group_0035
+  31. group_0038
+  32. group_0040
+  33. group_0004
+  34. group_0011
+  35. group_0013
+  36. group_0014
+  37. group_0016
+  38. group_0018
+  39. group_0021
+  40. group_0023
+  41. group_0024
+  42. group_0030
+  43. group_0031
+  44. group_0033
+  45. group_0039
+  46. group_0041
+  47. group_0042
+  48. group_0043
+  49. group_0047
+  50. group_0049
+  51. group_0050
+  52. group_0051
+  53. group_0053
+  54. group_0054
+  55. group_0055
+  56. group_0056
+  57. group_0057
+  58. group_0058

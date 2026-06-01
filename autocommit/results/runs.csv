@@ -21,3 +21,6 @@ run_id,timestamp,approach,repo,original_branch,tangled_sha,total_hunks,groups_pr
 20260427_204723,2026-04-27 21:11:42,programmatic,commandline,testing,ebc4e971037a16dcd4ca02a7d91294ede5cad57a,75,13,901,1456978,dotnet build --no-restore,
 20260427_211852,2026-04-27 23:00:27,programmatic,commandline,testing,3e5d2a844051902a98ae8931ed0e993f9a5e7627,75,54,3581,6089149,dotnet build --no-restore,
 20260514_132808,2026-05-14 20:32:02,programmatic,commandline,detangling,28883eb63552f77dcd49a081172f50ca27d901f4,75,58,3792,8353332,dotnet build --no-restore,
+20260531_153450,2026-05-31 15:44:14,programmatic,commandline,graph-test,b3d95727cbbf4a093b6b55cbc3e2bdcbb79b499f,75,1,329,549925,dotnet build --no-restore,
+20260531_154630,2026-05-31 17:54:20,programmatic,commandline,graph-test,6cf4dc23a2592a954941c8439bf083fc7301deff,75,33,2960,7277912,dotnet build --no-restore,
+20260531_175615,2026-05-31 20:36:07,programmatic,commandline,graph-test,65aa8ef6f53ab26290eacf23714786993c5006c7,75,58,3806,8681547,dotnet build --no-restore,

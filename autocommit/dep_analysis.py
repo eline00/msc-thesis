@@ -11,6 +11,9 @@ from collections import deque
 # Matches PascalCase identifiers (C# types, methods, properties follow this convention)
 _PASCAL = re.compile(r'\b([A-Z][A-Za-z0-9_]*)\b')
 
+# Matches camelCase identifiers used in added lines (length >= 2 to skip single-letter vars)
+_CAMEL = re.compile(r'\b([a-z][A-Za-z0-9_]+)\b')
+
 # Matches C# member declarations: class/interface/enum/struct/record keywords,
 # or access-modifier-prefixed members where the declared name is PascalCase.
 _DECL = re.compile(
@@ -20,13 +23,29 @@ _DECL = re.compile(
     r'(?:[\w<>\[\],\s]+\s)([A-Z]\w*)\s*[({<;=]'
 )
 
+# Matches camelCase field declarations (access-modifier prefixed) and local var declarations.
+# Covers: "private readonly bool fromSeparator;" and "var separatorSeen = false;"
+_CAMEL_DECL = re.compile(
+    r'(?:(?:public|private|protected|internal|static|virtual|override|'
+    r'abstract|sealed|async|new|partial|readonly)\s+)+'
+    r'(?:[\w<>\[\],\s]+\s)([a-z]\w*)\s*[({;=]'
+    r'|\bvar\s+([a-z]\w*)\s*='
+)
+
 # Well-known BCL / framework names that appear everywhere and produce false edges
 _SKIP: frozenset[str] = frozenset({
+    # PascalCase BCL / framework types
     'String', 'Boolean', 'Int32', 'Int64', 'Double', 'Float', 'Object', 'Void',
     'Task', 'List', 'Dictionary', 'IEnumerable', 'IList', 'IDictionary',
     'Exception', 'Nullable', 'Action', 'Func', 'Type', 'Array', 'Tuple',
     'Console', 'StringBuilder', 'Stream', 'File', 'Path', 'Environment',
     'Result', 'Value', 'Key', 'Index', 'Item', 'Name', 'Id', 'Data',
+    # camelCase C# keywords and ubiquitous locals that produce noise
+    'true', 'false', 'null', 'this', 'base', 'var', 'new', 'void',
+    'get', 'set', 'add', 'remove',
+    'result', 'value', 'key', 'index', 'item', 'name', 'data', 'text',
+    'count', 'size', 'length', 'error', 'message', 'args', 'param',
+    'type', 'obj', 'arg', 'val', 'str', 'ret', 'res', 'tmp', 'temp',
 })
 
 # Drop symbols defined across more than this many groups (same logic as Roslyn approach)
@@ -48,6 +67,10 @@ def _defined_symbols(patch_text: str) -> set[str]:
             name = m.group(1) or m.group(2)
             if name and len(name) >= 3 and name not in _SKIP:
                 names.add(name)
+        for m in _CAMEL_DECL.finditer(line):
+            name = m.group(1) or m.group(2)
+            if name and len(name) >= 3 and name not in _SKIP:
+                names.add(name)
     return names
 
 
@@ -55,6 +78,9 @@ def _used_symbols(patch_text: str) -> set[str]:
     names: set[str] = set()
     for line in _added_lines(patch_text):
         for name in _PASCAL.findall(line):
+            if name not in _SKIP:
+                names.add(name)
+        for name in _CAMEL.findall(line):
             if name not in _SKIP:
                 names.add(name)
     return names
