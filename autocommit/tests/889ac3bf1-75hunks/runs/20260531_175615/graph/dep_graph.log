@@ -17,30 +17,30 @@ Dependency graph (125 edge(s)):
   group_0016  --(flagCounter)-->  group_0024
   group_0016  --(flagCounter)-->  group_0033
   group_0016  --(flagCounter)-->  group_0043
-  group_0018  --(Options_For_Issue_619)-->  group_0047
-  group_0018  --(Ignores)-->  group_0047
-  group_0018  --(Excluded)-->  group_0047
-  group_0018  --(ModuleDirs)-->  group_0047
-  group_0018  --(OutDir)-->  group_0047
-  group_0018  --(Options_For_Issue_510)-->  group_0047
-  group_0018  --(Mode)-->  group_0047
-  group_0018  --(Options_For_Issue_91)-->  group_0047
-  group_0018  --(Options_For_Issue_454)-->  group_0047
   group_0018  --(FMode)-->  group_0047
-  group_0018  --(Files)-->  group_0047
-  group_0018  --(Included)-->  group_0047
-  group_0018  --(InputFileName)-->  group_0047
-  group_0018  --(Options_For_Issue_617)-->  group_0047
-  group_0018  --(Srcs)-->  group_0047
-  group_0018  --(ArchivePath)-->  group_0047
+  group_0018  --(Options_For_Issue_510)-->  group_0047
+  group_0018  --(ModuleDirs)-->  group_0047
   group_0018  --(Channels)-->  group_0047
+  group_0018  --(ArchivePath)-->  group_0047
+  group_0018  --(Options_For_Issue_619)-->  group_0047
+  group_0018  --(Options_For_Issue_91)-->  group_0047
+  group_0018  --(InputFileName)-->  group_0047
+  group_0018  --(Excluded)-->  group_0047
+  group_0018  --(Mode)-->  group_0047
+  group_0018  --(Srcs)-->  group_0047
+  group_0018  --(Included)-->  group_0047
+  group_0018  --(Files)-->  group_0047
+  group_0018  --(OutDir)-->  group_0047
+  group_0018  --(Ignores)-->  group_0047
+  group_0018  --(Options_For_Issue_617)-->  group_0047
+  group_0018  --(Options_For_Issue_454)-->  group_0047
   group_0018  --(Verbose)-->  group_0050
   group_0018  --(Verbose)-->  group_0053
-  group_0019  --(Profile)-->  group_0047
-  group_0019  --(Options_With_Similar_Names)-->  group_0047
   group_0019  --(Options_With_Similar_Names_And_Separator)-->  group_0047
-  group_0019  --(ConfigureProfile)-->  group_0047
+  group_0019  --(Options_With_Similar_Names)-->  group_0047
+  group_0019  --(Profile)-->  group_0047
   group_0019  --(Deploys)-->  group_0047
+  group_0019  --(ConfigureProfile)-->  group_0047
   group_0020  --(values)-->  group_0014
   group_0020  --(values)-->  group_0030
   group_0020  --(values)-->  group_0038
@@ -60,52 +60,52 @@ Dependency graph (125 edge(s)):
   group_0030  --(separator)-->  group_0011
   group_0030  --(GetoptTokenizer)-->  group_0039
   group_0030  --(separator)-->  group_0042
-  group_0030  --(exploded)-->  group_0042
   group_0030  --(tokens)-->  group_0042
   group_0030  --(nothing)-->  group_0042
+  group_0030  --(exploded)-->  group_0042
   group_0030  --(tokens)-->  group_0047
   group_0030  --(GetoptTokenizer)-->  group_0054
-  group_0030  --(ExplodeOptionList)-->  group_0054
   group_0030  --(errors)-->  group_0054
-  group_0030  --(Tokenize)-->  group_0054
   group_0030  --(tokens)-->  group_0054
+  group_0030  --(Tokenize)-->  group_0054
+  group_0030  --(ExplodeOptionList)-->  group_0054
   group_0032  --(ShortAndLong)-->  group_0041
-  group_0032  --(Simple_Options_WithExtraArgs)-->  group_0041
-  group_0032  --(IntSequence)-->  group_0041
+  group_0032  --(BoolValue)-->  group_0041
   group_0032  --(LongValue)-->  group_0041
   group_0032  --(ExtraArgs)-->  group_0041
+  group_0032  --(IntSequence)-->  group_0041
+  group_0032  --(Simple_Options_WithExtraArgs)-->  group_0041
   group_0032  --(StringValue)-->  group_0041
-  group_0032  --(BoolValue)-->  group_0041
   group_0038  --(posixlyCorrect)-->  group_0030
   group_0038  --(enableDashDash)-->  group_0030
-  group_0038  --(getoptMode)-->  group_0040
-  group_0038  --(allowMultiInstance)-->  group_0040
   group_0038  --(posixlyCorrect)-->  group_0040
   group_0038  --(enableDashDash)-->  group_0040
-  group_0041  --(expected)-->  group_0047
+  group_0038  --(allowMultiInstance)-->  group_0040
+  group_0038  --(getoptMode)-->  group_0040
   group_0041  --(sut)-->  group_0047
+  group_0041  --(expected)-->  group_0047
   group_0041  --(expected)-->  group_0049
   group_0041  --(sut)-->  group_0053
   group_0042  --(separator)-->  group_0004
   group_0042  --(separator)-->  group_0011
+  group_0042  --(nothing)-->  group_0030
   group_0042  --(separator)-->  group_0030
   group_0042  --(exploded)-->  group_0030
-  group_0042  --(nothing)-->  group_0030
-  group_0047  --(tokenizerResult)-->  group_0030
   group_0047  --(tokens)-->  group_0030
-  group_0047  --(expected)-->  group_0041
+  group_0047  --(tokenizerResult)-->  group_0030
   group_0047  --(sut)-->  group_0041
-  group_0047  --(tokenizerResult)-->  group_0042
+  group_0047  --(expected)-->  group_0041
   group_0047  --(tokens)-->  group_0042
+  group_0047  --(tokenizerResult)-->  group_0042
   group_0047  --(expected)-->  group_0049
   group_0047  --(sut)-->  group_0053
   group_0047  --(tokens)-->  group_0054
-  group_0048  --(Option_FlagCounter)-->  group_0049
   group_0048  --(VerboseLevel)-->  group_0049
+  group_0048  --(Option_FlagCounter)-->  group_0049
   group_0049  --(options)-->  group_0041
   group_0050  --(Verbose)-->  group_0018
-  group_0050  --(Silent)-->  group_0053
   group_0050  --(Verbose)-->  group_0053
+  group_0050  --(Silent)-->  group_0053
   group_0050  --(Options_With_FlagCounter_Switches)-->  group_0053
   group_0053  --(sut)-->  group_0041
   group_0053  --(sut)-->  group_0047

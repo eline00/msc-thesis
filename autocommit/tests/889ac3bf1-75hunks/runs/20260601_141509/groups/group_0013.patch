@@ -1,0 +1,6 @@
+diff --git a/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs b/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs
+index f14eea5..a489b74 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs
+@@ -127 +127,0 @@ namespace CommandLine.Tests.Unit.Core
+-
