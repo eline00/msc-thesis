@@ -230,80 +230,23 @@ def find_buildable_group(
 
 
 
-def find_buildable_group_clustered(
-    clusters: list[list[str]],
-    build_cmd: str,
-    committed: list[str] | None = None,
-) -> list[list[str]] | None:
-    """
-    Find the minimal buildable set of dep-graph clusters using delta debugging.
-
-    Each cluster is treated as an atomic unit — ddmin will not split within a
-    cluster.  Returns the minimal list of clusters whose combined hunks apply
-    and build, with those hunks left applied in the working tree.
-    """
-    def build_test(candidate_clusters: list[list[str]]) -> bool:
-        hunks = [h for cluster in candidate_clusters for h in cluster]
-        applied = git_apply(hunks, committed=committed)
-        if not applied:
-            git_revert(hunks)
-            log(f"    test {len(candidate_clusters)} cluster(s) ({len(hunks)} hunk(s)) -> fail")
-            return False
-        result = run_build(build_cmd)
-        git_revert(hunks)
-        log(f"    test {len(candidate_clusters)} cluster(s) ({len(hunks)} hunk(s)) -> {'PASS: ' + names([h for c in candidate_clusters for h in c]) if result else 'fail'}")
-        return result
-
-    try:
-        result_clusters = delta_debug(build_test, clusters)
-    except Exception as e:
-        log(f"Delta debugging (clustered) failed: {e}")
-        return None
-
-    all_hunks = [h for c in result_clusters for h in c]
-    try:
-        if not git_apply(all_hunks, committed=committed):
-            log("Failed to apply final clustered group.")
-            return None
-    except Exception as e:
-        log(f"Failed to apply final clustered group: {e}")
-        return None
-
-    return result_clusters
-
-
 if __name__ == "__main__":
     import argparse as _argparse
-    import json as _json
 
     _parser = _argparse.ArgumentParser(prog="group")
     _parser.add_argument("build_cmd")
     _parser.add_argument("--committed", nargs="*", default=[], metavar="HUNK")
-    _parser.add_argument(
-        "--clusters-json", metavar="FILE",
-        help="JSON file listing dep-graph clusters [[hunk,...], ...]; enables cluster-ddmin mode",
-    )
     _parser.add_argument("pending", nargs="*")
     _args = _parser.parse_args()
 
     committed = _args.committed or None
 
     try:
-        if _args.clusters_json:
-            with open(_args.clusters_json) as _f:
-                _clusters = _json.load(_f)
-            result = find_buildable_group_clustered(_clusters, _args.build_cmd, committed)
-            if result is None:
-                sys.exit(1)
-            for _cluster in result:
-                for _path in _cluster:
-                    print(_path)
-        else:
-            result = find_buildable_group(_args.pending, _args.build_cmd, committed)
-            if result is None:
-                sys.exit(1)
-            for _path in result:
-                print(_path)
+        result = find_buildable_group(_args.pending, _args.build_cmd, committed)
+        if result is None:
+            sys.exit(1)
+        for _path in result:
+            print(_path)
     except KeyboardInterrupt:
         print("\n[group] Interrupted.", file=sys.stderr, flush=True)
         sys.exit(130)

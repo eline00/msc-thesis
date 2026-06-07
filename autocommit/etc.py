@@ -406,53 +406,6 @@ def _run_ddmin_subprocess(
     return group, invocations, duration_ms
 
 
-def _run_dep_graph_subprocess(
-    pending: list[str],
-    committed_paths: list[str],
-) -> tuple[list[str] | None, int, int]:
-    """Run dep-graph-guided cluster ddmin and return (group, invocations, duration_ms)."""
-    import json as _json, tempfile as _tempfile
-    from autocommit.dep_analysis import hunk_clusters
-
-    iter_start = int(time.time() * 1000)
-
-    clusters = hunk_clusters(pending)
-    log_info(f"  Dep-graph: {len(clusters)} cluster(s) from {len(pending)} hunk(s)")
-
-    with _tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-        _json.dump(clusters, f)
-        clusters_json = f.name
-
-    try:
-        committed_args = ["--committed", *committed_paths, "--"] if committed_paths else []
-        proc = subprocess.Popen(
-            [sys.executable, "-m", "autocommit.group", BUILD_CMD,
-             "--clusters-json", clusters_json, *committed_args],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-        )
-        assert proc.stderr is not None and proc.stdout is not None
-
-        stderr_lines: list[str] = []
-        for line in proc.stderr:
-            print(line, end="", file=sys.stderr, flush=True)
-            if _log_file:
-                _log_file.write(line)
-                _log_file.flush()
-            stderr_lines.append(line)
-        stdout_output = proc.stdout.read()
-        proc.wait()
-    finally:
-        Path(clusters_json).unlink(missing_ok=True)
-
-    invocations = sum(1 for line in stderr_lines if "test" in line)
-    duration_ms = int(time.time() * 1000) - iter_start
-    group = [line for line in stdout_output.splitlines() if line.strip()]
-
-    if not group or proc.returncode != 0:
-        return None, invocations, duration_ms
-    return group, invocations, duration_ms
-
-
 def step_find_group() -> None:
     """--find-group: Find a minimal buildable group using the configured approach."""
     global _original_branch, _tangled_sha
@@ -472,15 +425,9 @@ def step_find_group() -> None:
     groups_dir = run_dir / "groups"
     committed_paths = [h for group in state["committed_groups"] for h in group]
 
-    approach = state.get("approach", "programmatic")
-    if approach == "dep_graph":
-        group, invocations, iter_duration = _run_dep_graph_subprocess(
-            pending, committed_paths,
-        )
-    else:
-        group, invocations, iter_duration = _run_ddmin_subprocess(
-            pending, committed_paths,
-        )
+    group, invocations, iter_duration = _run_ddmin_subprocess(
+        pending, committed_paths,
+    )
 
     # ── Shared outcome handling ───────────────────────────────────────────────
     state["last_invocations"] = invocations
@@ -677,42 +624,42 @@ def _write_graph_dir(
 
 
 def step_analyze_deps(run_dir_override: str | None = None) -> None:
-    """--analyze-deps: Analyse def-use relationships between individual hunks."""
+    """--analyze-deps: Analyse def-use relationships between committed groups."""
     _init_log()
 
     if run_dir_override:
         p = Path(run_dir_override)
         if not p.is_absolute():
             p = SCRIPT_DIR / "tests" / p
-        hunks_dir = p / "hunks"
-        if not hunks_dir.exists():
-            log_error(f"No hunks/ directory found in {p}")
+        groups_dir = p / "groups"
+        if not groups_dir.exists():
+            log_error(f"No groups/ directory found in {p}")
             return
-        patch_files = sorted(hunks_dir.glob("hunk_*.patch"))
+        patch_files = sorted(groups_dir.glob("group_*.patch"))
         if not patch_files:
-            log_error(f"No hunk_*.patch files found in {hunks_dir}")
+            log_error(f"No group_*.patch files found in {groups_dir}")
             return
     else:
         state = _load_state()
-        hunks_dir = Path(state["hunks_dir"])
-        patch_files = sorted(hunks_dir.glob("hunk_*.patch"))
+        groups_dir = Path(state["run_dir"]) / "groups"
+        patch_files = sorted(groups_dir.glob("group_*.patch"))
         if not patch_files:
-            log_warning("No hunk files found.")
+            log_warning("No group files found.")
             return
 
-    hunk_patches: list[tuple[str, str]] = [
+    group_patches: list[tuple[str, str]] = [
         (f.stem, f.read_text()) for f in patch_files
     ]
 
     from autocommit.dep_analysis import build_dep_graph, topological_order
 
-    edges = build_dep_graph(hunk_patches)
-    order = topological_order(len(hunk_patches), edges)
+    edges = build_dep_graph(group_patches)
+    order = topological_order(len(group_patches), edges)
 
     log_lines: list[str] = []
 
     if not edges:
-        msg = "Dependency graph: no def-use edges found — all hunks are independent."
+        msg = "Dependency graph: no def-use edges found — all groups are independent."
         log_info(msg)
         log_lines.append(msg)
     else:
@@ -724,11 +671,11 @@ def step_analyze_deps(run_dir_override: str | None = None) -> None:
             key = (from_idx, to_idx, sym)
             if key not in seen:
                 seen.add(key)
-                line = f"  {hunk_patches[from_idx][0]}  --({sym})-->  {hunk_patches[to_idx][0]}"
+                line = f"  {group_patches[from_idx][0]}  --({sym})-->  {group_patches[to_idx][0]}"
                 log_info(line)
                 log_lines.append(line)
 
-    graph_dir, n_files = _write_graph_dir(hunks_dir, hunk_patches, edges, order)
+    graph_dir, n_files = _write_graph_dir(groups_dir, group_patches, edges, order)
     log_info(f"Graph folder written → {graph_dir}  ({n_files} file(s))")
     (graph_dir / "dep_graph.log").write_text("\n".join(log_lines) + "\n")
 

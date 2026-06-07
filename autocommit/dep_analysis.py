@@ -116,52 +116,6 @@ def build_dep_graph(
     return edges
 
 
-def hunk_clusters(hunk_paths: list[str]) -> list[list[str]]:
-    """ Run dep analysis on individual hunk files and return ordered clusters."""
-    
-    from pathlib import Path as _Path
-    from collections import defaultdict as _defaultdict
-
-    patches = [(_Path(p).stem, _Path(p).read_text()) for p in hunk_paths]
-    edges = build_dep_graph(patches)
-    order = topological_order(len(patches), edges)
-    order_pos = {idx: rank for rank, idx in enumerate(order)}
-
-    parent = list(range(len(patches)))
-
-    def find(x: int) -> int:
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]
-            x = parent[x]
-        return x
-
-    def union(x: int, y: int) -> None:
-        px, py = find(x), find(y)
-        if px != py:
-            if order_pos[px] <= order_pos[py]:
-                parent[py] = px
-            else:
-                parent[px] = py
-
-    for from_idx, to_idx, _ in edges:
-        union(from_idx, to_idx)
-
-    # Group indices by component root
-    components: dict[int, list[int]] = _defaultdict(list)
-    for i in range(len(patches)):
-        components[find(i)].append(i)
-
-    # Sort members within each component by topo order, then sort components
-    items: list[tuple[int, list[str]]] = []
-    for members in components.values():
-        sorted_members = sorted(members, key=lambda i: order_pos[i])
-        earliest = order_pos[sorted_members[0]]
-        items.append((earliest, [hunk_paths[i] for i in sorted_members]))
-
-    items.sort(key=lambda x: x[0])
-    return [paths for _, paths in items]
-
-
 def topological_order(n: int, edges: list[tuple[int, int, str]]) -> list[int]:
     """Return group indices in topologically sorted commit order (Kahn's algorithm)."""
     in_degree = [0] * n
