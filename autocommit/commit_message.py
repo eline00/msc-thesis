@@ -13,7 +13,7 @@ _MODEL = "llama-3.3-70b-versatile"
 _SYSTEM_PROMPT = """\
 You are an expert software engineer writing git commit messages.
 Given a unified diff, write a single-line conventional commit message that summarises the change.
-Format: <type>(<scope>): <description>
+Format: <type>: <description>
 Types: feat, fix, refactor, test, docs, style, chore
 Keep it under 72 characters. Return ONLY the commit message, nothing else.\
 """
