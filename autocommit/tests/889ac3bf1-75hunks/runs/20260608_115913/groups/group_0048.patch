@@ -1,0 +1,10 @@
+diff --git a/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs b/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
+index 50cb329..7e878f3 100644
+--- a/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
++++ b/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
+@@ -313,0 +314,5 @@ namespace CommandLine.Tests.Unit
++        class Option_FlagCounter
++        {
++            [Option('v', Default = 1, FlagCounter=true)]
++            public int VerboseLevel { get; set; }
++        }
