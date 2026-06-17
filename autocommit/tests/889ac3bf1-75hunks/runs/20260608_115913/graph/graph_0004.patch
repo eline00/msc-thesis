@@ -1,0 +1,55 @@
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -49,0 +50 @@ namespace CommandLine.Core
++            var separatorSeen = false;
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -55,0 +56 @@ namespace CommandLine.Core
++                    separatorSeen = false;
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -60,0 +61 @@ namespace CommandLine.Core
++                    separatorSeen = false;
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -101,0 +102 @@ namespace CommandLine.Core
++                            separatorSeen = false;
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -108,0 +109 @@ namespace CommandLine.Core
++                            separatorSeen = false;
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -123,0 +124,14 @@ namespace CommandLine.Core
++                                else if (token.IsValueFromSeparator())
++                                {
++                                    separatorSeen = true;
++                                    sequence.Add(token);
++                                    count[nameToken]++;
++                                }
++                                else if (separatorSeen)
++                                {
++                                    // Previous token came from a separator but this one didn't: sequence is completed
++                                    separatorSeen = false;
++                                    nameToken = null;
++                                    nonOptionTokens.Add(token);
++                                    state = SequenceState.TokenSearch;
++                                }
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -146,0 +147 @@ namespace CommandLine.Core
++                                separatorSeen = false;
