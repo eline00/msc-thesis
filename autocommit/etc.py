@@ -311,11 +311,11 @@ def step_setup(test_name: str | None, approach: str = "programmatic") -> None:
         "last_iter_duration_ms": 0,
     })
     log_success(f"Setup complete. Run ID: {run_id}")
-    log_info("Next: run with --split-hunks")
+    log_info("Next: run with --next-iteration")
 
 
-def step_split_hunks() -> None:
-    """--split-hunks: Determine remaining hunks from the initial split and save the list for this iteration."""
+def step_next_iteration() -> None:
+    """--next-iteration: Determine remaining hunks from the initial split and save the list for this iteration."""
     global _original_branch, _tangled_sha
 
     state = _load_state()
@@ -417,7 +417,7 @@ def step_find_group() -> None:
 
     pending = state.get("pending_hunk_paths")
     if not pending:
-        log_error("No pending hunks in state. Run --split-hunks first.")
+        log_error("No pending hunks in state. Run --next-iteration first.")
         sys.exit(1)
 
     iteration = state["iteration"]
@@ -503,12 +503,12 @@ def step_commit_group() -> None:
 
     _save_state(state)
     log_success(f"Committed group {group_count}.")
-    log_info("Next: run with --split-hunks for the next iteration, or --merge when done.")
+    log_info("Next: run with --next-iteration for the next iteration, or --merge when done.")
 
 
 def step_one_iteration() -> None:
-    """--one-iteration: Run one full cycle: --split-hunks + --find-group + --commit-group."""
-    step_split_hunks()
+    """--one-iteration: Run one full cycle: --next-iteration + --find-group + --commit-group."""
+    step_next_iteration()
 
     state = json.loads(STATE_FILE.read_text())
     if state.get("remaining_hunk_count", 1) == 0:
@@ -744,7 +744,7 @@ def run_all(test_name: str | None, approach: str = "programmatic") -> None:
     while True:
         state = json.loads(STATE_FILE.read_text())
 
-        step_split_hunks()
+        step_next_iteration()
 
         state = json.loads(STATE_FILE.read_text())
         if state.get("remaining_hunk_count", 1) == 0:
@@ -774,7 +774,7 @@ def main() -> None:
         epilog=(
             "Step-by-step usage:\n"
             "  etc --setup [test_name]   Initialise a detangling run\n"
-            "  etc --split-hunks         Determine remaining hunks for this iteration\n"
+            "  etc --next-iteration         Determine remaining hunks for this iteration\n"
             "  etc --find-group          Run ddmin to find a minimal buildable group\n"
             "  etc --commit-group        Commit the group found by --find-group\n"
             "  etc --one-iteration       Run one full iteration (split → find → commit)\n"
@@ -804,7 +804,7 @@ def main() -> None:
         help="Create the detangling branch, snapshot the tangled state, initialise run dirs",
     )
     steps.add_argument(
-        "--split-hunks", dest="split_hunks", action="store_true",
+        "--next-iteration", dest="next_iteration", action="store_true",
         help="Determine remaining hunks from the initial split and copy them for this iteration",
     )
     steps.add_argument(
@@ -817,7 +817,7 @@ def main() -> None:
     )
     steps.add_argument(
         "--one-iteration", dest="one_iteration", action="store_true",
-        help="Run one full iteration: --split-hunks then --find-group then --commit-group",
+        help="Run one full iteration: --next-iteration then --find-group then --commit-group",
     )
     steps.add_argument(
         "--merge", action="store_true",
@@ -836,8 +836,8 @@ def main() -> None:
 
     if args.setup:
         step_setup(args.test_name, approach=args.approach)
-    elif args.split_hunks:
-        step_split_hunks()
+    elif args.next_iteration:
+        step_next_iteration()
     elif args.find_group:
         step_find_group()
     elif args.commit_group:
