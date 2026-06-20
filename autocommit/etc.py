@@ -526,6 +526,52 @@ def step_one_iteration() -> None:
     step_commit_group()
 
 
+def _completeness_check(
+    total_hunk_count: int,
+    committed_hunk_count: int,
+    committed_groups: list,
+) -> None:
+    """Print completeness checks: line count match and file coverage."""
+    full_patch = SCRIPT_DIR / "full.patch"
+    if not full_patch.exists():
+        log_warning("full.patch not found — skipping completeness check.")
+        return
+
+    full_lines = full_patch.read_text().splitlines()
+    full_added   = sum(1 for l in full_lines if l.startswith("+") and not l.startswith("+++"))
+    full_deleted = sum(1 for l in full_lines if l.startswith("-") and not l.startswith("---"))
+    full_files   = {l.split(" b/", 1)[1] for l in full_lines if l.startswith("diff --git ")}
+
+    committed_added = committed_deleted = 0
+    committed_files: set[str] = set()
+    for group in committed_groups:
+        for hunk_path_str in group:
+            hunk_path = Path(hunk_path_str)
+            if not hunk_path.exists():
+                continue
+            for line in hunk_path.read_text().splitlines():
+                if line.startswith("+") and not line.startswith("+++"):
+                    committed_added += 1
+                elif line.startswith("-") and not line.startswith("---"):
+                    committed_deleted += 1
+                elif line.startswith("diff --git "):
+                    committed_files.add(line.split(" b/", 1)[1])
+
+    missing_files = full_files - committed_files
+    hunks_ok = committed_hunk_count == total_hunk_count
+    lines_ok = committed_added == full_added and committed_deleted == full_deleted
+    files_ok = not missing_files
+
+    log_info("── Completeness ──────────────────────────────────────────────")
+    log_info(f"  Hunks     : {committed_hunk_count}/{total_hunk_count}  {'✓' if hunks_ok else f'✗  ({total_hunk_count - committed_hunk_count} uncommitted)'}")
+    log_info(f"  Lines +   : {committed_added}/{full_added}  {'✓' if committed_added == full_added else '✗'}")
+    log_info(f"  Lines -   : {committed_deleted}/{full_deleted}  {'✓' if committed_deleted == full_deleted else '✗'}")
+    log_info(f"  Files     : {len(full_files) - len(missing_files)}/{len(full_files)}  {'✓' if files_ok else '✗'}")
+    if missing_files:
+        for f in sorted(missing_files):
+            log_warning(f"    Not covered: {f}")
+
+
 def step_merge() -> None:
     """--merge: Fast-forward the original branch over the detangling branch and write results."""
     global _original_branch, _tangled_sha
@@ -542,7 +588,13 @@ def step_merge() -> None:
     total_duration_ms = state["total_duration_ms"]
     run_id = state["run_id"]
 
-    metrics_event("RUN_END", f"groups={group_count}")
+    committed_hunk_count = sum(len(g) for g in committed_groups)
+    uncommitted_hunk_count = total_hunk_count - committed_hunk_count
+
+    metrics_event(
+        "RUN_END",
+        f"groups={group_count},committed_hunks={committed_hunk_count},uncommitted_hunks={uncommitted_hunk_count}",
+    )
     log_success(f"Done: {group_count} group(s) produced from {total_hunk_count} hunk(s).")
 
     if group_count == 0:
@@ -551,6 +603,8 @@ def step_merge() -> None:
         git_run("branch", "-D", "detangling")
         STATE_FILE.unlink(missing_ok=True)
         return
+
+    _completeness_check(total_hunk_count, committed_hunk_count, committed_groups)
 
     write_results(
         run_id=run_id,
