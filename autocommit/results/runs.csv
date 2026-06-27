@@ -28,3 +28,4 @@ run_id,timestamp,approach,repo,original_branch,tangled_sha,total_hunks,groups_pr
 20260603_104932,2026-06-03 11:01:03,dep_graph,commandline,detangling,3031cb3d6211d7a336393e17ec1f9b8041d7fe4a,75,25,325,682961,dotnet build --no-restore,
 20260608_114929,2026-06-08 11:54:57,programmatic,commandline,small-change-test,6fb4d7d12a3bb7a6105f16dca0375ff2853cc342,8,5,43,106633,dotnet build --no-restore,
 20260608_115913,2026-06-08 14:19:09,programmatic,commandline,large-change-test,c24ca9fcb6859de2c64ebe93cc6a95a1d3ad5e8c,75,58,3792,8354661,dotnet build --no-restore,
+20260626_141536,2026-06-26 15:16:08,programmatic,commandline,small-change-test,08db505c405ab3b85a14ab238724798c565391ef,8,5,43,440727,dotnet build --no-restore,

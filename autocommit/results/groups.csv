@@ -464,3 +464,8 @@ run_id,group_num,hunk_count,hunks
 20260608_115913,56,10,"hunk_0002.patch, hunk_0003.patch, hunk_0005.patch, hunk_0007.patch, hunk_0033.patch, hunk_0060.patch, hunk_0061.patch, hunk_0062.patch, hunk_0065.patch, hunk_0067.patch"
 20260608_115913,57,1,hunk_0034.patch
 20260608_115913,58,1,hunk_0066.patch
+20260626_141536,1,1,hunk_0001.patch
+20260626_141536,2,1,hunk_0002.patch
+20260626_141536,3,1,hunk_0003.patch
+20260626_141536,4,1,hunk_0004.patch
+20260626_141536,5,4,"hunk_0005.patch, hunk_0006.patch, hunk_0007.patch, hunk_0008.patch"
