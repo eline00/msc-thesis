@@ -1,0 +1,7 @@
+Build-dependency graph: no hard build dependencies found — all atoms are independent.
+Connected components (5 group(s)):
+  build_graph_0001: group_0001
+  build_graph_0002: group_0002
+  build_graph_0003: group_0003
+  build_graph_0004: group_0004
+  build_graph_0005: group_0005

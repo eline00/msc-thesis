@@ -1,0 +1,12 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index 5a1b695..13129b3 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -974 +974,6 @@ namespace CommandLine.Text
+-            var lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
++            //Note that on the input side, we can't assume the line-break style at run time so we have to
++            //be able to handle both.  We cant use Environment.NewLine because that changes at
++            //_runtime_ and may not match the line-break style that was compiled in
++            var lines = input
++                .Replace("\r","")
++                .Split(new[] {'\n'}, StringSplitOptions.None);

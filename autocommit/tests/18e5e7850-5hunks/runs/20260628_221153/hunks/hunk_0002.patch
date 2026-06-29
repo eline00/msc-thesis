@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index 5a1b695..13129b3 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -733 +733 @@ namespace CommandLine.Text
+-       private HelpText AddOptionsImpl(
++        private HelpText AddOptionsImpl(

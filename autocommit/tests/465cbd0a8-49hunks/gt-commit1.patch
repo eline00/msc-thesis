@@ -1,0 +1,74 @@
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -2,0 +3,2 @@
++using CSharpx;
++
+@@ -6 +7,0 @@ using System.Linq;
+-using CSharpx;
+@@ -49 +50 @@ namespace CommandLine.Core
+-                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key));
++                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key, gr.Select(g => new NameInfo(g.Option.ShortName, g.Option.LongName))));
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -3,0 +4 @@ using System;
++using System.Collections.Generic;
+@@ -72 +73,5 @@ namespace CommandLine
+-        InvalidAttributeConfigurationError
++        InvalidAttributeConfigurationError,
++        /// <summary>
++        /// Value of <see cref="CommandLine.MissingGroupOptionError"/> type.
++        /// </summary>
++        MissingGroupOptionError
+@@ -534,0 +540 @@ namespace CommandLine
++        private readonly IEnumerable<NameInfo> names;
+@@ -536,2 +542,2 @@ namespace CommandLine
+-        internal MissingGroupOptionError(string group)
+-            : base(ErrorType.HelpRequestedError, true)
++        internal MissingGroupOptionError(string group, IEnumerable<NameInfo> names)
++            : base(ErrorType.MissingGroupOptionError)
+@@ -539,0 +546 @@ namespace CommandLine
++            this.names = names;
+@@ -545,0 +553,5 @@ namespace CommandLine
++
++        public IEnumerable<NameInfo> Names
++        {
++            get { return names; }
++        }
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..cdcf409 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -2,0 +3,2 @@
++using CommandLine.Infrastructure;
++
+@@ -7 +8,0 @@ using System.Text;
+-using CommandLine.Infrastructure;
+@@ -44 +45 @@ namespace CommandLine.Text
+-        public abstract Func<string> UsageHeadingText { get; } 
++        public abstract Func<string> UsageHeadingText { get; }
+@@ -56 +57 @@ namespace CommandLine.Text
+-        public abstract Func<bool, string> VersionCommandText { get; } 
++        public abstract Func<bool, string> VersionCommandText { get; }
+@@ -70 +71 @@ namespace CommandLine.Text
+-        private class DefaultSentenceBuilder : SentenceBuilder 
++        private class DefaultSentenceBuilder : SentenceBuilder
+@@ -142,0 +144,7 @@ namespace CommandLine.Text
++                                case ErrorType.MissingGroupOptionError:
++                                    var missingGroupOptionError = (MissingGroupOptionError)error;
++                                    return "At least one option from group '".JoinTo(
++                                        missingGroupOptionError.Group,
++                                        "' (",
++                                        string.Join(", ", missingGroupOptionError.Names.Select(n => n.NameText)),
++                                        ") is required.");
+@@ -156,2 +164,2 @@ namespace CommandLine.Text
+-                                group e by e.SetName into g
+-                                select new { SetName = g.Key, Errors = g.ToList() };
++                                    group e by e.SetName into g
++                                    select new { SetName = g.Key, Errors = g.ToList() };
+@@ -172 +180 @@ namespace CommandLine.Text
+-                                    select "'".JoinTo(x.NameInfo.NameText, "', ")).ToArray());
++                                     select "'".JoinTo(x.NameInfo.NameText, "', ")).ToArray());

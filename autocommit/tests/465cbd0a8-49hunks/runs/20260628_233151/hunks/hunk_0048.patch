@@ -1,0 +1,9 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -156,2 +174,2 @@ namespace CommandLine.Text
+-                                group e by e.SetName into g
+-                                select new { SetName = g.Key, Errors = g.ToList() };
++                                    group e by e.SetName into g
++                                    select new { SetName = g.Key, Errors = g.ToList() };

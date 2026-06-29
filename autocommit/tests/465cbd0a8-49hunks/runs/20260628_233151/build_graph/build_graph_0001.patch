@@ -1,0 +1,437 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -2,0 +3,5 @@
++using CommandLine.Core;
++using CommandLine.Infrastructure;
++
++using CSharpx;
++
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -2,0 +3,2 @@
++using CSharpx;
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -15,3 +15 @@ using System.Reflection;
+-using CommandLine.Infrastructure;
+-using CommandLine.Core;
+-using CSharpx;
++using System.Text;
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index 966f5ba..ce2e1fa 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -108,0 +109,3 @@ namespace CommandLine
++        /// <summary>
++        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
++        /// </summary>
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -12 +12,0 @@ using System.IO;
+-using System.Text;
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -22,3 +22,3 @@ namespace CommandLine.Text
+-    
+-    
+-    
++
++
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -34 +34 @@ namespace CommandLine.Text
+-    
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -60,26 +60,26 @@ namespace CommandLine.Text
+-        public static Comparison<ComparableOption> RequiredThenAlphaComparison  = (ComparableOption attr1, ComparableOption attr2) =>
+-        {
+-            if (attr1.IsOption && attr2.IsOption)
+-            {
+-                if (attr1.Required && !attr2.Required)
+-                {
+-                    return -1;
+-                }
+-                else if (!attr1.Required && attr2.Required)
+-                {
+-                    return 1;
+-                }
+-                
+-                return String.Compare(attr1.LongName, attr2.LongName, StringComparison.Ordinal);
+-                
+-            }
+-            else if (attr1.IsOption && attr2.IsValue)
+-            {
+-                return -1;
+-            }
+-            else
+-            {
+-                return 1;
+-            }
+-        };
+-        
++        public static Comparison<ComparableOption> RequiredThenAlphaComparison = (ComparableOption attr1, ComparableOption attr2) =>
++       {
++           if (attr1.IsOption && attr2.IsOption)
++           {
++               if (attr1.Required && !attr2.Required)
++               {
++                   return -1;
++               }
++               else if (!attr1.Required && attr2.Required)
++               {
++                   return 1;
++               }
++
++               return String.Compare(attr1.LongName, attr2.LongName, StringComparison.Ordinal);
++
++           }
++           else if (attr1.IsOption && attr2.IsValue)
++           {
++               return -1;
++           }
++           else
++           {
++               return 1;
++           }
++       };
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -87 +87 @@ namespace CommandLine.Text
+-        
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -93 +93 @@ namespace CommandLine.Text
+-        private const int OptionToHelpTextSeparatorWidth = 4; 
++        private const int OptionToHelpTextSeparatorWidth = 4;
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -339 +339 @@ namespace CommandLine.Text
+-         
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -44 +44 @@ namespace CommandLine.Text
+-        public abstract Func<string> UsageHeadingText { get; } 
++        public abstract Func<string> UsageHeadingText { get; }
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -3,0 +4 @@ using System;
++using System.Collections.Generic;
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -8 +8,0 @@ using System.Linq;
+-using CSharpx;
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -73 +73,5 @@ namespace CommandLine
+-        InvalidAttributeConfigurationError
++        InvalidAttributeConfigurationError,
++        /// <summary>
++        /// Value of <see cref="CommandLine.MissingGroupOptionError"/> type.
++        /// </summary>
++        MissingGroupOptionError
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -539,0 +540 @@ namespace CommandLine
++        private readonly IEnumerable<NameInfo> names;
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -545,0 +546 @@ namespace CommandLine
++            this.names = names;
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -552,0 +553,5 @@ namespace CommandLine
++
++        public IEnumerable<NameInfo> Names
++        {
++            get { return names; }
++        }
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -172 +172 @@ namespace CommandLine.Text
+-                                    select "'".JoinTo(x.NameInfo.NameText, "', ")).ToArray());
++                                     select "'".JoinTo(x.NameInfo.NameText, "', ")).ToArray());
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -142,0 +143,7 @@ namespace CommandLine.Text
++                                case ErrorType.MissingGroupOptionError:
++                                    var missingGroupOptionError = (MissingGroupOptionError)error;
++                                    return "At least one option from group '".JoinTo(
++                                        missingGroupOptionError.Group,
++                                        "' (",
++                                        string.Join(", ", missingGroupOptionError.Names.Select(n => n.NameText)),
++                                        ") is required.");
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -163,2 +163,2 @@ namespace CommandLine.Text
+-                                group e by e.SetName into g
+-                                select new { SetName = g.Key, Errors = g.ToList() };
++                                    group e by e.SetName into g
++                                    select new { SetName = g.Key, Errors = g.ToList() };
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -1042 +1042 @@ namespace CommandLine.Text
+-      
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -2,0 +3,2 @@
++using CommandLine.Infrastructure;
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -58 +58 @@ namespace CommandLine.Text
+-        public abstract Func<bool, string> VersionCommandText { get; } 
++        public abstract Func<bool, string> VersionCommandText { get; }
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -9 +9,0 @@ using System.Text;
+-using CommandLine.Infrastructure;
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -397 +397 @@ namespace CommandLine.Text
+-                return new HelpText($"{HeadingInfo.Default}{Environment.NewLine}"){MaximumDisplayWidth = maxDisplayWidth }.AddPreOptionsLine(Environment.NewLine);
++                return new HelpText($"{HeadingInfo.Default}{Environment.NewLine}") { MaximumDisplayWidth = maxDisplayWidth }.AddPreOptionsLine(Environment.NewLine);
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -619 +619 @@ namespace CommandLine.Text
+-            foreach(var error in  meaningfulErrors
++            foreach (var error in meaningfulErrors
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -994 +994 @@ namespace CommandLine.Text
+-                specLength += OptionPrefixWidth; 
++                specLength += OptionPrefixWidth;
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -71 +71 @@ namespace CommandLine.Text
+-        private class DefaultSentenceBuilder : SentenceBuilder 
++        private class DefaultSentenceBuilder : SentenceBuilder
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -756 +756 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeHelpEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeHelpEntry() });
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -758 +758 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeVersionEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeVersionEntry() });
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -899,2 +899,2 @@ namespace CommandLine.Text
+-            var indented = TextWrapper.WrapAndIndentText(optionHelpText, maxLength+TotalOptionPadding, widthOfHelpText).TrimStart();
+-          
++            var indented = TextWrapper.WrapAndIndentText(optionHelpText, maxLength + TotalOptionPadding, widthOfHelpText).TrimStart();
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -36,0 +37,5 @@ namespace CommandLine.Text
++        /// <summary>
++        /// Gets a delegate that returns the word 'group'.
++        /// </summary>
++        public abstract Func<string> OptionGroupWord { get; }
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -87,0 +93,5 @@ namespace CommandLine.Text
++            public override Func<string> OptionGroupWord
++            {
++                get { return () => "Group"; }
++            }
++
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -50 +50 @@ namespace CommandLine.Core
+-                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key));
++                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key, gr.Select(g => new NameInfo(g.Option.ShortName, g.Option.LongName))));
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -542,2 +542,2 @@ namespace CommandLine
+-        internal MissingGroupOptionError(string group)
+-            : base(ErrorType.HelpRequestedError, true)
++        internal MissingGroupOptionError(string group, IEnumerable<NameInfo> names)
++            : base(ErrorType.MissingGroupOptionError)
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -785,8 +785,8 @@ namespace CommandLine.Text
+-                    select
+-                        OptionSpecification.NewSwitch(
+-                            string.Empty,
+-                            verbTuple.Item1.Name,
+-                            false,
+-                            verbTuple.Item1.HelpText,
+-                            string.Empty,
+-                            verbTuple.Item1.Hidden);
++                              select
++                                  OptionSpecification.NewSwitch(
++                                      string.Empty,
++                                      verbTuple.Item1.Name,
++                                      false,
++                                      verbTuple.Item1.HelpText,
++                                      string.Empty,
++                                      verbTuple.Item1.Hidden);
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -794 +794 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeHelpEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeHelpEntry() });
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -796 +796 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeVersionEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeVersionEntry() });
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -524,0 +525 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -541,0 +543 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -557,0 +560 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -575,0 +579 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -802,0 +807 @@ namespace CommandLine.Text
++            string optionGroupWord,
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -811,2 +811,2 @@ namespace CommandLine.Text
+-            
+-            
++
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -832 +832 @@ namespace CommandLine.Text
+-                    AddOption(requiredWord, maxLength, spec, remainingSpace);
++                    AddOption(requiredWord, optionGroupWord, maxLength, spec, remainingSpace);
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -839 +839 @@ namespace CommandLine.Text
+-                        AddOption(requiredWord, maxLength, option, remainingSpace));
++                        AddOption(requiredWord, optionGroupWord, maxLength, option, remainingSpace));
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -875 +875 @@ namespace CommandLine.Text
+-        private HelpText AddOption(string requiredWord, int maxLength, Specification specification, int widthOfHelpText)
++        private HelpText AddOption(string requiredWord, string optionGroupWord, int maxLength, Specification specification, int widthOfHelpText)
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -901 +901,6 @@ namespace CommandLine.Text
+-          
++
++            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++            {
++                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
++            }
++

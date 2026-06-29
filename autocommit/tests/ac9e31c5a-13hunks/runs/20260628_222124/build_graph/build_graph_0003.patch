@@ -1,0 +1,16 @@
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -9,0 +10,11 @@ namespace CommandLine.Tests.Unit.Core
++        private string NormalizeLineBreaks(string str)
++        {
++            return str.Replace("\r", "");
++        }
++        private void EnsureEquivalent(string a,string b)
++        {
++            //workaround build system line-end inconsistencies
++            NormalizeLineBreaks(a).Should().Be(NormalizeLineBreaks(b));
++        }
++
++        

@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -868 +875 @@ namespace CommandLine.Text
+-        private HelpText AddOption(string requiredWord, int maxLength, Specification specification, int widthOfHelpText)
++        private HelpText AddOption(string requiredWord, string optionGroupWord, int maxLength, Specification specification, int widthOfHelpText)

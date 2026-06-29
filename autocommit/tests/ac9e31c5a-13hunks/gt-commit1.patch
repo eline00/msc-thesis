@@ -1,0 +1,13 @@
+diff --git a/src/CommandLine/Text/TextWrapper.cs b/src/CommandLine/Text/TextWrapper.cs
+index 15c22d7..5af2157 100644
+--- a/src/CommandLine/Text/TextWrapper.cs
++++ b/src/CommandLine/Text/TextWrapper.cs
+@@ -157,0 +158,3 @@ namespace CommandLine.Text
++        /// <summary>
++        /// Return the right part of a string in a way that compensates for Substring's deficiencies
++        /// </summary>
+@@ -164 +167,3 @@ namespace CommandLine.Text
+-
++        /// <summary>
++        /// Return the left part of a string in a way that compensates for Substring's deficiencies
++        /// </summary>

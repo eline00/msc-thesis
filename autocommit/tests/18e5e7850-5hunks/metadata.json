@@ -1,0 +1,63 @@
+{
+  "group_id": "group-01",
+  "base_commit": "18e5e7850d9dfd8b33b7116f11fa252434340fa5",
+  "tangle_equals_commit": "0a0fa208a008cf5707582ba6a2ab665497fa1532",
+  "build_target": "CommandLine.sln",
+  "build_command": "dotnet build CommandLine.sln",
+  "base_builds": true,
+  "tangle_builds": true,
+  "num_commits": 3,
+  "selection": {
+    "strategy": "same-author consecutive linear run; same-file non-overlap",
+    "time_gap_threshold_hours": 72,
+    "overlap_oracle": "per-commit 'git cherry-pick --no-commit' onto base; conflict => overlapping change"
+  },
+  "commits": [
+    {
+      "order": 1,
+      "sha": "f5aebb0b9fdc812cd189694325f1bed635eba7a6",
+      "parent": "18e5e7850d9dfd8b33b7116f11fa252434340fa5",
+      "file": "01_f5aebb0b9.patch",
+      "subject": "Better portability for line-break handling",
+      "author": "Neil MacMullen",
+      "date": "2019-06-06",
+      "files": [
+        "src/CommandLine/Text/HelpText.cs"
+      ]
+    },
+    {
+      "order": 2,
+      "sha": "e30e5a6afbfc8cb36d59c3467132531d50151353",
+      "parent": "f5aebb0b9fdc812cd189694325f1bed635eba7a6",
+      "file": "02_e30e5a6af.patch",
+      "subject": "Remove a couple of spurious indentation changes",
+      "author": "Neil MacMullen",
+      "date": "2019-06-06",
+      "files": [
+        "src/CommandLine/Text/HelpText.cs"
+      ]
+    },
+    {
+      "order": 3,
+      "sha": "0a0fa208a008cf5707582ba6a2ab665497fa1532",
+      "parent": "e30e5a6afbfc8cb36d59c3467132531d50151353",
+      "file": "03_0a0fa208a.patch",
+      "subject": "Add extra test to ensure mixed line-end styles are handled correctly",
+      "author": "Neil MacMullen",
+      "date": "2019-06-06",
+      "files": [
+        "tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs",
+        "tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs"
+      ]
+    }
+  ],
+  "verification": {
+    "base_builds": true,
+    "tangle_commit_builds": true,
+    "ground_truth_patches_apply": true,
+    "combined_patch_applies": true,
+    "builds_after_applying_combined_patch": true,
+    "combined_patch_reconstructs_tangle_byte_exact": false,
+    "note": "applies to a buildable working tree; a mixed CRLF/LF+BOM test fixture is normalized by 'git apply' (still compiles). For byte-exact tangle use 'git checkout 0a0fa208a008cf5707582ba6a2ab665497fa1532'."
+  }
+}

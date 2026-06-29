@@ -1,0 +1,11 @@
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -73 +73,5 @@ namespace CommandLine
+-        InvalidAttributeConfigurationError
++        InvalidAttributeConfigurationError,
++        /// <summary>
++        /// Value of <see cref="CommandLine.MissingGroupOptionError"/> type.
++        /// </summary>
++        MissingGroupOptionError

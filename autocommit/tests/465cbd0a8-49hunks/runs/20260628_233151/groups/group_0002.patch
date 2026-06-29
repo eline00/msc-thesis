@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -2,0 +3,2 @@
++using CSharpx;
++

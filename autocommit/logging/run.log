@@ -1,91 +1,149 @@
-14:15:31 [INFO] Full patch saved to autocommit/full.patch
-14:15:31 [INFO] Creating temporary tangled commit...
-14:15:36 [INFO] Tangled SHA: 08db505c405ab3b85a14ab238724798c565391ef
-14:15:36 [SUCCESS] Reset to clean state. Working tree is clean.
-14:15:39 [INFO] Total hunks in full patch: 8
-14:15:39 [INFO] Split full patch into 8 hunk file(s).
-14:15:39 [SUCCESS] Setup complete. Run ID: 20260626_141536
-14:15:39 [INFO] Next: run with --next-iteration
-14:15:52 [INFO] ── Iteration 1: 8 hunk(s) remaining ──
-14:15:52 [INFO] Next: run with --find-group
-  [group]     test 8 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 4 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch
+11:37:03 [INFO] Full patch saved to autocommit/full.patch
+11:37:04 [INFO] Creating temporary tangled commit...
+11:37:05 [INFO] Tangled SHA: 3900c3224003989bb0576d3dfe29a0240af18fbc
+11:37:05 [SUCCESS] Reset to clean state. Working tree is clean.
+11:37:05 [INFO] Total hunks in full patch: 5
+11:37:05 [INFO] Split full patch into 5 hunk file(s).
+11:37:05 [SUCCESS] Setup complete. Run ID: 20260629_113705
+11:37:05 [INFO] Next: run with --next-iteration
+11:37:12 [INFO] ── Iteration 1: 5 hunk(s) remaining ──
+11:37:12 [INFO] Next: run with --find-group
+  [group]     test 5 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0001.patch
-14:17:23 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0001.patch  [hunk_0001.patch]
-14:17:23 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:17:49 [SUCCESS] Committed group 1.
-14:17:49 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:18:03 [INFO] ── Iteration 2: 7 hunk(s) remaining ──
-14:18:03 [INFO] Next: run with --find-group
-  [group]     test 7 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 4 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 4 hunk(s) -> fail
+11:37:42 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0001.patch  [hunk_0001.patch]
+11:37:42 [INFO] Next: run with --commit-group (or inspect the group patch first)
+11:37:50 [SUCCESS] Committed group 1.
+11:37:50 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+11:39:10 [INFO] ── Iteration 2: 4 hunk(s) remaining ──
+11:39:10 [INFO] Next: run with --find-group
+  [group]     test 4 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0002.patch
-14:18:39 [SUCCESS] Found group 2 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0002.patch  [hunk_0002.patch]
-14:18:39 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:19:56 [SUCCESS] Committed group 2.
-14:19:56 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:20:35 [INFO] ── Iteration 3: 6 hunk(s) remaining ──
-14:20:35 [INFO] Next: run with --find-group
-  [group]     test 6 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
+11:39:26 [SUCCESS] Found group 2 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0002.patch  [hunk_0002.patch]
+11:39:26 [INFO] Next: run with --commit-group (or inspect the group patch first)
+11:39:58 [SUCCESS] Committed group 2.
+11:39:58 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+11:40:18 [INFO] ── Iteration 3: 3 hunk(s) remaining ──
+11:40:18 [INFO] Next: run with --find-group
+  [group]     test 3 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0003.patch
-14:22:36 [SUCCESS] Found group 3 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0003.patch  [hunk_0003.patch]
-14:22:36 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:23:56 [SUCCESS] Committed group 3.
-14:23:56 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:24:45 [INFO] ── Iteration 4: 5 hunk(s) remaining ──
-14:24:45 [INFO] Next: run with --find-group
-  [group]     test 5 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 4 hunk(s) -> fail
+11:40:37 [SUCCESS] Found group 3 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0003.patch  [hunk_0003.patch]
+11:40:37 [INFO] Next: run with --commit-group (or inspect the group patch first)
+11:40:43 [SUCCESS] Committed group 3.
+11:40:43 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+11:41:01 [INFO] ── Iteration 4: 2 hunk(s) remaining ──
+11:41:01 [INFO] Next: run with --find-group
+  [group]     test 2 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0004.patch
-14:27:17 [SUCCESS] Found group 4 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0004.patch  [hunk_0004.patch]
-14:27:17 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:34:30 [SUCCESS] Committed group 4.
-14:34:32 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:41:00 [INFO] ── Iteration 5: 4 hunk(s) remaining ──
-14:41:02 [INFO] Next: run with --find-group
-  [group]     test 4 hunk(s) -> PASS: hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-14:44:19 [SUCCESS] Found group 5 (4 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0005.patch  [hunk_0005.patch, hunk_0006.patch, hunk_0007.patch, hunk_0008.patch]
-14:44:22 [INFO] Next: run with --commit-group (or inspect the group patch first)
-15:10:32 [SUCCESS] Committed group 5.
-15:10:33 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-15:15:48 [SUCCESS] All changes have been grouped.
-15:15:48 [INFO] Next: run with --merge to finish.
-15:15:53 [SUCCESS] Done: 5 group(s) produced from 8 hunk(s).
-15:16:08 [INFO] ── Completeness ──────────────────────────────────────────────
-15:16:08 [INFO]   Hunks     : 8/8  ✓
-15:16:08 [INFO]   Lines +   : 18/18  ✓
-15:16:08 [INFO]   Lines -   : 5/5  ✓
-15:16:08 [INFO]   Files     : 3/3  ✓
-15:16:11 [INFO] Results appended → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/runs.csv, /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/groups.csv
-15:16:22 [SUCCESS] Moved 5 atomic commit(s) onto 'small-change-test' and deleted 'detangling'.
+11:41:14 [SUCCESS] Found group 4 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0004.patch  [hunk_0004.patch]
+11:41:14 [INFO] Next: run with --commit-group (or inspect the group patch first)
+11:41:18 [SUCCESS] Committed group 4.
+11:41:18 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+11:41:21 [INFO] ── Iteration 5: 1 hunk(s) remaining ──
+11:41:21 [INFO] Next: run with --find-group
+  [group]     test 1 hunk(s) -> PASS: hunk_0005.patch
+11:41:28 [SUCCESS] Found group 5 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0005.patch  [hunk_0005.patch]
+11:41:28 [INFO] Next: run with --commit-group (or inspect the group patch first)
+11:42:42 [SUCCESS] Committed group 5.
+11:42:42 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+11:42:43 [SUCCESS] All changes have been grouped.
+11:42:43 [INFO] Next: run with --merge to finish.
+11:42:57 [INFO] Probing build dependencies between 5 atoms (base=134a1a11aa)...
+11:42:57 [ERROR] The atom hunks do not apply cleanly onto base (134a1a11aa). The base is likely wrong — pass --base <ref> (the commit before the first atom).
+11:44:46 [SUCCESS] Done: 5 group(s) produced from 5 hunk(s).
+11:44:46 [INFO] ── Completeness ──────────────────────────────────────────────
+11:44:46 [INFO]   Hunks     : 5/5  ✓
+11:44:46 [INFO]   Lines +   : 135/135  ✓
+11:44:46 [INFO]   Lines -   : 1/1  ✓
+11:44:46 [INFO]   Files     : 4/4  ✓
+11:44:46 [INFO] Results appended → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/runs.csv, /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/groups.csv
+11:44:46 [ERROR] Merge failed. The detangling branch has been left intact.
+11:44:46 [INFO] Inspect it with: git log group-03-test..detangling
+11:45:49 [INFO] Post-merge build-dep analysis: 5 group(s), base=5541daf687, head=134a1a11aa
+11:45:49 [INFO] Probing build dependencies between 5 atoms (base=5541daf687)...
+11:46:22 [INFO] Build-dependency graph: no hard build dependencies found — all atoms are independent.
+11:46:22 [INFO] Connected components (5 group(s)):
+11:46:22 [INFO]   build_graph_0001: group_0001
+11:46:22 [INFO]   build_graph_0002: group_0002
+11:46:22 [INFO]   build_graph_0003: group_0003
+11:46:22 [INFO]   build_graph_0004: group_0004
+11:46:22 [INFO]   build_graph_0005: group_0005
+11:46:22 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/build_graph  (5 file(s))
+12:40:24 [INFO] Post-merge build-dep analysis: 5 group(s), base=07eaee2340, head=327cc8e4c3
+12:40:30 [WARNING] 97 re-diffed hunk(s) did not match any group — they will be excluded from probing.
+12:40:30 [INFO] Probing build dependencies between 5 atoms (base=07eaee2340)...
+12:41:08 [INFO] Build-dependency graph: no hard build dependencies found — all atoms are independent.
+12:41:08 [INFO] Connected components (5 group(s)):
+12:41:08 [INFO]   build_graph_0001: group_0001
+12:41:08 [INFO]   build_graph_0002: group_0002
+12:41:08 [INFO]   build_graph_0003: group_0003
+12:41:08 [INFO]   build_graph_0004: group_0004
+12:41:08 [INFO]   build_graph_0005: group_0005
+12:41:08 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/build_graph  (5 file(s))
+12:49:34 [INFO] Post-merge build-dep analysis: 58 group(s), base=3760d03f94, head=68f11f7ea7
+12:49:37 [WARNING] 381 re-diffed hunk(s) did not match any group — they will be excluded from probing.
+12:49:37 [INFO] Probing build dependencies between 58 atoms (base=3760d03f94)...
+13:30:18 [INFO] Build-dependency graph (1 edge(s), 1653 invocation(s)):
+13:30:18 [INFO]   group_0001  --(build)-->  group_0002
+13:30:18 [INFO] Connected components (57 group(s)):
+13:30:18 [INFO]   build_graph_0001: group_0001, group_0002
+13:30:18 [INFO]   build_graph_0002: group_0003
+13:30:18 [INFO]   build_graph_0003: group_0004
+13:30:18 [INFO]   build_graph_0004: group_0005
+13:30:18 [INFO]   build_graph_0005: group_0006
+13:30:18 [INFO]   build_graph_0006: group_0007
+13:30:18 [INFO]   build_graph_0007: group_0008
+13:30:18 [INFO]   build_graph_0008: group_0009
+13:30:18 [INFO]   build_graph_0009: group_0010
+13:30:18 [INFO]   build_graph_0010: group_0011
+13:30:18 [INFO]   build_graph_0011: group_0012
+13:30:18 [INFO]   build_graph_0012: group_0013
+13:30:18 [INFO]   build_graph_0013: group_0014
+13:30:18 [INFO]   build_graph_0014: group_0015
+13:30:18 [INFO]   build_graph_0015: group_0016
+13:30:18 [INFO]   build_graph_0016: group_0017
+13:30:18 [INFO]   build_graph_0017: group_0018
+13:30:18 [INFO]   build_graph_0018: group_0019
+13:30:18 [INFO]   build_graph_0019: group_0020
+13:30:18 [INFO]   build_graph_0020: group_0021
+13:30:18 [INFO]   build_graph_0021: group_0022
+13:30:18 [INFO]   build_graph_0022: group_0023
+13:30:18 [INFO]   build_graph_0023: group_0024
+13:30:18 [INFO]   build_graph_0024: group_0025
+13:30:18 [INFO]   build_graph_0025: group_0026
+13:30:18 [INFO]   build_graph_0026: group_0027
+13:30:18 [INFO]   build_graph_0027: group_0028
+13:30:18 [INFO]   build_graph_0028: group_0029
+13:30:18 [INFO]   build_graph_0029: group_0030
+13:30:18 [INFO]   build_graph_0030: group_0031
+13:30:18 [INFO]   build_graph_0031: group_0032
+13:30:18 [INFO]   build_graph_0032: group_0033
+13:30:18 [INFO]   build_graph_0033: group_0034
+13:30:18 [INFO]   build_graph_0034: group_0035
+13:30:18 [INFO]   build_graph_0035: group_0036
+13:30:18 [INFO]   build_graph_0036: group_0037
+13:30:18 [INFO]   build_graph_0037: group_0038
+13:30:18 [INFO]   build_graph_0038: group_0039
+13:30:18 [INFO]   build_graph_0039: group_0040
+13:30:18 [INFO]   build_graph_0040: group_0041
+13:30:18 [INFO]   build_graph_0041: group_0042
+13:30:18 [INFO]   build_graph_0042: group_0043
+13:30:18 [INFO]   build_graph_0043: group_0044
+13:30:18 [INFO]   build_graph_0044: group_0045
+13:30:18 [INFO]   build_graph_0045: group_0046
+13:30:18 [INFO]   build_graph_0046: group_0047
+13:30:18 [INFO]   build_graph_0047: group_0048
+13:30:18 [INFO]   build_graph_0048: group_0049
+13:30:18 [INFO]   build_graph_0049: group_0050
+13:30:18 [INFO]   build_graph_0050: group_0051
+13:30:18 [INFO]   build_graph_0051: group_0052
+13:30:18 [INFO]   build_graph_0052: group_0053
+13:30:18 [INFO]   build_graph_0053: group_0054
+13:30:18 [INFO]   build_graph_0054: group_0055
+13:30:18 [INFO]   build_graph_0055: group_0056
+13:30:18 [INFO]   build_graph_0056: group_0057
+13:30:18 [INFO]   build_graph_0057: group_0058
+13:30:18 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (57 file(s))

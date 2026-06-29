@@ -1,0 +1,8 @@
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index 966f5ba..ce2e1fa 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -108,0 +109,3 @@ namespace CommandLine
++        /// <summary>
++        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
++        /// </summary>

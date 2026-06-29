@@ -1,0 +1,41 @@
+{
+  "run_id": "20260629_113705",
+  "approach": "programmatic",
+  "tangled_sha": "3900c3224003989bb0576d3dfe29a0240af18fbc",
+  "original_branch": "group-03-test",
+  "test_name": "dd25e301a-5hunks",
+  "run_dir": "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705",
+  "total_hunk_count": 5,
+  "iteration": 6,
+  "group_count": 5,
+  "total_invocations": 13,
+  "total_duration_ms": 56444,
+  "committed_groups": [
+    [
+      "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks/hunk_0001.patch"
+    ],
+    [
+      "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks/hunk_0002.patch"
+    ],
+    [
+      "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks/hunk_0003.patch"
+    ],
+    [
+      "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks/hunk_0004.patch"
+    ],
+    [
+      "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks/hunk_0005.patch"
+    ]
+  ],
+  "hunks_dir": "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks",
+  "prev_remaining_hunk_count": 1,
+  "pending_hunk_paths": [
+    "/Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/hunks/hunk_0005.patch"
+  ],
+  "iter_start_ms": 1782726163970,
+  "last_found_group": null,
+  "last_invocations": 1,
+  "last_iter_duration_ms": 4275,
+  "stalled": false,
+  "remaining_hunk_count": 0
+}

@@ -1,43 +1,160 @@
-diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
-index d44b29c..31a2002 100644
---- a/src/CommandLine/Core/SpecificationPropertyRules.cs
-+++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
-@@ -103,0 +104 @@ namespace CommandLine.Core
-+                                           where o.Group.IsNothing()
-@@ -115,0 +117 @@ namespace CommandLine.Core
-+                            where o.Group.IsNothing()
-diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
-index ce2e1fa..4a38a4d 100644
---- a/src/CommandLine/OptionAttribute.cs
-+++ b/src/CommandLine/OptionAttribute.cs
-@@ -110 +110 @@ namespace CommandLine
--        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
-+        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value. Required rules are ignored.
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+new file mode 100644
+index 0000000..15ecae6
+--- /dev/null
++++ b/CHANGELOG.md
+@@ -0,0 +1,96 @@
++# Changelog
++All notable changes to this project will be documented in this file.
++
++The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
++and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
++
++## [2.6.0] - 2019-07-31
++### Added
++- Support HelpText localization with ResourceType property by [@tkouba](https://github.com/commandlineparser/commandline/pull/356).
++- Add demo for complete localization of command line help using resources by[@tkouba](https://github.com/commandlineparser/commandline/pull/485).
++- Localize VerbAttribute  by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/473).
++- Improve support for multiline help text by [@NeilMacMullen](https://github.com/commandlineparser/commandline/pull/456/).
++- Reorder options in auto help text (issue #482) [@b3b00](https://github.com/commandlineparser/commandline/pull/484).
++- Add IsHelp() and IsVersion() Extension methods to mange HelpText errors by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/467).
++
++### Fixed
++- Fix issues for HelpText.AutoBuild configuration (issues #224 , # 259) by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/467).
++- Test maintainance: add missed tests and removing xUnit1013 warning by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/462).
++- Fix issue #104 of nullable enum by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/453).
++- Fix issue #418, modify version screen to print a new line at the end by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/443).
++
++
++## [2.5.0] - 2019-04-27
++### Added
++- Add support to  NET40 and NET45 for both CSharp and FSharp by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/430).
++
++ 
++### Changed
++- Proposed changes for enhancement by [@Wind010](https://github.com/commandlineparser/commandline/pull/314), cover:appveyor.yml, ReflectionExtensions.cs and error.cs.
++- Enhance the CSharp demo to run in multi-target net40;net45;netcoreapp2.0;netcoreapp2.1 by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/430).
++- Added explicit support for .NET 4.6.1 and .NET Core 2.0 by [@ravenpride](https://github.com/commandlineparser/commandline/pull/400). 
++- Convert commandline project to multi-target project netstandard2.0;net40;net45;net461.
++- Convert commandline Test to multi-target project net461;netcoreapp2.0. 
++
++
++
++### Fixed
++- Fix the null EntryAssembly Exception in unit test of net4x projects: issues #389,#424 by [@moh-hassan](https://github.com/commandlineparser/commandline/pull/430).
++- Fix the test case 'Add unit tests for Issue #389 and #392
++- Fix CSC error CS7027: Error signing output with public key from file 'CommandLine.snk' -- Invalid public key in appveyor CI.
++- Fix the error CS0234: The type or namespace name 'FSharp' for net40 Framework.
++- Fix Mis-typed CommandLine.BaseAttribute.Default results in ArgumentException: Object of type 'X' cannot be converted to type 'Y' (issue #189) by[@Wind010](https://github.com/commandlineparser/commandline/pull/314).
++
++
++
++
++## [2.4.3] - 2019-01-09
++### Added
++- Add support to  NetStandard2.0 by [@ViktorHofer](https://github.com/commandlineparser/commandline/pull/307) 
++- Add strong name signing  [@ViktorHofer](https://github.com/commandlineparser/commandline/pull/307) 
++-  Added AutoHelp and AutoVersion properties to control adding of implicit 'help' and 'version' options/verbs by [@Athari](https://github.com/commandlineparser/commandline/pull/256). 
++- Added simpler C# Quick Start example at readme.md by [@lythix](https://github.com/commandlineparser/commandline/pull/274).
++- Add validate feature in Set parameter, and throw exception, and show usage,Issue #283 by[@e673](https://github.com/commandlineparser/commandline/pull/286).
++
++
++### Deprecated
++- Drop support for NET40 and NET45
++
++
++### Removed
++- Disable faulty tests in netsatbdard2.0 and enable testing in CI.
++
++
++### Fixed
++- Fix grammar error in specification error message by [@DillonAd](https://github.com/commandlineparser/commandline/pull/276).
++- Fix HelpText.AutoBuild Usage spacing  by[@ElijahReva](https://github.com/commandlineparser/commandline/pull/280).
++- Fix type at readme.md file by [@matthewjberger](https://github.com/commandlineparser/commandline/pull/304)
++- Fix not showing correct header info, issue #34 by[@tynar](https://github.com/commandlineparser/commandline/pull/312).
++- Fix title of assembly renders oddly issue-#197 by [@Yiabiten](https://github.com/commandlineparser/commandline/pull/344).
++- Fix nuget apikey by [@ericnewton76](https://github.com/commandlineparser/commandline/pull/386).
++- Fix missing fsharp from github release deployment by @ericnewton76.
++- Fix to Display Width Tests by [@Oddley](https://github.com/commandlineparser/commandline/pull/278).
++- Fixing DisplayWidth for newer Mono  by [@Oddley](https://github.com/commandlineparser/commandline/pull/279).
++
++
++## [2.3.0] - 2018-08-13
++### Added
++- Properly handle CaseInsensitiveEnumValues flag fixing issue #198 by [@niklaskarl](https://github.com/commandlineparser/commandline/pull/231).
++
++### Changed
++- Updated README examples quick start example for c# and Vb.net to work with the new API by [@loligans](https://github.com/commandlineparser/commandline/pull/218).
++- Updated README by [@ericnewton76](https://github.com/commandlineparser/commandline/pull/208).
++- Update copyright in unit tests 
++- Patching appveyor dotnet csproj 
++- Updates to appveyor to create a build matrix
++
++### Fixed
++- hotfix/issue #213 fsharp dependency by [@ericnewton76](https://github.com/commandlineparser/commandline/pull/215).
++
++
++## [2.2.1] - 2018-01-10
++
++## [2.2.0] - 2018-01-07 
++
++## [1.9.71.2] - 2013-02-27
++The starting bascode version
+\ No newline at end of file
 diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
-index a67e43d..949e687 100644
+index b287a6e..b23bb80 100644
 --- a/src/CommandLine/Text/HelpText.cs
 +++ b/src/CommandLine/Text/HelpText.cs
-@@ -309 +308,0 @@ namespace CommandLine.Text
--        /// <param name="comparison">a comparison lambda to order options in help text</param>
-@@ -876,0 +876,10 @@ namespace CommandLine.Text
-+            OptionSpecification GetOptionGroupSpecification()
-+            {
-+                if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
-+                {
-+                    return optionSpecification;
-+                }
+@@ -395 +395 @@ namespace CommandLine.Text
+-                return new HelpText(HeadingInfo.Default){MaximumDisplayWidth = maxDisplayWidth }.AddPreOptionsLine(Environment.NewLine);
++                return new HelpText($"{HeadingInfo.Default}{Environment.NewLine}"){MaximumDisplayWidth = maxDisplayWidth }.AddPreOptionsLine(Environment.NewLine);
+diff --git a/tests/CommandLine.Tests/Unit/Issue418Tests.cs b/tests/CommandLine.Tests/Unit/Issue418Tests.cs
+new file mode 100644
+index 0000000..9c8678b
+--- /dev/null
++++ b/tests/CommandLine.Tests/Unit/Issue418Tests.cs
+@@ -0,0 +1,36 @@
++using CommandLine.Text;
++using System;
++using System.IO;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using CommandLine.Tests.Fakes;
++using Xunit;
++using FluentAssertions;
 +
-+                return null;
-+            }
++namespace CommandLine.Tests.Unit
++{
++	 //issue#418, --version does not print a new line at the end cause trouble in Linux
++    public class Issue418Tests
++    {	
++		
++        [Fact]
++        public void Explicit_version_request_generates_version_info_screen_with_eol()
++        {
++            // Fixture setup
++            var help = new StringWriter();
++            var sut = new Parser(config => config.HelpWriter = help);
 +
-@@ -899 +908,3 @@ namespace CommandLine.Text
--            if (specification.Required)
-+            var optionGroupSpecification = GetOptionGroupSpecification();
++            // Exercize system
++            sut.ParseArguments<Simple_Options>(new[] { "--version" });
++            var result = help.ToString();           
++            // Verify outcome
++            var lines = result.ToNotEmptyLines();  
++            result.Length.Should().BeGreaterThan(0);			
++            result.Should().EndWith(Environment.NewLine);
++            result.ToNotEmptyLines().Length.Should().Be(1);
++           
++            // Teardown
++        }
++	}
++}
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 23cf0f3..07e9bed 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -804,0 +805 @@ namespace CommandLine.Tests.Unit
 +
-+            if (specification.Required && optionGroupSpecification == null)
-@@ -902 +913 @@ namespace CommandLine.Text
--            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
-+            if (optionGroupSpecification != null)
-@@ -904 +915 @@ namespace CommandLine.Text
--                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
-+                optionHelpText = "({0}: {1}) ".FormatInvariant(optionGroupWord, optionGroupSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
+@@ -825,0 +827 @@ namespace CommandLine.Tests.Unit
++

@@ -1,12 +1,15 @@
-1782476139587|RUN_START|total_hunks=8,build_cmd=dotnet build --no-restore
-1782476152227|ITER_START|iteration=1,pending=8
-1782476269801|ITER_GROUP|iteration=1,group=1,group_size=1,invocations=4,duration_ms=84543,hunks=hunk_0001.patch
-1782476283491|ITER_START|iteration=2,pending=7
-1782476396413|ITER_GROUP|iteration=2,group=2,group_size=1,invocations=7,duration_ms=31990,hunks=hunk_0002.patch
-1782476435521|ITER_START|iteration=3,pending=6
-1782476632593|ITER_GROUP|iteration=3,group=3,group_size=1,invocations=7,duration_ms=13478,hunks=hunk_0003.patch
-1782476685686|ITER_START|iteration=4,pending=5
-1782477267892|ITER_GROUP|iteration=4,group=4,group_size=1,invocations=12,duration_ms=121413,hunks=hunk_0004.patch
-1782477661376|ITER_START|iteration=5,pending=4
-1782479431120|ITER_GROUP|iteration=5,group=5,group_size=4,invocations=13,duration_ms=189303,hunks=hunk_0005.patch, hunk_0006.patch, hunk_0007.patch, hunk_0008.patch
-1782479753032|RUN_END|groups=5,committed_hunks=8,uncommitted_hunks=0
+1782725825539|RUN_START|total_hunks=5,build_cmd=dotnet build --no-restore
+1782725832747|ITER_START|iteration=1,pending=5
+1782725870510|ITER_GROUP|iteration=1,group=1,group_size=1,invocations=4,duration_ms=21291,hunks=hunk_0001.patch
+1782725950578|ITER_START|iteration=2,pending=4
+1782725998720|ITER_GROUP|iteration=2,group=2,group_size=1,invocations=3,duration_ms=13955,hunks=hunk_0002.patch
+1782726018378|ITER_START|iteration=3,pending=3
+1782726043960|ITER_GROUP|iteration=3,group=3,group_size=1,invocations=3,duration_ms=11038,hunks=hunk_0003.patch
+1782726061658|ITER_START|iteration=4,pending=2
+1782726078975|ITER_GROUP|iteration=4,group=4,group_size=1,invocations=2,duration_ms=5885,hunks=hunk_0004.patch
+1782726081930|ITER_START|iteration=5,pending=1
+1782726162440|ITER_GROUP|iteration=5,group=5,group_size=1,invocations=1,duration_ms=4275,hunks=hunk_0005.patch
+1782726286614|RUN_END|groups=5,committed_hunks=5,uncommitted_hunks=0
+1782726382881|BUILD_DEP|atoms=5,edges=0,components=5,invocations=10
+1782729668522|BUILD_DEP|atoms=5,edges=0,components=5,invocations=10
+1782732618893|BUILD_DEP|atoms=58,edges=1,components=57,invocations=1653

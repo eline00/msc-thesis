@@ -1,0 +1,46 @@
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -9,0 +10,11 @@ namespace CommandLine.Tests.Unit.Core
++        private string NormalizeLineBreaks(string str)
++        {
++            return str.Replace("\r", "");
++        }
++        private void EnsureEquivalent(string a,string b)
++        {
++            //workaround build system line-end inconsistencies
++            NormalizeLineBreaks(a).Should().Be(NormalizeLineBreaks(b));
++        }
++
++        
+@@ -20 +31 @@ line2";
+-            wrapper.Indent(2).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.Indent(2).ToText(),expected);
+@@ -35 +46 @@ wrapping";
+-            wrapper.WordWrap(10).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(10).ToText(),expected);
+@@ -50 +61 @@ needs wrapping";
+-            wrapper.WordWrap(15).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(15).ToText(),expected);
+@@ -64 +75 @@ wrapping";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+@@ -84 +95 @@ be indented";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+@@ -99 +110 @@ FitOnASingleLine";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+@@ -115 +126 @@ that contains
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+@@ -129 +140 @@ spacing";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+@@ -144 +155 @@ spacing";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+@@ -160 +171 @@ spacing";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
