@@ -13,3 +13,6 @@
 1782726382881|BUILD_DEP|atoms=5,edges=0,components=5,invocations=10
 1782729668522|BUILD_DEP|atoms=5,edges=0,components=5,invocations=10
 1782732618893|BUILD_DEP|atoms=58,edges=1,components=57,invocations=1653
+1782752207517|INTERRUPTED|
+1782752195720|INTERRUPTED|
+1782765373675|BUILD_DEP|atoms=58,edges=550,components=2,invocations=1653

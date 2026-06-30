@@ -17,17 +17,26 @@ def test_build_dependencies(
     oracle: callable(combined_hunks: list[str]) -> bool, True if the set applies
             and builds, False otherwise (build-failure or apply-failure).
 
-    For each atom B (index b) and each earlier atom A (index a < b), probe the
-    set flatten(atoms[0..b]) - atoms[a]. If the oracle returns False, B has a
-    hard build dependency on A; record edge (a, b).
+    For each earlier atom A (index a), probe the growing prefix
+    flatten(atoms[0..b]) - atoms[a] for b > a. The first b whose probe fails is
+    the atom that *introduces* the hard dependency on A; record edge (a, b) and
+    stop probing A.
+
+    Attributing the edge to the first failing b — rather than to every later b
+    whose prefix merely still contains an earlier consumer of A — avoids smearing
+    one real dependency across all downstream atoms (which previously collapsed
+    nearly every atom into a single component). Once a prefix fails without A it
+    stays failing as it grows (the consumer remains in the set), so probing
+    larger b for the same A yields no new information.
 
     Returns (edges, invocations).
     """
     edges: list[tuple[int, int]] = []
     invocations = 0
-    for b in range(len(atoms)):
-        for a in range(b):
-            a_hunks = set(atoms[a])
+    n = len(atoms)
+    for a in range(n):
+        a_hunks = set(atoms[a])
+        for b in range(a + 1, n):
             combined = [
                 h
                 for idx in range(b + 1)
@@ -37,6 +46,7 @@ def test_build_dependencies(
             invocations += 1
             if not oracle(combined):
                 edges.append((a, b))
+                break
     return edges, invocations
 
 
@@ -160,3 +170,35 @@ def assign_hunks_to_groups(
                 atom.append(pool[sig].popleft())
         atoms.append(atom)
     return atoms
+
+
+def reconstruct_atoms(
+    hunk_files: list[str],
+    group_files: list[str],
+) -> tuple[list[list[str]], int]:
+    """Rebuild ordered atoms from a run dir's hunk and group patch files.
+
+    hunk_files:  original hunk patches (raw clean-base line numbers).
+    group_files: committed group patches, in group order.
+
+    Each hunk is matched to the group whose signature set contains it; matching
+    is line-number-invariant (see iter_hunk_signatures). Returns (atoms,
+    unmatched_count): atoms[i] holds the hunk-file paths for group_files[i] in
+    group order; unmatched_count is the number of hunk files matching no group.
+    """
+    raw_hunks: list[tuple[str, Signature]] = []
+    for path in hunk_files:
+        with open(path) as f:
+            sigs = iter_hunk_signatures(f.read())
+        if sigs:
+            raw_hunks.append((path, sigs[0]))
+
+    group_signatures = []
+    for gf in group_files:
+        with open(gf) as f:
+            group_signatures.append(iter_hunk_signatures(f.read()))
+
+    atoms = assign_hunks_to_groups(raw_hunks, group_signatures)
+    assigned = sum(len(a) for a in atoms)
+    unmatched = len(raw_hunks) - assigned
+    return atoms, unmatched

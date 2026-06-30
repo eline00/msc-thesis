@@ -3,11 +3,9 @@ import csv
 import json
 import os
 import re
-import shutil
 import signal
 import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 
@@ -783,48 +781,46 @@ def step_analyze_deps(run_dir_override: str | None = None) -> None:
 
 def _probe_build_deps(
     atoms: list[list[str]],
-    base: str,
-    restore_ref: str,
 ) -> tuple[list[tuple[int, int]], int] | None:
-    """Detach to *base*, verify the atoms apply, probe, restore *restore_ref*.
+    """Probe build dependencies between atoms in place against the current HEAD.
 
-    Returns (edges, invocations), or None if the atoms do not apply cleanly onto
-    base (a sign that base is wrong). The restore runs in a finally so HEAD is
-    returned to restore_ref even on error.
+    The caller is responsible for having checked out the correct clean base.
+    Refuses if the working tree is dirty (the oracle reverts via git restore /
+    delete and would clobber uncommitted work) or if the full atom set does not
+    apply cleanly onto HEAD (the base is wrong). Never moves HEAD.
+
+    Returns (edges, invocations), or None on either refusal.
     """
     from autocommit.build_dep_analysis import test_build_dependencies
     from autocommit.group import git_apply
 
-    all_hunks = [h for atom in atoms for h in atom]
-    git_run("checkout", "--detach", base)
-    try:
-        if not git_apply(all_hunks, check_only=True):
-            log_error(
-                f"The atom hunks do not apply cleanly onto base ({base[:10]}). "
-                f"The base is likely wrong — pass --base <ref> (the commit before "
-                f"the first atom)."
-            )
-            return None
-        return test_build_dependencies(
-            atoms, lambda combined: _build_dep_oracle(combined, BUILD_CMD)
+    if git_output("status", "--porcelain"):
+        log_error(
+            "Working tree is not clean. Commit or stash changes, then check out "
+            "the commit before the first atom and re-run."
         )
-    finally:
-        if git_run("checkout", restore_ref) != 0:
-            log_error(
-                f"Failed to restore '{restore_ref}' after probing — you may be on "
-                f"a detached HEAD. Inspect with 'git status'."
-            )
+        return None
+
+    all_hunks = [h for atom in atoms for h in atom]
+    if not git_apply(all_hunks, check_only=True):
+        log_error(
+            "The atom hunks do not apply onto current HEAD. Check out the commit "
+            "before the first atom (the clean base) and re-run."
+        )
+        return None
+
+    return test_build_dependencies(
+        atoms, lambda combined: _build_dep_oracle(combined, BUILD_CMD)
+    )
 
 
 def _probe_and_write_build_graph(
     atoms: list[list[str]],
     groups_dir: Path,
-    base: str,
-    restore_ref: str,
 ) -> None:
-    """Shared core: probe build dependencies, merge components, write build_graph/.
+    """Probe build dependencies, merge components, write build_graph/.
 
-    Used by both live (--analyze-build-deps) and post-merge (--run-dir) modes.
+    Probes against the current HEAD (the user-checked-out clean base).
     """
     from autocommit.build_dep_analysis import connected_components
 
@@ -833,11 +829,8 @@ def _probe_and_write_build_graph(
         edges: list[tuple[int, int]] = []
         invocations = 0
     else:
-        log_info(
-            f"Probing build dependencies between {len(atoms)} atoms "
-            f"(base={base[:10]})..."
-        )
-        result = _probe_build_deps(atoms, base, restore_ref)
+        log_info(f"Probing build dependencies between {len(atoms)} atoms...")
+        result = _probe_build_deps(atoms)
         if result is None:
             return
         edges, invocations = result
@@ -877,137 +870,68 @@ def _probe_and_write_build_graph(
     )
 
 
-def _analyze_build_deps_postmerge(run_dir_override: str, base_override: str | None) -> None:
-    """Post-merge --analyze-build-deps: reconstruct atoms from a finished run dir.
+def _analyze_build_deps_postmerge(run_dir_override: str) -> None:
+    """--analyze-build-deps: probe build deps for a finished run dir.
 
-    run_state.json is gone after --merge, so atom membership is rebuilt by
-    re-diffing base..HEAD for clean-base hunks and matching them (by content) to
-    the group_*.patch files. base defaults to HEAD~N (N = number of groups) and
-    is verified before probing; pass base_override to set it explicitly.
+    Reconstructs atoms from the run dir's own hunks/ (raw clean-base line
+    numbers) and groups/ patches by signature, then probes them against the
+    current HEAD. The user must have checked out the correct clean base (the
+    commit before the first atom) beforehand; HEAD is never moved.
     """
-    global _original_branch
-
-    from autocommit.build_dep_analysis import (
-        iter_hunk_signatures,
-        assign_hunks_to_groups,
-    )
+    from autocommit.build_dep_analysis import reconstruct_atoms
 
     p = Path(run_dir_override)
     if not p.is_absolute():
         p = SCRIPT_DIR / "tests" / p
     groups_dir = p / "groups"
+    hunks_dir = p / "hunks"
     if not groups_dir.exists():
         log_error(f"No groups/ directory found in {p}")
         return
-    group_files = sorted(groups_dir.glob("group_*.patch"))
+    if not hunks_dir.exists():
+        log_error(f"No hunks/ directory found in {p}")
+        return
+
+    group_files = [str(f) for f in sorted(groups_dir.glob("group_*.patch"))]
+    hunk_files = [str(f) for f in sorted(hunks_dir.glob("hunk_*.patch"))]
     if not group_files:
         log_error(f"No group_*.patch files found in {groups_dir}")
         return
-    n = len(group_files)
+    if not hunk_files:
+        log_error(f"No hunk_*.patch files found in {hunks_dir}")
+        return
 
-    # Restore target: the branch we are on now (or the SHA if already detached).
-    restore_ref = git_output("rev-parse", "--abbrev-ref", "HEAD")
-    if restore_ref == "HEAD":
-        restore_ref = git_output("rev-parse", "HEAD")
-    # Let the SIGINT/SIGTERM handler return here too if interrupted mid-probe.
-    _original_branch = restore_ref
-
-    head = git_output("rev-parse", "HEAD")
-
-    if base_override:
-        base = git_output("rev-parse", base_override)
-        if not base:
-            log_error(f"Could not resolve --base {base_override!r}.")
-            return
-    else:
-        base = git_output("rev-parse", f"HEAD~{n}")
-        if not base:
-            log_error(
-                f"HEAD does not have {n} ancestor commits — cannot derive base. "
-                f"Pass --base <ref> (the commit before the first atom)."
-            )
-            return
+    atoms, unmatched = reconstruct_atoms(hunk_files, group_files)
+    if unmatched:
+        log_warning(
+            f"{unmatched} hunk(s) did not match any group — excluded from probing."
+        )
 
     log_info(
-        f"Post-merge build-dep analysis: {n} group(s), "
-        f"base={base[:10]}, head={head[:10]}"
+        f"Post-merge build-dep analysis: {len(group_files)} group(s), "
+        f"probing against current HEAD ({git_output('rev-parse', '--short', 'HEAD')})."
     )
-
-    probe_dir = Path(tempfile.mkdtemp(prefix="etc_build_probe_"))
-    try:
-        diff = subprocess.run(
-            ["git", "diff", "-U0", base, head], capture_output=True
-        )
-        full_patch = probe_dir / "full.patch"
-        full_patch.write_bytes(diff.stdout)
-        hunks_dir = probe_dir / "hunks"
-        hunks_dir.mkdir()
-        split_hunks(full_patch, hunks_dir)
-        raw_hunk_files = sorted(hunks_dir.glob("hunk_*.patch"))
-        if not raw_hunk_files:
-            log_error(
-                f"No changes between {base[:10]} and HEAD — nothing to analyze."
-            )
-            return
-
-        raw_hunks = [
-            (str(f), iter_hunk_signatures(f.read_text())[0])
-            for f in raw_hunk_files
-            if iter_hunk_signatures(f.read_text())
-        ]
-        group_signatures = [
-            iter_hunk_signatures(gf.read_text()) for gf in group_files
-        ]
-        atoms = assign_hunks_to_groups(raw_hunks, group_signatures)
-
-        assigned = sum(len(a) for a in atoms)
-        if assigned != len(raw_hunks):
-            log_warning(
-                f"{len(raw_hunks) - assigned} re-diffed hunk(s) did not match any "
-                f"group — they will be excluded from probing."
-            )
-
-        _probe_and_write_build_graph(atoms, groups_dir, base, restore_ref)
-    finally:
-        shutil.rmtree(probe_dir, ignore_errors=True)
+    _probe_and_write_build_graph(atoms, groups_dir)
 
 
-def step_analyze_build_deps(
-    run_dir_override: str | None = None,
-    base_override: str | None = None,
-) -> None:
-    """--analyze-build-deps: Detect hard build dependencies between atoms via pairwise build-probing.
+def step_analyze_build_deps(run_dir_override: str | None = None) -> None:
+    """--analyze-build-deps: detect hard build dependencies between atoms.
 
-    Live mode (default): probes the current run's committed atoms before --merge.
-    Post-merge mode (--run-dir): reconstructs atoms from a finished run dir.
+    Post-merge only: requires --run-dir. Reconstructs atoms from the run dir and
+    probes them against the currently checked-out base (HEAD). Check out the
+    commit before the first atom before running.
     """
-    global _original_branch, _tangled_sha
-
     _init_log()
 
-    if run_dir_override:
-        _analyze_build_deps_postmerge(run_dir_override, base_override)
-        return
-
-    state = _load_state()
-    _original_branch = state["original_branch"]
-    _tangled_sha = state["tangled_sha"]
-
-    atoms: list[list[str]] = state["committed_groups"]
-    groups_dir = Path(state["run_dir"]) / "groups"
-
-    # Probing detaches HEAD onto the clean base; we must be able to return to the
-    # 'detangling' branch afterwards. Refuse if it is gone (e.g. run after
-    # --merge), rather than stranding the user on a detached HEAD.
-    if not git_output("rev-parse", "--verify", "detangling"):
+    if not run_dir_override:
         log_error(
-            "'detangling' branch not found — run --analyze-build-deps during a "
-            "live run (before --merge), or use --run-dir for a merged run."
+            "--analyze-build-deps requires --run-dir PATH. Check out the commit "
+            "before the first atom (the clean base), then run "
+            "'etc --analyze-build-deps --run-dir <run-dir>'."
         )
         return
 
-    base = git_output("rev-parse", _original_branch)
-    _probe_and_write_build_graph(atoms, groups_dir, base, "detangling")
+    _analyze_build_deps_postmerge(run_dir_override)
 
 # endregion
 
@@ -1056,7 +980,7 @@ def main() -> None:
             "  etc --one-iteration       Run one full iteration (split → find → commit)\n"
             "  etc --merge               Merge the detangling branch and write results\n"
             "  etc --analyze-deps [--run-dir PATH]  Analyse def-use relationships between groups\n"
-            "  etc --analyze-build-deps [--run-dir PATH [--base REF]]  Probe build dependencies and merge connected atoms\n"
+            "  etc --analyze-build-deps --run-dir PATH  Probe build dependencies (post-merge; check out the clean base first)\n"
             "\n"
             "Full automatic run (default):\n"
             "  etc [test_name]           Run all steps end-to-end\n"
@@ -1110,11 +1034,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--run-dir",
-        help="Path to a completed run directory (for --analyze-deps or --analyze-build-deps on finished/merged runs)",
-    )
-    parser.add_argument(
-        "--base",
-        help="(post-merge --analyze-build-deps) commit before the first atom; defaults to HEAD~N",
+        help="Path to a completed run directory (for --analyze-deps, or required for --analyze-build-deps)",
     )
 
     args = parser.parse_args()
@@ -1134,7 +1054,7 @@ def main() -> None:
     elif args.analyze_deps:
         step_analyze_deps(run_dir_override=args.run_dir)
     elif args.analyze_build_deps:
-        step_analyze_build_deps(run_dir_override=args.run_dir, base_override=args.base)
+        step_analyze_build_deps(run_dir_override=args.run_dir)
     else:
         run_all(args.test_name, approach=args.approach)
 
