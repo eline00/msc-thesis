@@ -14,3 +14,73 @@ index eaa52d1..bcba909 100644
 +        }
 +
 +        
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -31 +31 @@ line2";
+-            wrapper.Indent(2).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.Indent(2).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -46 +46 @@ wrapping";
+-            wrapper.WordWrap(10).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(10).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -61 +61 @@ needs wrapping";
+-            wrapper.WordWrap(15).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(15).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -75 +75 @@ wrapping";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -95 +95 @@ be indented";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -110 +110 @@ FitOnASingleLine";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -126 +126 @@ that contains
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -140 +140 @@ spacing";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -155 +155 @@ spacing";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);
+diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+index eaa52d1..bcba909 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
+@@ -171 +171 @@ spacing";
+-            wrapper.WordWrap(20).ToText().Should().Be(expected);
++            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);

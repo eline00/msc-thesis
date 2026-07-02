@@ -1,7 +1,0 @@
-diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
-index eaa52d1..bcba909 100644
---- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
-+++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
-@@ -31 +31 @@ line2";
--            wrapper.Indent(2).ToText().Should().Be(expected);
-+            EnsureEquivalent(wrapper.Indent(2).ToText(),expected);

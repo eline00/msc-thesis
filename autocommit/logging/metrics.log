@@ -16,3 +16,11 @@
 1782752207517|INTERRUPTED|
 1782752195720|INTERRUPTED|
 1782765373675|BUILD_DEP|atoms=58,edges=550,components=2,invocations=1653
+1782809559890|BUILD_DEP|atoms=58,edges=22,components=36,invocations=1125
+1782893640568|INTERRUPTED|
+1782893639389|INTERRUPTED|
+1782928111134|BUILD_DEP|atoms=58,iterations=12,components=2,invocations=1916
+1782985041392|BUILD_DEP|atoms=5,iterations=1,components=5,invocations=10
+1782987258238|BUILD_DEP|atoms=13,iterations=11,components=3,invocations=318
+1782988141942|BUILD_DEP|atoms=5,iterations=2,components=4,invocations=16
+1782989042140|BUILD_DEP|atoms=5,iterations=1,components=5,invocations=10

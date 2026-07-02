@@ -708,3 +708,249 @@
 22:33:44 [INFO]   build_graph_0001: group_0001, group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013, group_0014, group_0015, group_0016, group_0017, group_0018, group_0019, group_0020, group_0021, group_0022, group_0023, group_0024, group_0025, group_0026, group_0027, group_0028, group_0029, group_0030, group_0031, group_0032, group_0033, group_0034, group_0035, group_0036, group_0037, group_0038, group_0039, group_0040, group_0041, group_0042, group_0043, group_0044, group_0045, group_0046, group_0047, group_0048, group_0049, group_0050, group_0051, group_0052, group_0053, group_0054, group_0055, group_0056, group_0057, group_0058
 22:33:44 [INFO]   build_graph_0002: group_0002
 22:36:13 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (2 file(s))
+10:03:55 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
+10:03:55 [INFO] Probing build dependencies between 58 atoms...
+10:52:39 [INFO] Build-dependency graph (22 edge(s), 1125 invocation(s)):
+10:52:39 [INFO]   group_0001  --(build)-->  group_0003
+10:52:39 [INFO]   group_0004  --(build)-->  group_0005
+10:52:39 [INFO]   group_0005  --(build)-->  group_0011
+10:52:39 [INFO]   group_0006  --(build)-->  group_0007
+10:52:39 [INFO]   group_0012  --(build)-->  group_0038
+10:52:39 [INFO]   group_0013  --(build)-->  group_0023
+10:52:39 [INFO]   group_0014  --(build)-->  group_0057
+10:52:39 [INFO]   group_0016  --(build)-->  group_0043
+10:52:39 [INFO]   group_0017  --(build)-->  group_0038
+10:52:39 [INFO]   group_0018  --(build)-->  group_0047
+10:52:39 [INFO]   group_0019  --(build)-->  group_0047
+10:52:39 [INFO]   group_0021  --(build)-->  group_0024
+10:52:39 [INFO]   group_0022  --(build)-->  group_0030
+10:52:39 [INFO]   group_0024  --(build)-->  group_0025
+10:52:39 [INFO]   group_0026  --(build)-->  group_0028
+10:52:39 [INFO]   group_0030  --(build)-->  group_0039
+10:52:39 [INFO]   group_0032  --(build)-->  group_0041
+10:52:39 [INFO]   group_0038  --(build)-->  group_0039
+10:52:39 [INFO]   group_0043  --(build)-->  group_0044
+10:52:39 [INFO]   group_0048  --(build)-->  group_0049
+10:52:39 [INFO]   group_0050  --(build)-->  group_0053
+10:52:39 [INFO]   group_0056  --(build)-->  group_0057
+10:52:39 [INFO] Connected components (36 group(s)):
+10:52:39 [INFO]   build_graph_0001: group_0001, group_0003
+10:52:39 [INFO]   build_graph_0002: group_0002
+10:52:39 [INFO]   build_graph_0003: group_0004, group_0005, group_0011
+10:52:39 [INFO]   build_graph_0004: group_0006, group_0007
+10:52:39 [INFO]   build_graph_0005: group_0008
+10:52:39 [INFO]   build_graph_0006: group_0009
+10:52:39 [INFO]   build_graph_0007: group_0010
+10:52:39 [INFO]   build_graph_0008: group_0012, group_0017, group_0022, group_0030, group_0038, group_0039
+10:52:39 [INFO]   build_graph_0009: group_0013, group_0023
+10:52:39 [INFO]   build_graph_0010: group_0014, group_0056, group_0057
+10:52:39 [INFO]   build_graph_0011: group_0015
+10:52:39 [INFO]   build_graph_0012: group_0016, group_0043, group_0044
+10:52:39 [INFO]   build_graph_0013: group_0018, group_0019, group_0047
+10:52:39 [INFO]   build_graph_0014: group_0020
+10:52:39 [INFO]   build_graph_0015: group_0021, group_0024, group_0025
+10:52:39 [INFO]   build_graph_0016: group_0026, group_0028
+10:52:39 [INFO]   build_graph_0017: group_0027
+10:52:39 [INFO]   build_graph_0018: group_0029
+10:52:39 [INFO]   build_graph_0019: group_0031
+10:52:39 [INFO]   build_graph_0020: group_0032, group_0041
+10:52:39 [INFO]   build_graph_0021: group_0033
+10:52:39 [INFO]   build_graph_0022: group_0034
+10:52:39 [INFO]   build_graph_0023: group_0035
+10:52:39 [INFO]   build_graph_0024: group_0036
+10:52:39 [INFO]   build_graph_0025: group_0037
+10:52:39 [INFO]   build_graph_0026: group_0040
+10:52:39 [INFO]   build_graph_0027: group_0042
+10:52:39 [INFO]   build_graph_0028: group_0045
+10:52:39 [INFO]   build_graph_0029: group_0046
+10:52:39 [INFO]   build_graph_0030: group_0048, group_0049
+10:52:39 [INFO]   build_graph_0031: group_0050, group_0053
+10:52:39 [INFO]   build_graph_0032: group_0051
+10:52:39 [INFO]   build_graph_0033: group_0052
+10:52:39 [INFO]   build_graph_0034: group_0054
+10:52:39 [INFO]   build_graph_0035: group_0055
+10:52:39 [INFO]   build_graph_0036: group_0058
+10:52:39 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (36 file(s))
+11:48:40 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
+11:48:40 [INFO] [iteration 1] probing 58 atoms...
+22:09:05 [INFO] [iteration 1] 58 atoms, 22 edge(s), 1125 invocation(s) -> 36 component(s)
+22:09:05 [INFO]     group_0001  --(build)-->  group_0003
+22:09:05 [INFO]     group_0004  --(build)-->  group_0005
+22:09:05 [INFO]     group_0005  --(build)-->  group_0011
+22:09:05 [INFO]     group_0006  --(build)-->  group_0007
+22:09:05 [INFO]     group_0012  --(build)-->  group_0038
+22:09:05 [INFO]     group_0013  --(build)-->  group_0023
+22:09:05 [INFO]     group_0014  --(build)-->  group_0057
+22:09:05 [INFO]     group_0016  --(build)-->  group_0043
+22:09:05 [INFO]     group_0017  --(build)-->  group_0038
+22:09:05 [INFO]     group_0018  --(build)-->  group_0047
+22:09:05 [INFO]     group_0019  --(build)-->  group_0047
+22:09:05 [INFO]     group_0021  --(build)-->  group_0024
+22:09:05 [INFO]     group_0022  --(build)-->  group_0030
+22:09:05 [INFO]     group_0024  --(build)-->  group_0025
+22:09:05 [INFO]     group_0026  --(build)-->  group_0028
+22:09:05 [INFO]     group_0030  --(build)-->  group_0039
+22:09:05 [INFO]     group_0032  --(build)-->  group_0041
+22:09:05 [INFO]     group_0038  --(build)-->  group_0039
+22:09:05 [INFO]     group_0043  --(build)-->  group_0044
+22:09:05 [INFO]     group_0048  --(build)-->  group_0049
+22:09:05 [INFO]     group_0050  --(build)-->  group_0053
+22:09:05 [INFO]     group_0056  --(build)-->  group_0057
+22:09:05 [INFO] [iteration 2] probing 36 atoms...
+10:13:59 [WARNING] Interrupted. Cleaning up...
+10:14:00 [WARNING] Interrupted. Cleaning up...
+16:11:46 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
+16:11:46 [INFO] [iteration 1] probing 58 atoms...
+17:56:01 [INFO] [iteration 1] 58 atoms, 24 edge(s), 1112 invocation(s) -> 34 component(s)
+17:56:01 [INFO]     group_0001  --(build)-->  group_0003
+17:56:01 [INFO]     group_0004  --(build)-->  group_0005
+17:56:01 [INFO]     group_0005  --(build)-->  group_0011
+17:56:01 [INFO]     group_0006  --(build)-->  group_0007
+17:56:01 [INFO]     group_0011  --(build)-->  group_0050
+17:56:01 [INFO]     group_0012  --(build)-->  group_0038
+17:56:01 [INFO]     group_0013  --(build)-->  group_0023
+17:56:01 [INFO]     group_0014  --(build)-->  group_0057
+17:56:01 [INFO]     group_0016  --(build)-->  group_0043
+17:56:01 [INFO]     group_0017  --(build)-->  group_0038
+17:56:01 [INFO]     group_0018  --(build)-->  group_0047
+17:56:01 [INFO]     group_0019  --(build)-->  group_0047
+17:56:01 [INFO]     group_0021  --(build)-->  group_0024
+17:56:01 [INFO]     group_0022  --(build)-->  group_0030
+17:56:01 [INFO]     group_0024  --(build)-->  group_0025
+17:56:01 [INFO]     group_0026  --(build)-->  group_0028
+17:56:01 [INFO]     group_0030  --(build)-->  group_0039
+17:56:01 [INFO]     group_0032  --(build)-->  group_0041
+17:56:01 [INFO]     group_0038  --(build)-->  group_0039
+17:56:01 [INFO]     group_0043  --(build)-->  group_0044
+17:56:01 [INFO]     group_0047  --(build)-->  group_0053
+17:56:01 [INFO]     group_0048  --(build)-->  group_0049
+17:56:01 [INFO]     group_0050  --(build)-->  group_0053
+17:56:01 [INFO]     group_0056  --(build)-->  group_0057
+17:56:01 [INFO] [iteration 2] probing 34 atoms...
+18:30:23 [INFO] [iteration 2] 34 atoms, 14 edge(s), 230 invocation(s) -> 20 component(s)
+18:30:23 [INFO]     {group_0001+group_0003}  --(build)-->  {group_0004+group_0005+group_0011+group_0018+group_0019+group_0047+group_0050+group_0053}
+18:30:23 [INFO]     group_0002  --(build)-->  {group_0004+group_0005+group_0011+group_0018+group_0019+group_0047+group_0050+group_0053}
+18:30:23 [INFO]     {group_0004+group_0005+group_0011+group_0018+group_0019+group_0047+group_0050+group_0053}  --(build)-->  {group_0014+group_0056+group_0057}
+18:30:23 [INFO]     {group_0006+group_0007}  --(build)-->  group_0008
+18:30:23 [INFO]     group_0008  --(build)-->  group_0009
+18:30:23 [INFO]     group_0009  --(build)-->  group_0010
+18:30:23 [INFO]     group_0010  --(build)-->  {group_0012+group_0017+group_0022+group_0030+group_0038+group_0039}
+18:30:23 [INFO]     {group_0012+group_0017+group_0022+group_0030+group_0038+group_0039}  --(build)-->  {group_0013+group_0023}
+18:30:23 [INFO]     {group_0013+group_0023}  --(build)-->  {group_0014+group_0056+group_0057}
+18:30:23 [INFO]     {group_0014+group_0056+group_0057}  --(build)-->  group_0015
+18:30:23 [INFO]     group_0015  --(build)-->  {group_0016+group_0043+group_0044}
+18:30:23 [INFO]     {group_0016+group_0043+group_0044}  --(build)-->  group_0020
+18:30:23 [INFO]     {group_0021+group_0024+group_0025}  --(build)-->  {group_0026+group_0028}
+18:30:23 [INFO]     {group_0032+group_0041}  --(build)-->  group_0055
+18:30:23 [INFO] [iteration 3] probing 20 atoms...
+18:49:36 [INFO] [iteration 3] 20 atoms, 2 edge(s), 159 invocation(s) -> 18 component(s)
+18:49:36 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0038+group_0039+group_0043+group_0044+group_0047+group_0050+group_0053+group_0056+group_0057}  --(build)-->  {group_0032+group_0041+group_0055}
+18:49:36 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0028}  --(build)-->  group_0027
+18:49:36 [INFO] [iteration 4] probing 18 atoms...
+19:12:36 [INFO] [iteration 4] 18 atoms, 2 edge(s), 126 invocation(s) -> 16 component(s)
+19:12:36 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0038+group_0039+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0034
+19:12:36 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028}  --(build)-->  group_0029
+19:12:36 [INFO] [iteration 5] probing 16 atoms...
+19:22:58 [INFO] [iteration 5] 16 atoms, 2 edge(s), 96 invocation(s) -> 14 component(s)
+19:22:58 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0038+group_0039+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0035
+19:22:58 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029}  --(build)-->  group_0031
+19:22:58 [INFO] [iteration 6] probing 14 atoms...
+19:32:36 [INFO] [iteration 6] 14 atoms, 2 edge(s), 72 invocation(s) -> 12 component(s)
+19:32:36 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0040
+19:32:36 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031}  --(build)-->  group_0033
+19:32:36 [INFO] [iteration 7] probing 12 atoms...
+19:39:48 [INFO] [iteration 7] 12 atoms, 2 edge(s), 50 invocation(s) -> 10 component(s)
+19:39:48 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0042
+19:39:48 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033}  --(build)-->  group_0036
+19:39:48 [INFO] [iteration 8] probing 10 atoms...
+19:41:22 [INFO] [iteration 8] 10 atoms, 2 edge(s), 34 invocation(s) -> 8 component(s)
+19:41:22 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  {group_0048+group_0049}
+19:41:22 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036}  --(build)-->  group_0037
+19:41:22 [INFO] [iteration 9] probing 8 atoms...
+19:46:12 [INFO] [iteration 9] 8 atoms, 2 edge(s), 20 invocation(s) -> 6 component(s)
+19:46:12 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0048+group_0049+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0051
+19:46:12 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036+group_0037}  --(build)-->  group_0045
+19:46:12 [INFO] [iteration 10] probing 6 atoms...
+19:46:57 [INFO] [iteration 10] 6 atoms, 2 edge(s), 11 invocation(s) -> 4 component(s)
+19:46:57 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0048+group_0049+group_0050+group_0051+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0054
+19:46:57 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036+group_0037+group_0045}  --(build)-->  group_0046
+19:46:57 [INFO] [iteration 11] probing 4 atoms...
+19:47:09 [INFO] [iteration 11] 4 atoms, 2 edge(s), 5 invocation(s) -> 2 component(s)
+19:47:09 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0048+group_0049+group_0050+group_0051+group_0053+group_0054+group_0055+group_0056+group_0057}  --(build)-->  group_0058
+19:47:09 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036+group_0037+group_0045+group_0046}  --(build)-->  group_0052
+19:47:09 [INFO] [iteration 12] probing 2 atoms...
+19:47:11 [INFO] [iteration 12] 2 atoms, 0 edge(s), 1 invocation(s) -> 2 component(s)
+19:47:11 [INFO] Build-dependency fixpoint: 2 component(s) after 12 iteration(s), 1916 total invocation(s).
+19:47:11 [INFO]   build_graph_0001: group_0001, group_0002, group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013, group_0014, group_0015, group_0016, group_0017, group_0018, group_0019, group_0020, group_0022, group_0023, group_0030, group_0032, group_0034, group_0035, group_0038, group_0039, group_0040, group_0041, group_0042, group_0043, group_0044, group_0047, group_0048, group_0049, group_0050, group_0051, group_0053, group_0054, group_0055, group_0056, group_0057, group_0058
+19:47:11 [INFO]   build_graph_0002: group_0021, group_0024, group_0025, group_0026, group_0027, group_0028, group_0029, group_0031, group_0033, group_0036, group_0037, group_0045, group_0046, group_0052
+19:48:31 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (2 file(s))
+11:34:00 [INFO] Post-merge build-dep analysis: 5 group(s), probing against current HEAD (3fbcbdb).
+11:34:02 [INFO] [iteration 1] probing 5 atoms...
+11:37:21 [INFO] [iteration 1] 5 atoms, 0 edge(s), 10 invocation(s) -> 5 component(s)
+11:37:21 [INFO] Build-dependency fixpoint: 5 component(s) after 1 iteration(s), 10 total invocation(s).
+11:37:21 [INFO]   build_graph_0001: group_0001
+11:37:21 [INFO]   build_graph_0002: group_0002
+11:37:21 [INFO]   build_graph_0003: group_0003
+11:37:21 [INFO]   build_graph_0004: group_0004
+11:37:21 [INFO]   build_graph_0005: group_0005
+11:37:21 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/build_graph  (5 file(s))
+11:45:38 [INFO] Post-merge build-dep analysis: 13 group(s), probing against current HEAD (bb4a3ce).
+11:45:43 [INFO] [iteration 1] probing 13 atoms...
+11:49:22 [INFO] [iteration 1] 13 atoms, 1 edge(s), 69 invocation(s) -> 12 component(s)
+11:49:22 [INFO]     group_0003  --(build)-->  group_0004
+11:49:22 [INFO] [iteration 2] probing 12 atoms...
+11:56:20 [INFO] [iteration 2] 12 atoms, 1 edge(s), 58 invocation(s) -> 11 component(s)
+11:56:20 [INFO]     {group_0003+group_0004}  --(build)-->  group_0005
+11:56:20 [INFO] [iteration 3] probing 11 atoms...
+11:57:29 [INFO] [iteration 3] 11 atoms, 1 edge(s), 48 invocation(s) -> 10 component(s)
+11:57:29 [INFO]     {group_0003+group_0004+group_0005}  --(build)-->  group_0006
+11:57:29 [INFO] [iteration 4] probing 10 atoms...
+12:02:19 [INFO] [iteration 4] 10 atoms, 1 edge(s), 39 invocation(s) -> 9 component(s)
+12:02:19 [INFO]     {group_0003+group_0004+group_0005+group_0006}  --(build)-->  group_0007
+12:02:19 [INFO] [iteration 5] probing 9 atoms...
+12:03:03 [INFO] [iteration 5] 9 atoms, 1 edge(s), 31 invocation(s) -> 8 component(s)
+12:03:03 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007}  --(build)-->  group_0008
+12:03:03 [INFO] [iteration 6] probing 8 atoms...
+12:03:37 [INFO] [iteration 6] 8 atoms, 1 edge(s), 24 invocation(s) -> 7 component(s)
+12:03:37 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008}  --(build)-->  group_0009
+12:03:37 [INFO] [iteration 7] probing 7 atoms...
+12:04:08 [INFO] [iteration 7] 7 atoms, 1 edge(s), 18 invocation(s) -> 6 component(s)
+12:04:08 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009}  --(build)-->  group_0010
+12:04:08 [INFO] [iteration 8] probing 6 atoms...
+12:09:56 [INFO] [iteration 8] 6 atoms, 1 edge(s), 13 invocation(s) -> 5 component(s)
+12:09:56 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010}  --(build)-->  group_0011
+12:09:56 [INFO] [iteration 9] probing 5 atoms...
+12:10:31 [INFO] [iteration 9] 5 atoms, 1 edge(s), 9 invocation(s) -> 4 component(s)
+12:10:31 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011}  --(build)-->  group_0012
+12:10:31 [INFO] [iteration 10] probing 4 atoms...
+12:13:16 [INFO] [iteration 10] 4 atoms, 1 edge(s), 6 invocation(s) -> 3 component(s)
+12:13:16 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012}  --(build)-->  group_0013
+12:13:16 [INFO] [iteration 11] probing 3 atoms...
+12:13:20 [INFO] [iteration 11] 3 atoms, 0 edge(s), 3 invocation(s) -> 3 component(s)
+12:13:20 [INFO] Build-dependency fixpoint: 3 component(s) after 11 iteration(s), 318 total invocation(s).
+12:13:20 [INFO]   build_graph_0001: group_0001
+12:13:20 [INFO]   build_graph_0002: group_0002
+12:13:20 [INFO]   build_graph_0003: group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013
+12:14:18 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/ac9e31c5a-13hunks/runs/20260628_222124/build_graph  (3 file(s))
+12:27:02 [INFO] Post-merge build-dep analysis: 5 group(s), probing against current HEAD (0d611f9).
+12:27:04 [INFO] [iteration 1] probing 5 atoms...
+12:28:52 [INFO] [iteration 1] 5 atoms, 1 edge(s), 10 invocation(s) -> 4 component(s)
+12:28:52 [INFO]     group_0004  --(build)-->  group_0005
+12:28:52 [INFO] [iteration 2] probing 4 atoms...
+12:29:01 [INFO] [iteration 2] 4 atoms, 0 edge(s), 6 invocation(s) -> 4 component(s)
+12:29:01 [INFO] Build-dependency fixpoint: 4 component(s) after 2 iteration(s), 16 total invocation(s).
+12:29:01 [INFO]   build_graph_0001: group_0001
+12:29:01 [INFO]   build_graph_0002: group_0002
+12:29:01 [INFO]   build_graph_0003: group_0003
+12:29:01 [INFO]   build_graph_0004: group_0004, group_0005
+12:29:01 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/18e5e7850-5hunks/runs/20260628_221153/build_graph  (4 file(s))
+12:38:59 [INFO] Post-merge build-dep analysis: 5 group(s), probing against current HEAD (5541daf).
+12:39:01 [INFO] [iteration 1] probing 5 atoms...
+12:43:36 [INFO] [iteration 1] 5 atoms, 0 edge(s), 10 invocation(s) -> 5 component(s)
+12:43:36 [INFO] Build-dependency fixpoint: 5 component(s) after 1 iteration(s), 10 total invocation(s).
+12:43:36 [INFO]   build_graph_0001: group_0001
+12:43:36 [INFO]   build_graph_0002: group_0002
+12:43:36 [INFO]   build_graph_0003: group_0003
+12:43:36 [INFO]   build_graph_0004: group_0004
+12:43:36 [INFO]   build_graph_0005: group_0005
+12:44:02 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/build_graph  (5 file(s))

@@ -1,7 +1,0 @@
-diff --git a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
-index eaa52d1..bcba909 100644
---- a/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
-+++ b/tests/CommandLine.Tests/Unit/Core/TextWrapperTests.cs
-@@ -171 +171 @@ spacing";
--            wrapper.WordWrap(20).ToText().Should().Be(expected);
-+            EnsureEquivalent(wrapper.WordWrap(20).ToText(),expected);

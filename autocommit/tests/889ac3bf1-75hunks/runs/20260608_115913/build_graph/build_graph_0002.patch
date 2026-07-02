@@ -1,0 +1,116 @@
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -16,0 +17 @@ namespace CommandLine.Core
++        private readonly bool flagCounter;
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -81,0 +82,8 @@ namespace CommandLine.Core
++
++        /// <summary>
++        /// Whether this is an int option that counts how many times a flag was set rather than taking a value on the command line
++        /// </summary>
++        public bool FlagCounter
++        {
++            get { return flagCounter; }
++        }
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -179 +179,6 @@ namespace CommandLine
+-                    info => ((OptionSpecification)info.Specification).ShortName).ToArray())).Append(' ')
++                    info => {
++                        var o = (OptionSpecification)info.Specification;
++                        return o.FlagCounter
++                            ? string.Concat(Enumerable.Repeat(o.ShortName, (int)info.Value))
++                            : o.ShortName;
++                    }).ToArray())).Append(' ')
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -258 +258 @@ namespace CommandLine
+-                    .Append(spec.FormatName(settings))
++                    .Append(spec.FormatName(value, settings))
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -263 +263 @@ namespace CommandLine
+-        private static string FormatName(this OptionSpecification optionSpec, UnParserSettings settings)
++        private static string FormatName(this OptionSpecification optionSpec, object value, UnParserSettings settings)
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..b079ce0 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -108,0 +109 @@ namespace CommandLine.Tests.Unit
++            // NOTE: Once GetoptMode becomes the default, it will imply MultiInstance and the above check will fail because it will be Parsed.
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -270 +270 @@ namespace CommandLine
+-            return
++            var formattedName =
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -275,0 +276 @@ namespace CommandLine
++            return optionSpec.FlagCounter ? String.Join(" ", Enumerable.Repeat(formattedName, (int)value)) : formattedName;
+diff --git a/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs b/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs
+index f14eea5..a489b74 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TokenizerTests.cs
+@@ -127 +127,0 @@ namespace CommandLine.Tests.Unit.Core
+-
+diff --git a/src/CommandLine/Core/NameLookup.cs b/src/CommandLine/Core/NameLookup.cs
+index 3605d1a..ccb24ea 100644
+--- a/src/CommandLine/Core/NameLookup.cs
++++ b/src/CommandLine/Core/NameLookup.cs
+@@ -23 +23 @@ namespace CommandLine.Core
+-            return option.ConversionType == typeof(bool)
++            return option.ConversionType == typeof(bool) || (option.ConversionType == typeof(int) && option.FlagCounter)
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -29,0 +30 @@ namespace CommandLine.Core
++            this.flagCounter = flagCounter;
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -180,0 +181 @@ namespace CommandLine
++        /// If GetoptMode is true, this defaults to true, but can be turned off by explicitly specifying AllowMultiInstance = false.
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -156 +156,3 @@ namespace CommandLine
+-                              where o.TargetType != TargetType.Switch || (o.TargetType == TargetType.Switch && ((bool)info.Value))
++                              where o.TargetType != TargetType.Switch ||
++                                   (o.TargetType == TargetType.Switch && o.FlagCounter && ((int)info.Value > 0)) ||
++                                   (o.TargetType == TargetType.Switch && ((bool)info.Value))
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..b079ce0 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -271,0 +272 @@ namespace CommandLine.Tests.Unit
++            // NOTE: Once GetoptMode becomes the default, it will imply MultiInstance and the above check will fail because it will be Parsed.
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..b079ce0 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -947,0 +948 @@ namespace CommandLine.Tests.Unit
++            // NOTE: Once GetoptMode becomes the default, it will imply MultiInstance and this test will fail because the parser result will be Parsed.
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -168,0 +169 @@ namespace CommandLine
++        /// If GetoptMode is true, this defaults to true, but can be turned off by explicitly specifying EnableDashDash = false.

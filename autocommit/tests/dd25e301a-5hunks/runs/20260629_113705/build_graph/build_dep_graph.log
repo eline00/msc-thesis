@@ -1,5 +1,5 @@
-Build-dependency graph: no hard build dependencies found — all atoms are independent.
-Connected components (5 group(s)):
+[iteration 1] 5 atoms, 0 edge(s), 10 invocation(s) -> 5 component(s)
+Build-dependency fixpoint: 5 component(s) after 1 iteration(s), 10 total invocation(s).
   build_graph_0001: group_0001
   build_graph_0002: group_0002
   build_graph_0003: group_0003

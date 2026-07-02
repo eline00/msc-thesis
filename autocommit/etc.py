@@ -818,55 +818,100 @@ def _probe_and_write_build_graph(
     atoms: list[list[str]],
     groups_dir: Path,
 ) -> None:
-    """Probe build dependencies, merge components, write build_graph/.
+    """Iteratively probe build dependencies to a fixpoint, then write build_graph/.
+
+    A single probing pass only links each atom to its *first* downstream consumer
+    (test_build_dependencies breaks after the first failing prefix), so one pass
+    under-merges when one atom has several independent consumers: only the first
+    is pulled in. We re-probe the merged components as new atoms and repeat until
+    a pass finds no further dependencies — the fixpoint, i.e. the transitive
+    closure of the build-dependency relation. Each pass either merges at least one
+    pair (strictly fewer atoms) or finds nothing and stops, so it always
+    terminates.
 
     Probes against the current HEAD (the user-checked-out clean base).
     """
     from autocommit.build_dep_analysis import connected_components
 
-    if len(atoms) < 2:
-        log_info(f"{len(atoms)} atom(s) — no pairs to probe.")
-        edges: list[tuple[int, int]] = []
-        invocations = 0
-    else:
-        log_info(f"Probing build dependencies between {len(atoms)} atoms...")
-        result = _probe_build_deps(atoms)
-        if result is None:
-            return
-        edges, invocations = result
+    def atom_label(group_idxs: list[int]) -> str:
+        names = [f"group_{g + 1:04d}" for g in group_idxs]
+        return names[0] if len(names) == 1 else "{" + "+".join(names) + "}"
+
+    # current_atoms holds hunk-path lists for the current (possibly merged) atoms;
+    # groups_of_atom[i] tracks which original group indices each one bundles.
+    current_atoms = atoms
+    groups_of_atom: list[list[int]] = [[i] for i in range(len(atoms))]
 
     log_lines: list[str] = []
-    if not edges:
-        msg = "Build-dependency graph: no hard build dependencies found — all atoms are independent."
-        log_info(msg)
-        log_lines.append(msg)
-    else:
-        header = f"Build-dependency graph ({len(edges)} edge(s), {invocations} invocation(s)):"
+    total_invocations = 0
+    iteration = 0
+
+    while True:
+        iteration += 1
+        n = len(current_atoms)
+        if n < 2:
+            log_info(f"[iteration {iteration}] {n} atom(s) — no pairs to probe.")
+            edges: list[tuple[int, int]] = []
+            invocations = 0
+        else:
+            log_info(f"[iteration {iteration}] probing {n} atoms...")
+            result = _probe_build_deps(current_atoms)
+            if result is None:
+                return
+            edges, invocations = result
+        total_invocations += invocations
+
+        components = connected_components(n, edges)
+
+        header = (
+            f"[iteration {iteration}] {n} atoms, {len(edges)} edge(s), "
+            f"{invocations} invocation(s) -> {len(components)} component(s)"
+        )
         log_info(header)
         log_lines.append(header)
         for a, b in edges:
-            line = f"  group_{a + 1:04d}  --(build)-->  group_{b + 1:04d}"
+            line = (
+                f"    {atom_label(groups_of_atom[a])}  --(build)-->  "
+                f"{atom_label(groups_of_atom[b])}"
+            )
             log_info(line)
             log_lines.append(line)
 
-    components = connected_components(len(atoms), edges)
-    comp_header = f"Connected components ({len(components)} group(s)):"
-    log_info(comp_header)
-    log_lines.append(comp_header)
-    for i, comp in enumerate(components, start=1):
+        # Fixpoint: no edge merged any pair this pass (every component a singleton).
+        if len(components) == n:
+            break
+
+        new_atoms: list[list[str]] = []
+        new_groups: list[list[int]] = []
+        for comp in components:
+            new_atoms.append([h for idx in comp for h in current_atoms[idx]])
+            new_groups.append(sorted(g for idx in comp for g in groups_of_atom[idx]))
+        current_atoms = new_atoms
+        groups_of_atom = new_groups
+
+    # Final components, expressed in original group indices, ordered by first member.
+    final_components = sorted((sorted(g) for g in groups_of_atom), key=lambda g: g[0])
+
+    summary = (
+        f"Build-dependency fixpoint: {len(final_components)} component(s) after "
+        f"{iteration} iteration(s), {total_invocations} total invocation(s)."
+    )
+    log_info(summary)
+    log_lines.append(summary)
+    for i, comp in enumerate(final_components, start=1):
         members = ", ".join(f"group_{idx + 1:04d}" for idx in comp)
         line = f"  build_graph_{i:04d}: {members}"
         log_info(line)
         log_lines.append(line)
 
-    graph_dir, n_files = _write_build_graph_dir(groups_dir, components)
+    graph_dir, n_files = _write_build_graph_dir(groups_dir, final_components)
     log_info(f"Build-graph folder written → {graph_dir}  ({n_files} file(s))")
     (graph_dir / "build_dep_graph.log").write_text("\n".join(log_lines) + "\n")
 
     metrics_event(
         "BUILD_DEP",
-        f"atoms={len(atoms)},edges={len(edges)},"
-        f"components={len(components)},invocations={invocations}",
+        f"atoms={len(atoms)},iterations={iteration},"
+        f"components={len(final_components)},invocations={total_invocations}",
     )
 
 
