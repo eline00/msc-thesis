@@ -1,0 +1,51 @@
+diff --git a/src/CommandLine/Infrastructure/StringExtensions.cs b/src/CommandLine/Infrastructure/StringExtensions.cs
+index 7bfab66..db8aa0b 100644
+--- a/src/CommandLine/Infrastructure/StringExtensions.cs
++++ b/src/CommandLine/Infrastructure/StringExtensions.cs
+@@ -75,0 +76,18 @@ namespace CommandLine.Infrastructure
++
++        public static bool ToBooleanLoose(this string value)
++        {
++            if ((string.IsNullOrEmpty(value)) ||
++                (value == "0") ||
++                (value.Equals("f", StringComparison.OrdinalIgnoreCase)) ||
++                (value.Equals("n", StringComparison.OrdinalIgnoreCase)) ||
++                (value.Equals("no", StringComparison.OrdinalIgnoreCase)) ||
++                (value.Equals("off", StringComparison.OrdinalIgnoreCase)) ||
++                (value.Equals("false", StringComparison.OrdinalIgnoreCase)))
++            {
++                return false;
++            }
++            else
++            {
++                return true;
++            }
++        }
+diff --git a/src/CommandLine/ParserSettings.cs b/src/CommandLine/ParserSettings.cs
+index 95a4cd8..5ed73f3 100644
+--- a/src/CommandLine/ParserSettings.cs
++++ b/src/CommandLine/ParserSettings.cs
+@@ -183,2 +192,21 @@ namespace CommandLine
+-            get => allowMultiInstance;
+-            set => PopsicleSetter.Set(Consumed, ref allowMultiInstance, value);
++            get => allowMultiInstance.MatchJust(out bool value) ? value : getoptMode;
++            set => PopsicleSetter.Set(Consumed, ref allowMultiInstance, Maybe.Just(value));
++        }
++
++        /// <summary>
++        /// Whether strict getopt-like processing is applied to option values; if true, AllowMultiInstance and EnableDashDash will default to true as well.
++        /// </summary>
++        public bool GetoptMode
++        {
++            get => getoptMode;
++            set => PopsicleSetter.Set(Consumed, ref getoptMode, value);
++        }
++
++        /// <summary>
++        /// Whether getopt-like processing should follow the POSIX rules (the equivalent of using the "+" prefix in the C getopt() call).
++        /// If not explicitly set, will default to false unless the POSIXLY_CORRECT environment variable is set, in which case it will default to true.
++        /// </summary>
++        public bool PosixlyCorrect
++        {
++            get => posixlyCorrect.MapValueOrDefault(val => val, () => Environment.GetEnvironmentVariable("POSIXLY_CORRECT").ToBooleanLoose());
++            set => PopsicleSetter.Set(Consumed, ref posixlyCorrect, Maybe.Just(value));

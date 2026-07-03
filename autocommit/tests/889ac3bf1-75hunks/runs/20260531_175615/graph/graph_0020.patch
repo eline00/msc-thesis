@@ -1,0 +1,6 @@
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..b079ce0 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -271,0 +272 @@ namespace CommandLine.Tests.Unit
++            // NOTE: Once GetoptMode becomes the default, it will imply MultiInstance and the above check will fail because it will be Parsed.

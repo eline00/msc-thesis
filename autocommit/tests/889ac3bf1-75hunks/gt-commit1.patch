@@ -1,0 +1,274 @@
+diff --git a/src/CommandLine/Core/InstanceBuilder.cs b/src/CommandLine/Core/InstanceBuilder.cs
+index ffd6250..f48127b 100644
+--- a/src/CommandLine/Core/InstanceBuilder.cs
++++ b/src/CommandLine/Core/InstanceBuilder.cs
+@@ -91 +91 @@ namespace CommandLine.Core
+-                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, parsingCulture, ignoreValueCase),
++                        (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, parsingCulture, ignoreValueCase),
+@@ -98 +98 @@ namespace CommandLine.Core
+-                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, parsingCulture, ignoreValueCase));
++                        (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, false, parsingCulture, ignoreValueCase));
+diff --git a/src/CommandLine/Core/NameLookup.cs b/src/CommandLine/Core/NameLookup.cs
+index 3605d1a..ccb24ea 100644
+--- a/src/CommandLine/Core/NameLookup.cs
++++ b/src/CommandLine/Core/NameLookup.cs
+@@ -23 +23 @@ namespace CommandLine.Core
+-            return option.ConversionType == typeof(bool)
++            return option.ConversionType == typeof(bool) || (option.ConversionType == typeof(int) && option.FlagCounter)
+diff --git a/src/CommandLine/Core/OptionMapper.cs b/src/CommandLine/Core/OptionMapper.cs
+index d222c10..ded42c4 100644
+--- a/src/CommandLine/Core/OptionMapper.cs
++++ b/src/CommandLine/Core/OptionMapper.cs
+@@ -18 +18 @@ namespace CommandLine.Core
+-                Func<IEnumerable<string>, Type, bool, Maybe<object>> converter,
++                Func<IEnumerable<string>, Type, bool, bool, Maybe<object>> converter,
+@@ -30 +30 @@ namespace CommandLine.Core
+-                            var values = new HashSet<string>();
++                            var values = new List<string>();
+@@ -39 +39,3 @@ namespace CommandLine.Core
+-                            return converter(values, pt.Property.PropertyType, pt.Specification.TargetType != TargetType.Sequence)
++                            bool isFlag = pt.Specification.Tag == SpecificationType.Option && ((OptionSpecification)pt.Specification).FlagCounter;
++
++                            return converter(values, isFlag ? typeof(bool) : pt.Property.PropertyType, pt.Specification.TargetType != TargetType.Sequence, isFlag)
+diff --git a/src/CommandLine/Core/OptionSpecification.cs b/src/CommandLine/Core/OptionSpecification.cs
+index 77e7977..1c2e4f8 100644
+--- a/src/CommandLine/Core/OptionSpecification.cs
++++ b/src/CommandLine/Core/OptionSpecification.cs
+@@ -16,0 +17 @@ namespace CommandLine.Core
++        private readonly bool flagCounter;
+@@ -20 +21 @@ namespace CommandLine.Core
+-            Type conversionType, TargetType targetType, string group, bool hidden = false)
++            Type conversionType, TargetType targetType, string group, bool flagCounter = false, bool hidden = false)
+@@ -22 +23 @@ namespace CommandLine.Core
+-                 required, min, max, defaultValue, helpText, metaValue, enumValues, conversionType, targetType, hidden)
++                 required, min, max, defaultValue, helpText, metaValue, enumValues, conversionType, conversionType == typeof(int) && flagCounter ? TargetType.Switch : targetType, hidden)
+@@ -28,0 +30 @@ namespace CommandLine.Core
++            this.flagCounter = flagCounter;
+@@ -47,0 +50 @@ namespace CommandLine.Core
++                attribute.FlagCounter,
+@@ -54 +57 @@ namespace CommandLine.Core
+-                '\0', Maybe.Nothing<object>(), helpText, metaValue, Enumerable.Empty<string>(), typeof(bool), TargetType.Switch, string.Empty, hidden);
++                '\0', Maybe.Nothing<object>(), helpText, metaValue, Enumerable.Empty<string>(), typeof(bool), TargetType.Switch, string.Empty, false, hidden);
+@@ -80,0 +84,8 @@ namespace CommandLine.Core
++
++        /// <summary>
++        /// Whether this is an int option that counts how many times a flag was set rather than taking a value on the command line
++        /// </summary>
++        public bool FlagCounter
++        {
++            get { return flagCounter; }
++        }
+diff --git a/src/CommandLine/Core/SpecificationExtensions.cs b/src/CommandLine/Core/SpecificationExtensions.cs
+index e223e98..c080e98 100644
+--- a/src/CommandLine/Core/SpecificationExtensions.cs
++++ b/src/CommandLine/Core/SpecificationExtensions.cs
+@@ -37,0 +38 @@ namespace CommandLine.Core
++                specification.FlagCounter,
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index ee69373..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -16 +16 @@ namespace CommandLine.Core
+-        public static Maybe<object> ChangeType(IEnumerable<string> values, Type conversionType, bool scalar, CultureInfo conversionCulture, bool ignoreValueCase)
++        public static Maybe<object> ChangeType(IEnumerable<string> values, Type conversionType, bool scalar, bool isFlag, CultureInfo conversionCulture, bool ignoreValueCase)
+@@ -18,3 +18,5 @@ namespace CommandLine.Core
+-            return scalar
+-                ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
+-                : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);
++            return isFlag
++                ? ChangeTypeFlagCounter(values, conversionType, conversionCulture, ignoreValueCase)
++                : scalar
++                    ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
++                    : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);
+@@ -48,0 +51,8 @@ namespace CommandLine.Core
++        private static Maybe<object> ChangeTypeFlagCounter(IEnumerable<string> values, Type conversionType, CultureInfo conversionCulture, bool ignoreValueCase)
++        {
++            var converted = values.Select(value => ChangeTypeScalar(value, typeof(bool), conversionCulture, ignoreValueCase));
++            return converted.Any(maybe => maybe.MatchNothing())
++                ? Maybe.Nothing<object>()
++                : Maybe.Just((object)converted.Count(value => value.IsJust()));
++        }
++
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index 7448b69..6ae51da 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -17,0 +18 @@ namespace CommandLine
++        private bool flagCounter;
+@@ -98,0 +100,10 @@ namespace CommandLine
++        /// <summary>
++        /// If true, this is an int option that counts how many times a flag was set (e.g. "-v -v -v" or "-vvv" would return 3).
++        /// The property must be of type int (signed 32-bit integer).
++        /// </summary>
++        public bool FlagCounter
++        {
++            get { return flagCounter; }
++            set { flagCounter = value; }
++        }
++
+diff --git a/src/CommandLine/UnParserExtensions.cs b/src/CommandLine/UnParserExtensions.cs
+index 51811ef..e823a7f 100644
+--- a/src/CommandLine/UnParserExtensions.cs
++++ b/src/CommandLine/UnParserExtensions.cs
+@@ -156 +156,3 @@ namespace CommandLine
+-                              where o.TargetType != TargetType.Switch || (o.TargetType == TargetType.Switch && ((bool)info.Value))
++                              where o.TargetType != TargetType.Switch ||
++                                   (o.TargetType == TargetType.Switch && o.FlagCounter && ((int)info.Value > 0)) ||
++                                   (o.TargetType == TargetType.Switch && ((bool)info.Value))
+@@ -179 +181,6 @@ namespace CommandLine
+-                    info => ((OptionSpecification)info.Specification).ShortName).ToArray())).Append(' ')
++                    info => {
++                        var o = (OptionSpecification)info.Specification;
++                        return o.FlagCounter
++                            ? string.Concat(Enumerable.Repeat(o.ShortName, (int)info.Value))
++                            : o.ShortName;
++                    }).ToArray())).Append(' ')
+@@ -253 +260 @@ namespace CommandLine
+-                    .Append(spec.FormatName(settings))
++                    .Append(spec.FormatName(value, settings))
+@@ -258 +265 @@ namespace CommandLine
+-        private static string FormatName(this OptionSpecification optionSpec, UnParserSettings settings)
++        private static string FormatName(this OptionSpecification optionSpec, object value, UnParserSettings settings)
+@@ -265 +272 @@ namespace CommandLine
+-            return
++            var formattedName =
+@@ -270,0 +278 @@ namespace CommandLine
++            return optionSpec.FlagCounter ? String.Join(" ", Enumerable.Repeat(formattedName, (int)value)) : formattedName;
+diff --git a/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+new file mode 100644
+index 0000000..06787b3
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+@@ -0,0 +1,13 @@
++// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++namespace CommandLine.Tests.Fakes
++{
++    public class Options_With_FlagCounter_Switches
++    {
++        [Option('v', FlagCounter=true)]
++        public int Verbose { get; set; }
++
++        [Option('s', FlagCounter=true)]
++        public int Silent { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+index 63bf22f..0a948ce 100644
+--- a/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/OptionMapperTests.cs
+@@ -40 +40 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),
+@@ -75 +75 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),
+@@ -104 +104 @@ namespace CommandLine.Tests.Unit.Core
+-                (vals, type, isScalar) => TypeConverter.ChangeType(vals, type, isScalar, CultureInfo.InvariantCulture, false),
++                (vals, type, isScalar, isFlag) => TypeConverter.ChangeType(vals, type, isScalar, isFlag, CultureInfo.InvariantCulture, false),
+diff --git a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+index dc16dfd..c3e9378 100644
+--- a/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
++++ b/tests/CommandLine.Tests/Unit/Core/TypeConverterTests.cs
+@@ -30 +30 @@ namespace CommandLine.Tests.Unit.Core
+-            Maybe<object> result = TypeConverter.ChangeType(new[] {testValue}, destinationType, true, CultureInfo.InvariantCulture, true);
++            Maybe<object> result = TypeConverter.ChangeType(new[] {testValue}, destinationType, true, false, CultureInfo.InvariantCulture, true);
+@@ -123,0 +124,32 @@ namespace CommandLine.Tests.Unit.Core
++        [Theory]
++        [MemberData(nameof(ChangeType_flagCounters_source))]
++        public void ChangeType_flagCounters(string[] testValue, Type destinationType, bool expectFail, object expectedResult)
++        {
++            Maybe<object> result = TypeConverter.ChangeType(testValue, destinationType, true, true, CultureInfo.InvariantCulture, true);
++
++            if (expectFail)
++            {
++                result.MatchNothing().Should().BeTrue("should fail parsing");
++            }
++            else
++            {
++                result.MatchJust(out object matchedValue).Should().BeTrue("should parse successfully");
++                Assert.Equal(matchedValue, expectedResult);
++            }
++        }
++
++        public static IEnumerable<object[]> ChangeType_flagCounters_source
++        {
++            get
++            {
++                return new[]
++                {
++                    new object[] {new string[0], typeof (int), false, 0},
++                    new object[] {new[] {"true"}, typeof (int), false, 1},
++                    new object[] {new[] {"true", "true"}, typeof (int), false, 2},
++                    new object[] {new[] {"true", "true", "true"}, typeof (int), false, 3},
++                    new object[] {new[] {"true", "x"}, typeof (int), true, 0},
++                };
++            }
++        }
++
+@@ -128 +160 @@ namespace CommandLine.Tests.Unit.Core
+-            var result = TypeConverter.ChangeType(values, typeof(int), true, CultureInfo.InvariantCulture, true);
++            var result = TypeConverter.ChangeType(values, typeof(int), true, false, CultureInfo.InvariantCulture, true);
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..f8593cf 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -97,0 +98,30 @@ namespace CommandLine.Tests.Unit
++        [Theory]
++        [InlineData(new string[0], 0, 0)]
++        [InlineData(new[] { "-v" }, 1, 0)]
++        [InlineData(new[] { "-vv" }, 2, 0)]
++        [InlineData(new[] { "-v", "-v" }, 2, 0)]
++        [InlineData(new[] { "-v", "-v", "-v" }, 3, 0)]
++        [InlineData(new[] { "-v", "-vv" }, 3, 0)]
++        [InlineData(new[] { "-vv", "-v" }, 3, 0)]
++        [InlineData(new[] { "-vvv" }, 3, 0)]
++        [InlineData(new[] { "-v", "-s", "-v", "-v" }, 3, 1)]
++        [InlineData(new[] { "-v", "-ss", "-v", "-v" }, 3, 2)]
++        [InlineData(new[] { "-v", "-s", "-sv", "-v" }, 3, 2)]
++        [InlineData(new[] { "-vsvv" }, 3, 1)]
++        [InlineData(new[] { "-vssvv" }, 3, 2)]
++        [InlineData(new[] { "-vsvsv" }, 3, 2)]
++        public void Parse_FlagCounter_options_with_short_name(string[] args, int verboseCount, int silentCount)
++        {
++            // Fixture setup
++            var expectedOptions = new Options_With_FlagCounter_Switches { Verbose = verboseCount, Silent = silentCount };
++            var sut = new Parser(with => with.AllowMultiInstance = true);
++
++            // Exercize system
++            var result = sut.ParseArguments<Options_With_FlagCounter_Switches>(args);
++
++            // Verify outcome
++            // ((NotParsed<Options_With_FlagCounter_Switches>)result).Errors.Should().BeEmpty();
++            ((Parsed<Options_With_FlagCounter_Switches>)result).Value.Should().BeEquivalentTo(expectedOptions);
++            // Teardown
++        }
++
+diff --git a/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs b/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
+index 50cb329..7e878f3 100644
+--- a/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
++++ b/tests/CommandLine.Tests/Unit/UnParserExtensionsTests.cs
+@@ -256,0 +257,17 @@ namespace CommandLine.Tests.Unit
++
++        [Theory]
++        [InlineData(false, false, 0, "")]
++        [InlineData(false, false, 1, "-v")]  // default but not skipped
++        [InlineData(false, false, 2, "-v -v")]
++        [InlineData(false, true, 2, "-vv")]
++        [InlineData(false, false, 3, "-v -v -v")]
++        [InlineData(false, true, 3, "-vvv")]
++        [InlineData(true, false, 1, "")]  // default, skipped
++        public static void UnParsing_instance_with_flag_counter(bool skipDefault, bool groupSwitches, int value, string expected)
++        {
++            var options = new Option_FlagCounter { VerboseLevel = value };
++            var result = new Parser()
++                .FormatCommandLine(options, x => { x.SkipDefault = skipDefault; x.GroupSwitches = groupSwitches; })
++                .Should().BeEquivalentTo(expected);
++        }
++
+@@ -313,0 +331,5 @@ namespace CommandLine.Tests.Unit
++        class Option_FlagCounter
++        {
++            [Option('v', Default = 1, FlagCounter=true)]
++            public int VerboseLevel { get; set; }
++        }

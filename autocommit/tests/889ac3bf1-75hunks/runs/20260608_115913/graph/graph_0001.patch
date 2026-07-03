@@ -1,0 +1,61 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -88,0 +89 @@ namespace CommandLine.Core
++        private readonly bool fromSeparator;
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -105,0 +106 @@ namespace CommandLine.Core
++            this.fromSeparator = fromSeparator;
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -116,0 +117,11 @@ namespace CommandLine.Core
++        /// <summary>
++        /// Whether this value came from a sequence specified with a separator (e.g., "--files a.txt,b.txt,c.txt")
++        /// </summary>
++        public bool FromSeparator
++        {
++            get { return fromSeparator; }
++        }
++
++        /// <summary>
++        /// Whether this value came from args after the -- separator (when EnableDashDash = true)
++        /// </summary>
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -37 +37,6 @@ namespace CommandLine.Core
+-            return new Value(text, false, true);
++            return new Value(text, false, true, false);
++        }
++
++        public static Token ValueFromSeparator(string text)
++        {
++            return new Value(text, false, false, true);
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -92 +97 @@ namespace CommandLine.Core
+-            : this(text, false, false)
++            : this(text, false, false, false)
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -97 +102 @@ namespace CommandLine.Core
+-            : this(text, explicitlyAssigned, false)
++            : this(text, explicitlyAssigned, false, false)
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -101 +106 @@ namespace CommandLine.Core
+-        public Value(string text, bool explicitlyAssigned, bool forced)
++        public Value(string text, bool explicitlyAssigned, bool forced, bool fromSeparator)

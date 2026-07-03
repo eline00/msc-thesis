@@ -1,0 +1,601 @@
+diff --git a/src/CommandLine/Core/Token.cs b/src/CommandLine/Core/Token.cs
+index c8641bd..90bbe54 100644
+--- a/src/CommandLine/Core/Token.cs
++++ b/src/CommandLine/Core/Token.cs
+@@ -116,0 +117,11 @@ namespace CommandLine.Core
++        /// <summary>
++        /// Whether this value came from a sequence specified with a separator (e.g., "--files a.txt,b.txt,c.txt")
++        /// </summary>
++        public bool FromSeparator
++        {
++            get { return fromSeparator; }
++        }
++
++        /// <summary>
++        /// Whether this value came from args after the -- separator (when EnableDashDash = true)
++        /// </summary>
+diff --git a/src/CommandLine/Core/TokenPartitioner.cs b/src/CommandLine/Core/TokenPartitioner.cs
+index d6fe97e..4dc25f7 100644
+--- a/src/CommandLine/Core/TokenPartitioner.cs
++++ b/src/CommandLine/Core/TokenPartitioner.cs
+@@ -123,0 +124,14 @@ namespace CommandLine.Core
++                                else if (token.IsValueFromSeparator())
++                                {
++                                    separatorSeen = true;
++                                    sequence.Add(token);
++                                    count[nameToken]++;
++                                }
++                                else if (separatorSeen)
++                                {
++                                    // Previous token came from a separator but this one didn't: sequence is completed
++                                    separatorSeen = false;
++                                    nameToken = null;
++                                    nonOptionTokens.Add(token);
++                                    state = SequenceState.TokenSearch;
++                                }
+diff --git a/src/CommandLine/Core/GetoptTokenizer.cs b/src/CommandLine/Core/GetoptTokenizer.cs
+new file mode 100644
+index 0000000..b8c97fc
+--- /dev/null
++++ b/src/CommandLine/Core/GetoptTokenizer.cs
+@@ -0,0 +1,228 @@
++﻿// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using CommandLine.Infrastructure;
++using CSharpx;
++using RailwaySharp.ErrorHandling;
++using System.Text.RegularExpressions;
++
++namespace CommandLine.Core
++{
++    static class GetoptTokenizer
++    {
++        public static Result<IEnumerable<Token>, Error> Tokenize(
++            IEnumerable<string> arguments,
++            Func<string, NameLookupResult> nameLookup)
++        {
++            return GetoptTokenizer.Tokenize(arguments, nameLookup, ignoreUnknownArguments:false, allowDashDash:true, posixlyCorrect:false);
++        }
++
++        public static Result<IEnumerable<Token>, Error> Tokenize(
++            IEnumerable<string> arguments,
++            Func<string, NameLookupResult> nameLookup,
++            bool ignoreUnknownArguments,
++            bool allowDashDash,
++            bool posixlyCorrect)
++        {
++            var errors = new List<Error>();
++            Action<string> onBadFormatToken = arg => errors.Add(new BadFormatTokenError(arg));
++            Action<string> unknownOptionError = name => errors.Add(new UnknownOptionError(name));
++            Action<string> doNothing = name => {};
++            Action<string> onUnknownOption = ignoreUnknownArguments ? doNothing : unknownOptionError;
++
++            int consumeNext = 0;
++            Action<int> onConsumeNext = (n => consumeNext = consumeNext + n);
++            bool forceValues = false;
++
++            var tokens = new List<Token>();
++
++            var enumerator = arguments.GetEnumerator();
++            while (enumerator.MoveNext())
++            {
++                switch (enumerator.Current) {
++                    case null:
++                        break;
++
++                    case string arg when forceValues:
++                        tokens.Add(Token.ValueForced(arg));
++                        break;
++
++                    case string arg when consumeNext > 0:
++                        tokens.Add(Token.Value(arg));
++                        consumeNext = consumeNext - 1;
++                        break;
++
++                    case "--" when allowDashDash:
++                        forceValues = true;
++                        break;
++
++                    case "--":
++                        tokens.Add(Token.Value("--"));
++                        if (posixlyCorrect) forceValues = true;
++                        break;
++
++                    case "-":
++                        // A single hyphen is always a value (it usually means "read from stdin" or "write to stdout")
++                        tokens.Add(Token.Value("-"));
++                        if (posixlyCorrect) forceValues = true;
++                        break;
++
++                    case string arg when arg.StartsWith("--"):
++                        tokens.AddRange(TokenizeLongName(arg, nameLookup, onBadFormatToken, onUnknownOption, onConsumeNext));
++                        break;
++
++                    case string arg when arg.StartsWith("-"):
++                        tokens.AddRange(TokenizeShortName(arg, nameLookup, onUnknownOption, onConsumeNext));
++                        break;
++
++                    case string arg:
++                        // If we get this far, it's a plain value
++                        tokens.Add(Token.Value(arg));
++                        if (posixlyCorrect) forceValues = true;
++                        break;
++                }
++            }
++
++            return Result.Succeed<IEnumerable<Token>, Error>(tokens.AsEnumerable(), errors.AsEnumerable());
++        }
++
++        public static Result<IEnumerable<Token>, Error> ExplodeOptionList(
++            Result<IEnumerable<Token>, Error> tokenizerResult,
++            Func<string, Maybe<char>> optionSequenceWithSeparatorLookup)
++        {
++            var tokens = tokenizerResult.SucceededWith().Memoize();
++
++            var exploded = new List<Token>(tokens is ICollection<Token> coll ? coll.Count : tokens.Count());
++            var nothing = Maybe.Nothing<char>();  // Re-use same Nothing instance for efficiency
++            var separator = nothing;
++            foreach (var token in tokens) {
++                if (token.IsName()) {
++                    separator = optionSequenceWithSeparatorLookup(token.Text);
++                    exploded.Add(token);
++                } else {
++                    // Forced values are never considered option values, so they should not be split
++                    if (separator.MatchJust(out char sep) && sep != '\0' && !token.IsValueForced()) {
++                        if (token.Text.Contains(sep)) {
++                            exploded.AddRange(token.Text.Split(sep).Select(Token.ValueFromSeparator));
++                        } else {
++                            exploded.Add(token);
++                        }
++                    } else {
++                        exploded.Add(token);
++                    }
++                    separator = nothing;  // Only first value after a separator can possibly be split
++                }
++            }
++            return Result.Succeed(exploded as IEnumerable<Token>, tokenizerResult.SuccessMessages());
++        }
++
++        public static Func<
++                    IEnumerable<string>,
++                    IEnumerable<OptionSpecification>,
++                    Result<IEnumerable<Token>, Error>>
++            ConfigureTokenizer(
++                    StringComparer nameComparer,
++                    bool ignoreUnknownArguments,
++                    bool enableDashDash,
++                    bool posixlyCorrect)
++        {
++            return (arguments, optionSpecs) =>
++                {
++                    var tokens = GetoptTokenizer.Tokenize(arguments, name => NameLookup.Contains(name, optionSpecs, nameComparer), ignoreUnknownArguments, enableDashDash, posixlyCorrect);
++                    var explodedTokens = GetoptTokenizer.ExplodeOptionList(tokens, name => NameLookup.HavingSeparator(name, optionSpecs, nameComparer));
++                    return explodedTokens;
++                };
++        }
++
++        private static IEnumerable<Token> TokenizeShortName(
++            string arg,
++            Func<string, NameLookupResult> nameLookup,
++            Action<string> onUnknownOption,
++            Action<int> onConsumeNext)
++        {
++
++            // First option char that requires a value means we swallow the rest of the string as the value
++            // But if there is no rest of the string, then instead we swallow the next argument
++            string chars = arg.Substring(1);
++            int len = chars.Length;
++            if (len > 0 && Char.IsDigit(chars[0]))
++            {
++                // Assume it's a negative number
++                yield return Token.Value(arg);
++                yield break;
++            }
++            for (int i = 0; i < len; i++)
++            {
++                var s = new String(chars[i], 1);
++                switch(nameLookup(s))
++                {
++                    case NameLookupResult.OtherOptionFound:
++                        yield return Token.Name(s);
++
++                        if (i+1 < len)
++                        {
++                            // Rest of this is the value (e.g. "-sfoo" where "-s" is a string-consuming arg)
++                            yield return Token.Value(chars.Substring(i+1));
++                            yield break;
++                        }
++                        else
++                        {
++                            // Value is in next param (e.g., "-s foo")
++                            onConsumeNext(1);
++                        }
++                        break;
++
++                    case NameLookupResult.NoOptionFound:
++                        onUnknownOption(s);
++                        break;
++
++                    default:
++                        yield return Token.Name(s);
++                        break;
++                }
++            }
++        }
++
++        private static IEnumerable<Token> TokenizeLongName(
++            string arg,
++            Func<string, NameLookupResult> nameLookup,
++            Action<string> onBadFormatToken,
++            Action<string> onUnknownOption,
++            Action<int> onConsumeNext)
++        {
++            string[] parts = arg.Substring(2).Split(new char[] { '=' }, 2);
++            string name = parts[0];
++            string value = (parts.Length > 1) ? parts[1] : null;
++            // A parameter like "--stringvalue=" is acceptable, and makes stringvalue be the empty string
++            if (String.IsNullOrWhiteSpace(name) || name.Contains(" "))
++            {
++                onBadFormatToken(arg);
++                yield break;
++            }
++            switch(nameLookup(name))
++            {
++                case NameLookupResult.NoOptionFound:
++                    onUnknownOption(name);
++                    yield break;
++
++                case NameLookupResult.OtherOptionFound:
++                    yield return Token.Name(name);
++                    if (value == null) // NOT String.IsNullOrEmpty
++                    {
++                        onConsumeNext(1);
++                    }
++                    else
++                    {
++                        yield return Token.Value(value);
++                    }
++                    break;
++
++                default:
++                    yield return Token.Name(name);
++                    break;
++            }
++        }
++    }
++}
+diff --git a/src/CommandLine/Parser.cs b/src/CommandLine/Parser.cs
+index 10c9b4e..4301aa5 100644
+--- a/src/CommandLine/Parser.cs
++++ b/src/CommandLine/Parser.cs
+@@ -188,2 +188,7 @@ namespace CommandLine
+-            return
+-                Tokenizer.ConfigureTokenizer(
++            return settings.GetoptMode
++                ? GetoptTokenizer.ConfigureTokenizer(
++                    settings.NameComparer,
++                    settings.IgnoreUnknownArguments,
++                    settings.EnableDashDash,
++                    settings.PosixlyCorrect)(arguments, optionSpecs)
++                : Tokenizer.ConfigureTokenizer(
+diff --git a/src/CommandLine/Core/Tokenizer.cs b/src/CommandLine/Core/Tokenizer.cs
+index e35edc9..b71ec7e 100644
+--- a/src/CommandLine/Core/Tokenizer.cs
++++ b/src/CommandLine/Core/Tokenizer.cs
+@@ -65,13 +65,22 @@ namespace CommandLine.Core
+-            var replaces = tokens.Select((t, i) =>
+-                optionSequenceWithSeparatorLookup(t.Text)
+-                    .MapValueOrDefault(sep => Tuple.Create(i + 1, sep),
+-                        Tuple.Create(-1, '\0'))).SkipWhile(x => x.Item1 < 0).Memoize();
+-
+-            var exploded = tokens.Select((t, i) =>
+-                        replaces.FirstOrDefault(x => x.Item1 == i).ToMaybe()
+-                            .MapValueOrDefault(r => t.Text.Split(r.Item2).Select(Token.Value),
+-                                Enumerable.Empty<Token>().Concat(new[] { t })));
+-
+-            var flattened = exploded.SelectMany(x => x);
+-
+-            return Result.Succeed(flattened, tokenizerResult.SuccessMessages());
++            var exploded = new List<Token>(tokens is ICollection<Token> coll ? coll.Count : tokens.Count());
++            var nothing = Maybe.Nothing<char>();  // Re-use same Nothing instance for efficiency
++            var separator = nothing;
++            foreach (var token in tokens) {
++                if (token.IsName()) {
++                    separator = optionSequenceWithSeparatorLookup(token.Text);
++                    exploded.Add(token);
++                } else {
++                    // Forced values are never considered option values, so they should not be split
++                    if (separator.MatchJust(out char sep) && sep != '\0' && !token.IsValueForced()) {
++                        if (token.Text.Contains(sep)) {
++                            exploded.AddRange(token.Text.Split(sep).Select(Token.ValueFromSeparator));
++                        } else {
++                            exploded.Add(token);
++                        }
++                    } else {
++                        exploded.Add(token);
++                    }
++                    separator = nothing;  // Only first value after a separator can possibly be split
++                }
++            }
++            return Result.Succeed(exploded as IEnumerable<Token>, tokenizerResult.SuccessMessages());
+diff --git a/tests/CommandLine.Tests/Unit/SequenceParsingTests.cs b/tests/CommandLine.Tests/Unit/SequenceParsingTests.cs
+new file mode 100644
+index 0000000..cb65e42
+--- /dev/null
++++ b/tests/CommandLine.Tests/Unit/SequenceParsingTests.cs
+@@ -0,0 +1,140 @@
++﻿using System.Collections.Generic;
++using System.Linq;
++using System;
++using Xunit;
++using CommandLine.Text;
++using CommandLine.Tests.Fakes;
++using FluentAssertions;
++using CommandLine.Core;
++using System.Reflection;
++using CSharpx;
++using RailwaySharp.ErrorHandling;
++
++namespace CommandLine.Tests.Unit
++{
++	// Reference: PR #684
++    public class SequenceParsingTests
++    {
++        // Issue #91
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++        public static void Enumerable_with_separator_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = "--exclude=a,b InputFile.txt".Split();
++            var expected = new Options_For_Issue_91 {
++                Excluded = new[] { "a", "b" },
++                Included = Enumerable.Empty<string>(),
++                InputFileName = "InputFile.txt",
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_91>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_91>>();
++            result.As<Parsed<Options_For_Issue_91>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #396
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++        public static void Options_with_similar_names_are_not_ambiguous(bool useGetoptMode)
++        {
++            var args = new[] { "--configure-profile", "deploy", "--profile", "local" };
++            var expected = new Options_With_Similar_Names { ConfigureProfile = "deploy", Profile = "local", Deploys = Enumerable.Empty<string>() };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_With_Similar_Names>(args);
++            result.Should().BeOfType<Parsed<Options_With_Similar_Names>>();
++            result.As<Parsed<Options_With_Similar_Names>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #420
++        [Fact]
++
++        public static void Values_with_same_name_as_sequence_option_do_not_cause_later_values_to_split_on_separators()
++        {
++            var args = new[] { "c", "x,y" };
++            var tokensExpected = new[] { Token.Value("c"), Token.Value("x,y") };
++            var typeInfo = typeof(Options_With_Similar_Names_And_Separator);
++
++            var specProps = typeInfo.GetSpecifications(pi => SpecificationProperty.Create(
++                    Specification.FromProperty(pi), pi, Maybe.Nothing<object>()))
++                .Select(sp => sp.Specification)
++                .OfType<OptionSpecification>();
++
++            var tokenizerResult = Tokenizer.ConfigureTokenizer(StringComparer.InvariantCulture, false, false)(args, specProps);
++            var tokens = tokenizerResult.SucceededWith();
++            tokens.Should().BeEquivalentTo(tokensExpected);
++        }
++
++        // Issue #454
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Enumerable_with_colon_separator_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = "-c chanA:chanB file.hdf5".Split();
++            var expected = new Options_For_Issue_454 {
++                Channels = new[] { "chanA", "chanB" },
++                ArchivePath = "file.hdf5",
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_454>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_454>>();
++            result.As<Parsed<Options_For_Issue_454>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #510
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Enumerable_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = new[] { "-a", "1,2", "c" };
++            var expected = new Options_For_Issue_510 { A = new[] { "1", "2" }, C = "c" };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_510>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_510>>();
++            result.As<Parsed<Options_For_Issue_510>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #617
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Enumerable_with_enum_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = "--fm D,C a.txt".Split();
++            var expected = new Options_For_Issue_617 {
++                Mode = new[] { FMode.D, FMode.C },
++                Files = new[] { "a.txt" },
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_617>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_617>>();
++            result.As<Parsed<Options_For_Issue_617>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #619
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Separator_just_before_values_does_not_try_to_parse_values(bool useGetoptMode)
++        {
++            var args = "--outdir ./x64/Debug --modules ../utilities/x64/Debug,../auxtool/x64/Debug m_xfunit.f03 m_xfunit_assertion.f03".Split();
++            var expected = new Options_For_Issue_619 {
++                OutDir = "./x64/Debug",
++                ModuleDirs = new[] { "../utilities/x64/Debug", "../auxtool/x64/Debug" },
++                Ignores = Enumerable.Empty<string>(),
++                Srcs = new[] { "m_xfunit.f03", "m_xfunit_assertion.f03" },
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_619>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_619>>();
++            result.As<Parsed<Options_For_Issue_619>>().Value.Should().BeEquivalentTo(expected);
++        }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/Core/GetoptTokenizerTests.cs b/tests/CommandLine.Tests/Unit/Core/GetoptTokenizerTests.cs
+new file mode 100644
+index 0000000..337a9a3
+--- /dev/null
++++ b/tests/CommandLine.Tests/Unit/Core/GetoptTokenizerTests.cs
+@@ -0,0 +1,126 @@
++﻿// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using Xunit;
++using FluentAssertions;
++using CSharpx;
++using RailwaySharp.ErrorHandling;
++using CommandLine.Core;
++
++namespace CommandLine.Tests.Unit.Core
++{
++    public class GetoptTokenizerTests
++    {
++        [Fact]
++        public void Explode_scalar_with_separator_in_odd_args_input_returns_sequence()
++        {
++            // Fixture setup
++            var expectedTokens = new[] { Token.Name("i"), Token.Value("10"), Token.Name("string-seq"),
++                Token.Value("aaa"), Token.Value("bb"),  Token.Value("cccc"), Token.Name("switch") };
++            var specs = new[] { new OptionSpecification(string.Empty, "string-seq",
++                false, string.Empty, Maybe.Nothing<int>(), Maybe.Nothing<int>(), ',', null, string.Empty, string.Empty, new List<string>(), typeof(IEnumerable<string>), TargetType.Sequence, string.Empty)};
++
++            // Exercize system
++            var result =
++                GetoptTokenizer.ExplodeOptionList(
++                    Result.Succeed(
++                        Enumerable.Empty<Token>().Concat(new[] { Token.Name("i"), Token.Value("10"),
++                            Token.Name("string-seq"), Token.Value("aaa,bb,cccc"), Token.Name("switch") }),
++                        Enumerable.Empty<Error>()),
++                        optionName => NameLookup.HavingSeparator(optionName, specs, StringComparer.Ordinal));
++            // Verify outcome
++            ((Ok<IEnumerable<Token>, Error>)result).Success.Should().BeEquivalentTo(expectedTokens);
++
++            // Teardown
++        }
++
++        [Fact]
++        public void Explode_scalar_with_separator_in_even_args_input_returns_sequence()
++        {
++            // Fixture setup
++            var expectedTokens = new[] { Token.Name("x"), Token.Name("string-seq"),
++                Token.Value("aaa"), Token.Value("bb"),  Token.Value("cccc"), Token.Name("switch") };
++            var specs = new[] { new OptionSpecification(string.Empty, "string-seq",
++                false, string.Empty, Maybe.Nothing<int>(), Maybe.Nothing<int>(), ',', null, string.Empty, string.Empty, new List<string>(), typeof(IEnumerable<string>), TargetType.Sequence, string.Empty)};
++
++            // Exercize system
++            var result =
++                GetoptTokenizer.ExplodeOptionList(
++                    Result.Succeed(
++                        Enumerable.Empty<Token>().Concat(new[] { Token.Name("x"),
++                            Token.Name("string-seq"), Token.Value("aaa,bb,cccc"), Token.Name("switch") }),
++                        Enumerable.Empty<Error>()),
++                        optionName => NameLookup.HavingSeparator(optionName, specs, StringComparer.Ordinal));
++
++            // Verify outcome
++            ((Ok<IEnumerable<Token>, Error>)result).Success.Should().BeEquivalentTo(expectedTokens);
++
++            // Teardown
++        }
++
++        [Fact]
++        public void Should_properly_parse_option_with_equals_in_value()
++        {
++            /**
++             * This is how the arg. would look in `static void Main(string[] args)`
++             * if passed from the command-line and the option-value wrapped in quotes.
++             * Ex.) ./app --connectionString="Server=localhost;Data Source..."
++             */
++            var args = new[] { "--connectionString=Server=localhost;Data Source=(LocalDB)\v12.0;Initial Catalog=temp;" };
++
++            var result = GetoptTokenizer.Tokenize(args, name => NameLookupResult.OtherOptionFound);
++
++            var tokens = result.SucceededWith();
++
++            Assert.NotNull(tokens);
++            Assert.Equal(2, tokens.Count());
++            Assert.Equal("connectionString", tokens.First().Text);
++            Assert.Equal("Server=localhost;Data Source=(LocalDB)\v12.0;Initial Catalog=temp;", tokens.Last().Text);
++        }
++
++        [Fact]
++        public void Should_return_error_if_option_format_with_equals_is_not_correct()
++        {
++            var args = new[] { "--option1 = fail", "--option2= succeed" };
++
++            var result = GetoptTokenizer.Tokenize(args, name => NameLookupResult.OtherOptionFound);
++
++            var errors = result.SuccessMessages();
++
++            Assert.NotNull(errors);
++            Assert.Equal(1, errors.Count());
++            Assert.Equal(ErrorType.BadFormatTokenError, errors.First().Tag);
++
++            var tokens = result.SucceededWith();
++            Assert.NotNull(tokens);
++            Assert.Equal(2, tokens.Count());
++            Assert.Equal(TokenType.Name, tokens.First().Tag);
++            Assert.Equal(TokenType.Value, tokens.Last().Tag);
++            Assert.Equal("option2", tokens.First().Text);
++            Assert.Equal(" succeed", tokens.Last().Text);
++        }
++
++
++        [Theory]
++        [InlineData(new[] { "-a", "-" }, 2,"a","-")]
++        [InlineData(new[] { "--file", "-" }, 2,"file","-")]
++        [InlineData(new[] { "-f-" }, 2,"f", "-")]
++        [InlineData(new[] { "--file=-" }, 2, "file", "-")]
++        [InlineData(new[] { "-a", "--" }, 2, "a", "--")]
++        public void Single_dash_as_a_value(string[] args, int countExcepted,string first,string last)
++        {
++            //Arrange
++            //Act
++            var result = GetoptTokenizer.Tokenize(args, name => NameLookupResult.OtherOptionFound);
++            var tokens = result.SucceededWith().ToList();
++            //Assert
++            tokens.Should().NotBeNull();
++            tokens.Count.Should().Be(countExcepted);
++            tokens.First().Text.Should().Be(first);
++            tokens.Last().Text.Should().Be(last);
++        }
++    }
++
++}

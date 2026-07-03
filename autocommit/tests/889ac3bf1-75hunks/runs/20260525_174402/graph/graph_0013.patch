@@ -1,0 +1,26 @@
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index ee69373..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -48,0 +51,8 @@ namespace CommandLine.Core
++        private static Maybe<object> ChangeTypeFlagCounter(IEnumerable<string> values, Type conversionType, CultureInfo conversionCulture, bool ignoreValueCase)
++        {
++            var converted = values.Select(value => ChangeTypeScalar(value, typeof(bool), conversionCulture, ignoreValueCase));
++            return converted.Any(maybe => maybe.MatchNothing())
++                ? Maybe.Nothing<object>()
++                : Maybe.Just((object)converted.Count(value => value.IsJust()));
++        }
++
+diff --git a/src/CommandLine/Core/TypeConverter.cs b/src/CommandLine/Core/TypeConverter.cs
+index ee69373..2e27af4 100644
+--- a/src/CommandLine/Core/TypeConverter.cs
++++ b/src/CommandLine/Core/TypeConverter.cs
+@@ -18,3 +18,5 @@ namespace CommandLine.Core
+-            return scalar
+-                ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
+-                : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);
++            return isFlag
++                ? ChangeTypeFlagCounter(values, conversionType, conversionCulture, ignoreValueCase)
++                : scalar
++                    ? ChangeTypeScalar(values.Last(), conversionType, conversionCulture, ignoreValueCase)
++                    : ChangeTypeSequence(values, conversionType, conversionCulture, ignoreValueCase);

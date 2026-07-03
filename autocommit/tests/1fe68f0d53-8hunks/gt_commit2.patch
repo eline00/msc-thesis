@@ -1,0 +1,26 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index a67e43d..5c0ecea 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -876,0 +877,10 @@ namespace CommandLine.Text
++            OptionSpecification GetOptionGroupSpecification()
++            {
++                if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++                {
++                    return optionSpecification;
++                }
++
++                return null;
++            }
++
+@@ -899 +909,3 @@ namespace CommandLine.Text
+-            if (specification.Required)
++            var optionGroupSpecification = GetOptionGroupSpecification();
++
++            if (specification.Required && optionGroupSpecification == null)
+@@ -902 +914 @@ namespace CommandLine.Text
+-            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++            if (optionGroupSpecification != null)
+@@ -904 +916 @@ namespace CommandLine.Text
+-                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
++                optionHelpText = "({0}: {1}) ".FormatInvariant(optionGroupWord, optionGroupSpecification.Group.GetValueOrDefault(null)) + optionHelpText;

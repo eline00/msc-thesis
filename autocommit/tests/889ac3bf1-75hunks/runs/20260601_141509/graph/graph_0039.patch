@@ -1,0 +1,280 @@
+diff --git a/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+new file mode 100644
+index 0000000..06787b3
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+@@ -0,0 +1,13 @@
++// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++namespace CommandLine.Tests.Fakes
++{
++    public class Options_With_FlagCounter_Switches
++    {
++        [Option('v', FlagCounter=true)]
++        public int Verbose { get; set; }
++
++        [Option('s', FlagCounter=true)]
++        public int Silent { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Fakes/Options_With_Sequence_Having_Separator_And_Values.cs b/tests/CommandLine.Tests/Fakes/Options_With_Sequence_Having_Separator_And_Values.cs
+new file mode 100644
+index 0000000..6099b5b
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/Options_With_Sequence_Having_Separator_And_Values.cs
+@@ -0,0 +1,74 @@
++// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++using System.Collections.Generic;
++
++namespace CommandLine.Tests.Fakes
++{
++    public class Options_For_Issue_91
++    {
++        [Value(0, Required = true)]
++        public string InputFileName { get; set; }
++
++        [Option('o', "output")]
++        public string OutputFileName { get; set; }
++
++        [Option('i', "include", Separator = ',')]
++        public IEnumerable<string> Included { get; set; }
++
++        [Option('e', "exclude", Separator = ',')]
++        public IEnumerable<string> Excluded { get; set; }
++    }
++
++    public class Options_For_Issue_454
++    {
++        [Option('c', "channels", Required = true, Separator = ':', HelpText = "Channel names")]
++        public IEnumerable<string> Channels { get; set; }
++
++        [Value(0, Required = true, MetaName = "file_path", HelpText = "Path of archive to be processed")]
++        public string ArchivePath { get; set; }
++    }
++
++    public class Options_For_Issue_510
++    {
++        [Option('a', "aa", Required = false, Separator = ',')]
++        public IEnumerable<string> A { get; set; }
++
++        [Option('b', "bb", Required = false)]
++        public string B { get; set; }
++        
++        [Value(0, Required = true)]
++        public string C { get; set; }
++    }
++
++    public enum FMode { C, D, S };
++
++    public class Options_For_Issue_617
++    {
++        [Option("fm",  Separator=',', Default = new[] { FMode.S })]  
++        public IEnumerable<FMode> Mode { get; set; }
++            
++        [Option('q')]
++        public bool q { get;set; }
++            
++        [Value(0)]
++        public IList<string> Files { get; set; }
++    }
++
++    public class Options_For_Issue_619
++    {
++        [Option("verbose", Required = false, Default = false, HelpText = "Generate process tracing information")]
++        public bool Verbose { get; set; }
++
++        [Option("outdir", Required = false, Default = ".", HelpText = "Directory to look for object file")]
++        public string OutDir { get; set; }
++
++        [Option("modules", Required = true, Separator = ',', HelpText = "Directories to look for module file")]
++        public IEnumerable<string> ModuleDirs { get; set; }
++
++        [Option("ignore", Required = false, Separator = ' ', HelpText = "List of additional module name references to ignore")]
++        public IEnumerable<string> Ignores { get; set; }
++
++        [Value(0, Required = true, HelpText = "List of source files to process")]
++        public IEnumerable<string> Srcs { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..b079ce0 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -97,0 +98,30 @@ namespace CommandLine.Tests.Unit
++        [Theory]
++        [InlineData(new string[0], 0, 0)]
++        [InlineData(new[] { "-v" }, 1, 0)]
++        [InlineData(new[] { "-vv" }, 2, 0)]
++        [InlineData(new[] { "-v", "-v" }, 2, 0)]
++        [InlineData(new[] { "-v", "-v", "-v" }, 3, 0)]
++        [InlineData(new[] { "-v", "-vv" }, 3, 0)]
++        [InlineData(new[] { "-vv", "-v" }, 3, 0)]
++        [InlineData(new[] { "-vvv" }, 3, 0)]
++        [InlineData(new[] { "-v", "-s", "-v", "-v" }, 3, 1)]
++        [InlineData(new[] { "-v", "-ss", "-v", "-v" }, 3, 2)]
++        [InlineData(new[] { "-v", "-s", "-sv", "-v" }, 3, 2)]
++        [InlineData(new[] { "-vsvv" }, 3, 1)]
++        [InlineData(new[] { "-vssvv" }, 3, 2)]
++        [InlineData(new[] { "-vsvsv" }, 3, 2)]
++        public void Parse_FlagCounter_options_with_short_name(string[] args, int verboseCount, int silentCount)
++        {
++            // Fixture setup
++            var expectedOptions = new Options_With_FlagCounter_Switches { Verbose = verboseCount, Silent = silentCount };
++            var sut = new Parser(with => with.AllowMultiInstance = true);
++
++            // Exercize system
++            var result = sut.ParseArguments<Options_With_FlagCounter_Switches>(args);
++
++            // Verify outcome
++            // ((NotParsed<Options_With_FlagCounter_Switches>)result).Errors.Should().BeEmpty();
++            ((Parsed<Options_With_FlagCounter_Switches>)result).Value.Should().BeEquivalentTo(expectedOptions);
++            // Teardown
++        }
++
+diff --git a/tests/CommandLine.Tests/Unit/SequenceParsingTests.cs b/tests/CommandLine.Tests/Unit/SequenceParsingTests.cs
+new file mode 100644
+index 0000000..cb65e42
+--- /dev/null
++++ b/tests/CommandLine.Tests/Unit/SequenceParsingTests.cs
+@@ -0,0 +1,140 @@
++﻿using System.Collections.Generic;
++using System.Linq;
++using System;
++using Xunit;
++using CommandLine.Text;
++using CommandLine.Tests.Fakes;
++using FluentAssertions;
++using CommandLine.Core;
++using System.Reflection;
++using CSharpx;
++using RailwaySharp.ErrorHandling;
++
++namespace CommandLine.Tests.Unit
++{
++	// Reference: PR #684
++    public class SequenceParsingTests
++    {
++        // Issue #91
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++        public static void Enumerable_with_separator_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = "--exclude=a,b InputFile.txt".Split();
++            var expected = new Options_For_Issue_91 {
++                Excluded = new[] { "a", "b" },
++                Included = Enumerable.Empty<string>(),
++                InputFileName = "InputFile.txt",
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_91>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_91>>();
++            result.As<Parsed<Options_For_Issue_91>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #396
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++        public static void Options_with_similar_names_are_not_ambiguous(bool useGetoptMode)
++        {
++            var args = new[] { "--configure-profile", "deploy", "--profile", "local" };
++            var expected = new Options_With_Similar_Names { ConfigureProfile = "deploy", Profile = "local", Deploys = Enumerable.Empty<string>() };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_With_Similar_Names>(args);
++            result.Should().BeOfType<Parsed<Options_With_Similar_Names>>();
++            result.As<Parsed<Options_With_Similar_Names>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #420
++        [Fact]
++
++        public static void Values_with_same_name_as_sequence_option_do_not_cause_later_values_to_split_on_separators()
++        {
++            var args = new[] { "c", "x,y" };
++            var tokensExpected = new[] { Token.Value("c"), Token.Value("x,y") };
++            var typeInfo = typeof(Options_With_Similar_Names_And_Separator);
++
++            var specProps = typeInfo.GetSpecifications(pi => SpecificationProperty.Create(
++                    Specification.FromProperty(pi), pi, Maybe.Nothing<object>()))
++                .Select(sp => sp.Specification)
++                .OfType<OptionSpecification>();
++
++            var tokenizerResult = Tokenizer.ConfigureTokenizer(StringComparer.InvariantCulture, false, false)(args, specProps);
++            var tokens = tokenizerResult.SucceededWith();
++            tokens.Should().BeEquivalentTo(tokensExpected);
++        }
++
++        // Issue #454
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Enumerable_with_colon_separator_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = "-c chanA:chanB file.hdf5".Split();
++            var expected = new Options_For_Issue_454 {
++                Channels = new[] { "chanA", "chanB" },
++                ArchivePath = "file.hdf5",
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_454>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_454>>();
++            result.As<Parsed<Options_For_Issue_454>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #510
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Enumerable_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = new[] { "-a", "1,2", "c" };
++            var expected = new Options_For_Issue_510 { A = new[] { "1", "2" }, C = "c" };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_510>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_510>>();
++            result.As<Parsed<Options_For_Issue_510>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #617
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Enumerable_with_enum_before_values_does_not_try_to_parse_too_much(bool useGetoptMode)
++        {
++            var args = "--fm D,C a.txt".Split();
++            var expected = new Options_For_Issue_617 {
++                Mode = new[] { FMode.D, FMode.C },
++                Files = new[] { "a.txt" },
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_617>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_617>>();
++            result.As<Parsed<Options_For_Issue_617>>().Value.Should().BeEquivalentTo(expected);
++        }
++
++        // Issue #619
++        [Theory]
++        [InlineData(false)]
++        [InlineData(true)]
++
++        public static void Separator_just_before_values_does_not_try_to_parse_values(bool useGetoptMode)
++        {
++            var args = "--outdir ./x64/Debug --modules ../utilities/x64/Debug,../auxtool/x64/Debug m_xfunit.f03 m_xfunit_assertion.f03".Split();
++            var expected = new Options_For_Issue_619 {
++                OutDir = "./x64/Debug",
++                ModuleDirs = new[] { "../utilities/x64/Debug", "../auxtool/x64/Debug" },
++                Ignores = Enumerable.Empty<string>(),
++                Srcs = new[] { "m_xfunit.f03", "m_xfunit_assertion.f03" },
++            };
++            var sut = new Parser(parserSettings => { parserSettings.GetoptMode = useGetoptMode; });
++            var result = sut.ParseArguments<Options_For_Issue_619>(args);
++            result.Should().BeOfType<Parsed<Options_For_Issue_619>>();
++            result.As<Parsed<Options_For_Issue_619>>().Value.Should().BeEquivalentTo(expected);
++        }
++    }
++}

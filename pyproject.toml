@@ -1,36 +1,23 @@
-[project]
-name = "autocommit"
-version = "0.1.0"
-description = "A CLI tool that splits code changes into atomic commits using LLM-powered clustering"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "click>=8.1",
-    "gitpython>=3.1",
-    "anthropic>=0.40",
-    "pydantic>=2.0",
-]
-
-[project.scripts]
-autocommit = "autocommit.cli:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[dependency-groups]
-dev = [
-    "pytest>=8.0",
-    "pytest-cov>=6.0",
-    "ruff>=0.9",
+[project]
+name = "autocommit"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "groq>=1.0.0",
+    "python-dotenv>=1.2.2",
 ]
 
-[tool.ruff]
-target-version = "py311"
-line-length = 100
+[project.scripts]
+etc = "autocommit.etc:main"
 
-[tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
+[tool.hatchling.build.targets.wheel]
+packages = ["autocommit"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

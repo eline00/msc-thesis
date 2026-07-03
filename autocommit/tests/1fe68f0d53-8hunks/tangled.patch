@@ -1,0 +1,80 @@
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index d44b29c..31a2002 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -101,6 +101,7 @@ namespace CommandLine.Core
+                                            where sp.Value.IsNothing()
+                                            let o = (OptionSpecification)sp.Specification
+                                            where o.SetName.Length > 0
++                                           where o.Group.IsNothing()
+                                            where setWithRequiredValue.ContainsIfNotEmpty(o.SetName)
+                                            select sp.Specification;
+                 var missing =
+@@ -113,6 +114,7 @@ namespace CommandLine.Core
+                             where sp.Value.IsNothing()
+                             let o = (OptionSpecification)sp.Specification
+                             where o.SetName.Length == 0
++                            where o.Group.IsNothing()
+                             select sp.Specification)
+                         .Concat(
+                             from sp in specProps
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index ce2e1fa..4a38a4d 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -107,7 +107,7 @@ namespace CommandLine
+         }
+ 
+         /// <summary>
+-        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
++        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value. Required rules are ignored.
+         /// </summary>
+         public string Group
+         {
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index a67e43d..949e687 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -306,7 +306,6 @@ namespace CommandLine.Text
+         /// <param name='onExample'>A delegate used to customize <see cref="CommandLine.Text.Example"/> model used to render text block of usage examples.</param>
+         /// <param name="verbsIndex">If true the output style is consistent with verb commands (no dashes), otherwise it outputs options.</param>
+         /// <param name="maxDisplayWidth">The maximum width of the display.</param>
+-        /// <param name="comparison">a comparison lambda to order options in help text</param>
+         /// <remarks>The parameter <paramref name="verbsIndex"/> is not ontly a metter of formatting, it controls whether to handle verbs or options.</remarks>
+         public static HelpText AutoBuild<T>(
+             ParserResult<T> parserResult,
+@@ -874,6 +873,16 @@ namespace CommandLine.Text
+ 
+         private HelpText AddOption(string requiredWord, string optionGroupWord, int maxLength, Specification specification, int widthOfHelpText)
+         {
++            OptionSpecification GetOptionGroupSpecification()
++            {
++                if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++                {
++                    return optionSpecification;
++                }
++
++                return null;
++            }
++
+             if (specification.Hidden)
+                 return this;
+ 
+@@ -896,12 +905,14 @@ namespace CommandLine.Text
+             specification.DefaultValue.Do(
+                 defaultValue => optionHelpText = "(Default: {0}) ".FormatInvariant(FormatDefaultValue(defaultValue)) + optionHelpText);
+ 
+-            if (specification.Required)
++            var optionGroupSpecification = GetOptionGroupSpecification();
++
++            if (specification.Required && optionGroupSpecification == null)
+                 optionHelpText = "{0} ".FormatInvariant(requiredWord) + optionHelpText;
+ 
+-            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++            if (optionGroupSpecification != null)
+             {
+-                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
++                optionHelpText = "({0}: {1}) ".FormatInvariant(optionGroupWord, optionGroupSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
+             }
+ 
+             //note that we need to indent trim the start of the string because it's going to be 

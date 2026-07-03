@@ -1,0 +1,19 @@
+diff --git a/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+new file mode 100644
+index 0000000..06787b3
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+@@ -0,0 +1,13 @@
++// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++namespace CommandLine.Tests.Fakes
++{
++    public class Options_With_FlagCounter_Switches
++    {
++        [Option('v', FlagCounter=true)]
++        public int Verbose { get; set; }
++
++        [Option('s', FlagCounter=true)]
++        public int Silent { get; set; }
++    }
++}

@@ -1,0 +1,134 @@
+diff --git a/tests/CommandLine.Tests/Fakes/Options_With_Sequence_Having_Separator_And_Values.cs b/tests/CommandLine.Tests/Fakes/Options_With_Sequence_Having_Separator_And_Values.cs
+new file mode 100644
+index 0000000..6099b5b
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/Options_With_Sequence_Having_Separator_And_Values.cs
+@@ -0,0 +1,74 @@
++// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++using System.Collections.Generic;
++
++namespace CommandLine.Tests.Fakes
++{
++    public class Options_For_Issue_91
++    {
++        [Value(0, Required = true)]
++        public string InputFileName { get; set; }
++
++        [Option('o', "output")]
++        public string OutputFileName { get; set; }
++
++        [Option('i', "include", Separator = ',')]
++        public IEnumerable<string> Included { get; set; }
++
++        [Option('e', "exclude", Separator = ',')]
++        public IEnumerable<string> Excluded { get; set; }
++    }
++
++    public class Options_For_Issue_454
++    {
++        [Option('c', "channels", Required = true, Separator = ':', HelpText = "Channel names")]
++        public IEnumerable<string> Channels { get; set; }
++
++        [Value(0, Required = true, MetaName = "file_path", HelpText = "Path of archive to be processed")]
++        public string ArchivePath { get; set; }
++    }
++
++    public class Options_For_Issue_510
++    {
++        [Option('a', "aa", Required = false, Separator = ',')]
++        public IEnumerable<string> A { get; set; }
++
++        [Option('b', "bb", Required = false)]
++        public string B { get; set; }
++        
++        [Value(0, Required = true)]
++        public string C { get; set; }
++    }
++
++    public enum FMode { C, D, S };
++
++    public class Options_For_Issue_617
++    {
++        [Option("fm",  Separator=',', Default = new[] { FMode.S })]  
++        public IEnumerable<FMode> Mode { get; set; }
++            
++        [Option('q')]
++        public bool q { get;set; }
++            
++        [Value(0)]
++        public IList<string> Files { get; set; }
++    }
++
++    public class Options_For_Issue_619
++    {
++        [Option("verbose", Required = false, Default = false, HelpText = "Generate process tracing information")]
++        public bool Verbose { get; set; }
++
++        [Option("outdir", Required = false, Default = ".", HelpText = "Directory to look for object file")]
++        public string OutDir { get; set; }
++
++        [Option("modules", Required = true, Separator = ',', HelpText = "Directories to look for module file")]
++        public IEnumerable<string> ModuleDirs { get; set; }
++
++        [Option("ignore", Required = false, Separator = ' ', HelpText = "List of additional module name references to ignore")]
++        public IEnumerable<string> Ignores { get; set; }
++
++        [Value(0, Required = true, HelpText = "List of source files to process")]
++        public IEnumerable<string> Srcs { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+new file mode 100644
+index 0000000..06787b3
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/Options_With_FlagCounter_Switches.cs
+@@ -0,0 +1,13 @@
++// Copyright 2005-2015 Giacomo Stelluti Scala & Contributors. All rights reserved. See License.md in the project root for license information.
++
++namespace CommandLine.Tests.Fakes
++{
++    public class Options_With_FlagCounter_Switches
++    {
++        [Option('v', FlagCounter=true)]
++        public int Verbose { get; set; }
++
++        [Option('s', FlagCounter=true)]
++        public int Silent { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/ParserTests.cs b/tests/CommandLine.Tests/Unit/ParserTests.cs
+index 58ce7d3..b079ce0 100644
+--- a/tests/CommandLine.Tests/Unit/ParserTests.cs
++++ b/tests/CommandLine.Tests/Unit/ParserTests.cs
+@@ -97,0 +98,30 @@ namespace CommandLine.Tests.Unit
++        [Theory]
++        [InlineData(new string[0], 0, 0)]
++        [InlineData(new[] { "-v" }, 1, 0)]
++        [InlineData(new[] { "-vv" }, 2, 0)]
++        [InlineData(new[] { "-v", "-v" }, 2, 0)]
++        [InlineData(new[] { "-v", "-v", "-v" }, 3, 0)]
++        [InlineData(new[] { "-v", "-vv" }, 3, 0)]
++        [InlineData(new[] { "-vv", "-v" }, 3, 0)]
++        [InlineData(new[] { "-vvv" }, 3, 0)]
++        [InlineData(new[] { "-v", "-s", "-v", "-v" }, 3, 1)]
++        [InlineData(new[] { "-v", "-ss", "-v", "-v" }, 3, 2)]
++        [InlineData(new[] { "-v", "-s", "-sv", "-v" }, 3, 2)]
++        [InlineData(new[] { "-vsvv" }, 3, 1)]
++        [InlineData(new[] { "-vssvv" }, 3, 2)]
++        [InlineData(new[] { "-vsvsv" }, 3, 2)]
++        public void Parse_FlagCounter_options_with_short_name(string[] args, int verboseCount, int silentCount)
++        {
++            // Fixture setup
++            var expectedOptions = new Options_With_FlagCounter_Switches { Verbose = verboseCount, Silent = silentCount };
++            var sut = new Parser(with => with.AllowMultiInstance = true);
++
++            // Exercize system
++            var result = sut.ParseArguments<Options_With_FlagCounter_Switches>(args);
++
++            // Verify outcome
++            // ((NotParsed<Options_With_FlagCounter_Switches>)result).Errors.Should().BeEmpty();
++            ((Parsed<Options_With_FlagCounter_Switches>)result).Value.Should().BeEquivalentTo(expectedOptions);
++            // Teardown
++        }
++

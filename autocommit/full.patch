@@ -1,0 +1,43 @@
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index d44b29c..31a2002 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -103,0 +104 @@ namespace CommandLine.Core
++                                           where o.Group.IsNothing()
+@@ -115,0 +117 @@ namespace CommandLine.Core
++                            where o.Group.IsNothing()
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index ce2e1fa..4a38a4d 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -110 +110 @@ namespace CommandLine
+-        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
++        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value. Required rules are ignored.
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index a67e43d..949e687 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -309 +308,0 @@ namespace CommandLine.Text
+-        /// <param name="comparison">a comparison lambda to order options in help text</param>
+@@ -876,0 +876,10 @@ namespace CommandLine.Text
++            OptionSpecification GetOptionGroupSpecification()
++            {
++                if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++                {
++                    return optionSpecification;
++                }
++
++                return null;
++            }
++
+@@ -899 +908,3 @@ namespace CommandLine.Text
+-            if (specification.Required)
++            var optionGroupSpecification = GetOptionGroupSpecification();
++
++            if (specification.Required && optionGroupSpecification == null)
+@@ -902 +913 @@ namespace CommandLine.Text
+-            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++            if (optionGroupSpecification != null)
+@@ -904 +915 @@ namespace CommandLine.Text
+-                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
++                optionHelpText = "({0}: {1}) ".FormatInvariant(optionGroupWord, optionGroupSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
