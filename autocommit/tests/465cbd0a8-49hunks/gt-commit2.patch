@@ -1,0 +1,191 @@
+diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
+index 966f5ba..ce2e1fa 100644
+--- a/src/CommandLine/OptionAttribute.cs
++++ b/src/CommandLine/OptionAttribute.cs
+@@ -108,0 +109,3 @@ namespace CommandLine
++        /// <summary>
++        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
++        /// </summary>
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -2,0 +3,5 @@
++using CommandLine.Core;
++using CommandLine.Infrastructure;
++
++using CSharpx;
++
+@@ -7 +11,0 @@ using System.IO;
+-using System.Text;
+@@ -10,3 +14 @@ using System.Reflection;
+-using CommandLine.Infrastructure;
+-using CommandLine.Core;
+-using CSharpx;
++using System.Text;
+@@ -20,3 +22,3 @@ namespace CommandLine.Text
+-    
+-    
+-    
++
++
++
+@@ -32 +34 @@ namespace CommandLine.Text
+-    
++
+@@ -58,26 +60,26 @@ namespace CommandLine.Text
+-        public static Comparison<ComparableOption> RequiredThenAlphaComparison  = (ComparableOption attr1, ComparableOption attr2) =>
+-        {
+-            if (attr1.IsOption && attr2.IsOption)
+-            {
+-                if (attr1.Required && !attr2.Required)
+-                {
+-                    return -1;
+-                }
+-                else if (!attr1.Required && attr2.Required)
+-                {
+-                    return 1;
+-                }
+-                
+-                return String.Compare(attr1.LongName, attr2.LongName, StringComparison.Ordinal);
+-                
+-            }
+-            else if (attr1.IsOption && attr2.IsValue)
+-            {
+-                return -1;
+-            }
+-            else
+-            {
+-                return 1;
+-            }
+-        };
+-        
++        public static Comparison<ComparableOption> RequiredThenAlphaComparison = (ComparableOption attr1, ComparableOption attr2) =>
++       {
++           if (attr1.IsOption && attr2.IsOption)
++           {
++               if (attr1.Required && !attr2.Required)
++               {
++                   return -1;
++               }
++               else if (!attr1.Required && attr2.Required)
++               {
++                   return 1;
++               }
++
++               return String.Compare(attr1.LongName, attr2.LongName, StringComparison.Ordinal);
++
++           }
++           else if (attr1.IsOption && attr2.IsValue)
++           {
++               return -1;
++           }
++           else
++           {
++               return 1;
++           }
++       };
++
+@@ -85 +87 @@ namespace CommandLine.Text
+-        
++
+@@ -91 +93 @@ namespace CommandLine.Text
+-        private const int OptionToHelpTextSeparatorWidth = 4; 
++        private const int OptionToHelpTextSeparatorWidth = 4;
+@@ -337 +339 @@ namespace CommandLine.Text
+-         
++
+@@ -395 +397 @@ namespace CommandLine.Text
+-                return new HelpText($"{HeadingInfo.Default}{Environment.NewLine}"){MaximumDisplayWidth = maxDisplayWidth }.AddPreOptionsLine(Environment.NewLine);
++                return new HelpText($"{HeadingInfo.Default}{Environment.NewLine}") { MaximumDisplayWidth = maxDisplayWidth }.AddPreOptionsLine(Environment.NewLine);
+@@ -522,0 +525 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+@@ -539,0 +543 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+@@ -555,0 +560 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+@@ -573,0 +579 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+@@ -617 +623 @@ namespace CommandLine.Text
+-            foreach(var error in  meaningfulErrors
++            foreach (var error in meaningfulErrors
+@@ -754 +760 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeHelpEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeHelpEntry() });
+@@ -756 +762 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeVersionEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeVersionEntry() });
+@@ -783,8 +789,8 @@ namespace CommandLine.Text
+-                    select
+-                        OptionSpecification.NewSwitch(
+-                            string.Empty,
+-                            verbTuple.Item1.Name,
+-                            false,
+-                            verbTuple.Item1.HelpText,
+-                            string.Empty,
+-                            verbTuple.Item1.Hidden);
++                              select
++                                  OptionSpecification.NewSwitch(
++                                      string.Empty,
++                                      verbTuple.Item1.Name,
++                                      false,
++                                      verbTuple.Item1.HelpText,
++                                      string.Empty,
++                                      verbTuple.Item1.Hidden);
+@@ -792 +798 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeHelpEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeHelpEntry() });
+@@ -794 +800 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeVersionEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeVersionEntry() });
+@@ -800,0 +807 @@ namespace CommandLine.Text
++            string optionGroupWord,
+@@ -804,2 +811,2 @@ namespace CommandLine.Text
+-            
+-            
++
++
+@@ -825 +832 @@ namespace CommandLine.Text
+-                    AddOption(requiredWord, maxLength, spec, remainingSpace);
++                    AddOption(requiredWord, optionGroupWord, maxLength, spec, remainingSpace);
+@@ -832 +839 @@ namespace CommandLine.Text
+-                        AddOption(requiredWord, maxLength, option, remainingSpace));
++                        AddOption(requiredWord, optionGroupWord, maxLength, option, remainingSpace));
+@@ -868 +875 @@ namespace CommandLine.Text
+-        private HelpText AddOption(string requiredWord, int maxLength, Specification specification, int widthOfHelpText)
++        private HelpText AddOption(string requiredWord, string optionGroupWord, int maxLength, Specification specification, int widthOfHelpText)
+@@ -894 +901,6 @@ namespace CommandLine.Text
+-          
++
++            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++            {
++                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
++            }
++
+@@ -897,2 +909,2 @@ namespace CommandLine.Text
+-            var indented = TextWrapper.WrapAndIndentText(optionHelpText, maxLength+TotalOptionPadding, widthOfHelpText).TrimStart();
+-          
++            var indented = TextWrapper.WrapAndIndentText(optionHelpText, maxLength + TotalOptionPadding, widthOfHelpText).TrimStart();
++
+@@ -992 +1004 @@ namespace CommandLine.Text
+-                specLength += OptionPrefixWidth; 
++                specLength += OptionPrefixWidth;
+@@ -1040 +1052 @@ namespace CommandLine.Text
+-      
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index cdcf409..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -36,0 +37,5 @@ namespace CommandLine.Text
++        /// <summary>
++        /// Gets a delegate that returns the word 'group'.
++        /// </summary>
++        public abstract Func<string> OptionGroupWord { get; }
++
+@@ -87,0 +93,5 @@ namespace CommandLine.Text
++            public override Func<string> OptionGroupWord
++            {
++                get { return () => "Group"; }
++            }
++

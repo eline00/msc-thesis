@@ -1,0 +1,16 @@
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -50 +50 @@ namespace CommandLine.Core
+-                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key));
++                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key, gr.Select(g => new NameInfo(g.Option.ShortName, g.Option.LongName))));
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -542,2 +542,2 @@ namespace CommandLine
+-        internal MissingGroupOptionError(string group)
+-            : base(ErrorType.HelpRequestedError, true)
++        internal MissingGroupOptionError(string group, IEnumerable<NameInfo> names)
++            : base(ErrorType.MissingGroupOptionError)

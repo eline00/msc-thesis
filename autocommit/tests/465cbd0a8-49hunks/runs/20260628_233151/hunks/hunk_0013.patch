@@ -1,0 +1,9 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -10,3 +14 @@ using System.Reflection;
+-using CommandLine.Infrastructure;
+-using CommandLine.Core;
+-using CSharpx;
++using System.Text;

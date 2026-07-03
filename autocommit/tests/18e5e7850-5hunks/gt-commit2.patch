@@ -1,0 +1,10 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index dc5a1c0..13129b3 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -660 +660 @@ namespace CommandLine.Text
+-     internal static void AddLine(StringBuilder builder, string value, int maximumLength)
++        internal static void AddLine(StringBuilder builder, string value, int maximumLength)
+@@ -733 +733 @@ namespace CommandLine.Text
+-       private HelpText AddOptionsImpl(
++        private HelpText AddOptionsImpl(

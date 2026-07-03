@@ -1,0 +1,12 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -142,0 +154,7 @@ namespace CommandLine.Text
++                                case ErrorType.MissingGroupOptionError:
++                                    var missingGroupOptionError = (MissingGroupOptionError)error;
++                                    return "At least one option from group '".JoinTo(
++                                        missingGroupOptionError.Group,
++                                        "' (",
++                                        string.Join(", ", missingGroupOptionError.Names.Select(n => n.NameText)),
++                                        ") is required.");

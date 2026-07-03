@@ -1,0 +1,80 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index 5a1b695..13129b3 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -657,7 +657,7 @@ namespace CommandLine.Text
+                 .ToString();
+         }
+ 
+-     internal static void AddLine(StringBuilder builder, string value, int maximumLength)
++        internal static void AddLine(StringBuilder builder, string value, int maximumLength)
+         {
+             if (builder == null)
+             {
+@@ -730,7 +730,7 @@ namespace CommandLine.Text
+             return optionSpecs;
+         }
+ 
+-       private HelpText AddOptionsImpl(
++        private HelpText AddOptionsImpl(
+             IEnumerable<Specification> specifications,
+             string requiredWord,
+             int maximumLength)
+@@ -971,7 +971,12 @@ namespace CommandLine.Text
+         private static string WrapAndIndentText(string input,int indentLevel,int columnWidth)
+         {
+             //start by splitting at newlines and then reinserting the newline as a separate word
+-            var lines = input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
++            //Note that on the input side, we can't assume the line-break style at run time so we have to
++            //be able to handle both.  We cant use Environment.NewLine because that changes at
++            //_runtime_ and may not match the line-break style that was compiled in
++            var lines = input
++                .Replace("\r","")
++                .Split(new[] {'\n'}, StringSplitOptions.None);
+             var lineCount = lines.Length;
+             
+             var tokens = lines
+diff --git a/tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs b/tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs
+new file mode 100644
+index 0000000..9950dbc
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs
+@@ -0,0 +1,9 @@
++﻿namespace CommandLine.Tests.Fakes
++{
++    public class HelpTextWithMixedLineBreaks_Options
++    {
++        [Option(HelpText = 
++            "This is a help text description\n  It has multiple lines.\r\n  Third line")]
++        public string StringValue { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs b/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs
+index 8412e66..f384e4d 100644
+--- a/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs
++++ b/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs
+@@ -718,5 +718,24 @@ namespace CommandLine.Tests.Unit.Text
+         }
+ 
+ 
++        [Fact]
++        public void HelpTextIsConsitentRegardlessOfCompileTimeLineStyle()
++        {
++            // Fixture setup
++            // Exercize system 
++            var sut = new HelpText {AddDashesToOption = true}
++                .AddOptions(new NotParsed<Simple_Options>(TypeInfo.Create(typeof(HelpTextWithMixedLineBreaks_Options)),
++                    Enumerable.Empty<Error>()));
++
++            // Verify outcome
++
++            var lines = sut.ToString().ToNotEmptyLines();
++            lines[0].Should().BeEquivalentTo("  --stringvalue    This is a help text description");
++            lines[1].Should().BeEquivalentTo("                     It has multiple lines.");
++            lines[2].Should().BeEquivalentTo("                     Third line");
++         
++            // Teardown
++        }
++
+     }
+ }

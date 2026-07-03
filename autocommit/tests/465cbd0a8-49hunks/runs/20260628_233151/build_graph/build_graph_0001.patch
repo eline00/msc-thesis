@@ -1,0 +1,32 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -2,0 +3,5 @@
++using CommandLine.Core;
++using CommandLine.Infrastructure;
++
++using CSharpx;
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -15,3 +15 @@ using System.Reflection;
+-using CommandLine.Infrastructure;
+-using CommandLine.Core;
+-using CSharpx;
++using System.Text;
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -12 +12,0 @@ using System.IO;
+-using System.Text;
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -758 +758 @@ namespace CommandLine.Text
+-                optionSpecs = optionSpecs.Concat(new [] { MakeVersionEntry() });
++                optionSpecs = optionSpecs.Concat(new[] { MakeVersionEntry() });

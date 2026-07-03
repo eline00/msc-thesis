@@ -677,6 +677,51 @@ def _write_graph_dir(
     return graph_dir, len(items)
 
 
+def _build_dep_oracle(combined: list[str], build_cmd: str) -> bool:
+    """Apply the combined hunk set onto the current (clean base) tree, build, revert.
+
+    Returns True only if the set both applies and builds. Apply-failure returns
+    False (treated as a hard dependency by the caller).
+    """
+    from autocommit.group import git_apply, git_revert, run_build
+
+    if not git_apply(combined):
+        git_revert(combined)
+        return False
+    result = run_build(build_cmd)
+    git_revert(combined)
+    return result
+
+
+def _write_build_graph_dir(
+    groups_dir: Path,
+    components: list[list[int]],
+) -> tuple[Path, int]:
+    """Create build_graph/ alongside groups/, one patch file per component.
+
+    Each component's file concatenates its constituent group_NNNN.patch texts in
+    atom order. Files are numbered by component order (components are pre-sorted
+    by minimum atom index). Returns (build_graph_dir, number_of_files_written).
+    """
+    build_graph_dir = groups_dir.parent / "build_graph"
+    build_graph_dir.mkdir(exist_ok=True)
+
+    for file_num, comp in enumerate(components, start=1):
+        parts: list[str] = []
+        for atom_idx in comp:
+            group_file = groups_dir / f"group_{atom_idx + 1:04d}.patch"
+            if group_file.exists():
+                parts.append(group_file.read_text())
+            else:
+                log_warning(
+                    f"Expected group patch missing — build_graph_{file_num:04d}.patch "
+                    f"will be incomplete: {group_file}"
+                )
+        (build_graph_dir / f"build_graph_{file_num:04d}.patch").write_text("".join(parts))
+
+    return build_graph_dir, len(components)
+
+
 def step_analyze_deps(run_dir_override: str | None = None) -> None:
     """--analyze-deps: Analyse def-use relationships between committed groups."""
     _init_log()
@@ -733,6 +778,206 @@ def step_analyze_deps(run_dir_override: str | None = None) -> None:
     log_info(f"Graph folder written → {graph_dir}  ({n_files} file(s))")
     (graph_dir / "dep_graph.log").write_text("\n".join(log_lines) + "\n")
 
+
+def _probe_build_deps(
+    atoms: list[list[str]],
+) -> tuple[list[tuple[int, int]], int] | None:
+    """Probe build dependencies between atoms in place against the current HEAD.
+
+    The caller is responsible for having checked out the correct clean base.
+    Refuses if the working tree is dirty (the oracle reverts via git restore /
+    delete and would clobber uncommitted work) or if the full atom set does not
+    apply cleanly onto HEAD (the base is wrong). Never moves HEAD.
+
+    Returns (edges, invocations), or None on either refusal.
+    """
+    from autocommit.build_dep_analysis import test_build_dependencies
+    from autocommit.group import git_apply
+
+    if git_output("status", "--porcelain"):
+        log_error(
+            "Working tree is not clean. Commit or stash changes, then check out "
+            "the commit before the first atom and re-run."
+        )
+        return None
+
+    all_hunks = [h for atom in atoms for h in atom]
+    if not git_apply(all_hunks, check_only=True):
+        log_error(
+            "The atom hunks do not apply onto current HEAD. Check out the commit "
+            "before the first atom (the clean base) and re-run."
+        )
+        return None
+
+    return test_build_dependencies(
+        atoms, lambda combined: _build_dep_oracle(combined, BUILD_CMD)
+    )
+
+
+def _probe_and_write_build_graph(
+    atoms: list[list[str]],
+    groups_dir: Path,
+) -> None:
+    """Iteratively probe build dependencies to a fixpoint, then write build_graph/.
+
+    A single probing pass only links each atom to its *first* downstream consumer
+    (test_build_dependencies breaks after the first failing prefix), so one pass
+    under-merges when one atom has several independent consumers: only the first
+    is pulled in. We re-probe the merged components as new atoms and repeat until
+    a pass finds no further dependencies — the fixpoint, i.e. the transitive
+    closure of the build-dependency relation. Each pass either merges at least one
+    pair (strictly fewer atoms) or finds nothing and stops, so it always
+    terminates.
+
+    Probes against the current HEAD (the user-checked-out clean base).
+    """
+    from autocommit.build_dep_analysis import connected_components
+
+    def atom_label(group_idxs: list[int]) -> str:
+        names = [f"group_{g + 1:04d}" for g in group_idxs]
+        return names[0] if len(names) == 1 else "{" + "+".join(names) + "}"
+
+    # current_atoms holds hunk-path lists for the current (possibly merged) atoms;
+    # groups_of_atom[i] tracks which original group indices each one bundles.
+    current_atoms = atoms
+    groups_of_atom: list[list[int]] = [[i] for i in range(len(atoms))]
+
+    log_lines: list[str] = []
+    total_invocations = 0
+    iteration = 0
+
+    while True:
+        iteration += 1
+        n = len(current_atoms)
+        if n < 2:
+            log_info(f"[iteration {iteration}] {n} atom(s) — no pairs to probe.")
+            edges: list[tuple[int, int]] = []
+            invocations = 0
+        else:
+            log_info(f"[iteration {iteration}] probing {n} atoms...")
+            result = _probe_build_deps(current_atoms)
+            if result is None:
+                return
+            edges, invocations = result
+        total_invocations += invocations
+
+        components = connected_components(n, edges)
+
+        header = (
+            f"[iteration {iteration}] {n} atoms, {len(edges)} edge(s), "
+            f"{invocations} invocation(s) -> {len(components)} component(s)"
+        )
+        log_info(header)
+        log_lines.append(header)
+        for a, b in edges:
+            line = (
+                f"    {atom_label(groups_of_atom[a])}  --(build)-->  "
+                f"{atom_label(groups_of_atom[b])}"
+            )
+            log_info(line)
+            log_lines.append(line)
+
+        # Fixpoint: no edge merged any pair this pass (every component a singleton).
+        if len(components) == n:
+            break
+
+        new_atoms: list[list[str]] = []
+        new_groups: list[list[int]] = []
+        for comp in components:
+            new_atoms.append([h for idx in comp for h in current_atoms[idx]])
+            new_groups.append(sorted(g for idx in comp for g in groups_of_atom[idx]))
+        current_atoms = new_atoms
+        groups_of_atom = new_groups
+
+    # Final components, expressed in original group indices, ordered by first member.
+    final_components = sorted((sorted(g) for g in groups_of_atom), key=lambda g: g[0])
+
+    summary = (
+        f"Build-dependency fixpoint: {len(final_components)} component(s) after "
+        f"{iteration} iteration(s), {total_invocations} total invocation(s)."
+    )
+    log_info(summary)
+    log_lines.append(summary)
+    for i, comp in enumerate(final_components, start=1):
+        members = ", ".join(f"group_{idx + 1:04d}" for idx in comp)
+        line = f"  build_graph_{i:04d}: {members}"
+        log_info(line)
+        log_lines.append(line)
+
+    graph_dir, n_files = _write_build_graph_dir(groups_dir, final_components)
+    log_info(f"Build-graph folder written → {graph_dir}  ({n_files} file(s))")
+    (graph_dir / "build_dep_graph.log").write_text("\n".join(log_lines) + "\n")
+
+    metrics_event(
+        "BUILD_DEP",
+        f"atoms={len(atoms)},iterations={iteration},"
+        f"components={len(final_components)},invocations={total_invocations}",
+    )
+
+
+def _analyze_build_deps_postmerge(run_dir_override: str) -> None:
+    """--analyze-build-deps: probe build deps for a finished run dir.
+
+    Reconstructs atoms from the run dir's own hunks/ (raw clean-base line
+    numbers) and groups/ patches by signature, then probes them against the
+    current HEAD. The user must have checked out the correct clean base (the
+    commit before the first atom) beforehand; HEAD is never moved.
+    """
+    from autocommit.build_dep_analysis import reconstruct_atoms
+
+    p = Path(run_dir_override)
+    if not p.is_absolute():
+        p = SCRIPT_DIR / "tests" / p
+    groups_dir = p / "groups"
+    hunks_dir = p / "hunks"
+    if not groups_dir.exists():
+        log_error(f"No groups/ directory found in {p}")
+        return
+    if not hunks_dir.exists():
+        log_error(f"No hunks/ directory found in {p}")
+        return
+
+    group_files = [str(f) for f in sorted(groups_dir.glob("group_*.patch"))]
+    hunk_files = [str(f) for f in sorted(hunks_dir.glob("hunk_*.patch"))]
+    if not group_files:
+        log_error(f"No group_*.patch files found in {groups_dir}")
+        return
+    if not hunk_files:
+        log_error(f"No hunk_*.patch files found in {hunks_dir}")
+        return
+
+    atoms, unmatched = reconstruct_atoms(hunk_files, group_files)
+    if unmatched:
+        log_warning(
+            f"{unmatched} hunk(s) did not match any group — excluded from probing."
+        )
+
+    log_info(
+        f"Post-merge build-dep analysis: {len(group_files)} group(s), "
+        f"probing against current HEAD ({git_output('rev-parse', '--short', 'HEAD')})."
+    )
+    _probe_and_write_build_graph(atoms, groups_dir)
+
+
+def step_analyze_build_deps(run_dir_override: str | None = None) -> None:
+    """--analyze-build-deps: detect hard build dependencies between atoms.
+
+    Post-merge only: requires --run-dir. Reconstructs atoms from the run dir and
+    probes them against the currently checked-out base (HEAD). Check out the
+    commit before the first atom before running.
+    """
+    _init_log()
+
+    if not run_dir_override:
+        log_error(
+            "--analyze-build-deps requires --run-dir PATH. Check out the commit "
+            "before the first atom (the clean base), then run "
+            "'etc --analyze-build-deps --run-dir <run-dir>'."
+        )
+        return
+
+    _analyze_build_deps_postmerge(run_dir_override)
+
 # endregion
 
 # region Full automatic run
@@ -780,6 +1025,7 @@ def main() -> None:
             "  etc --one-iteration       Run one full iteration (split → find → commit)\n"
             "  etc --merge               Merge the detangling branch and write results\n"
             "  etc --analyze-deps [--run-dir PATH]  Analyse def-use relationships between groups\n"
+            "  etc --analyze-build-deps --run-dir PATH  Probe build dependencies (post-merge; check out the clean base first)\n"
             "\n"
             "Full automatic run (default):\n"
             "  etc [test_name]           Run all steps end-to-end\n"
@@ -827,9 +1073,13 @@ def main() -> None:
         "--analyze-deps", dest="analyze_deps", action="store_true",
         help="Analyse def-use relationships between committed groups and suggest commit ordering",
     )
+    steps.add_argument(
+        "--analyze-build-deps", dest="analyze_build_deps", action="store_true",
+        help="Probe pairwise build dependencies between atoms and merge connected components",
+    )
     parser.add_argument(
         "--run-dir",
-        help="Path to a completed run directory (for --analyze-deps on finished runs)",
+        help="Path to a completed run directory (for --analyze-deps, or required for --analyze-build-deps)",
     )
 
     args = parser.parse_args()
@@ -848,6 +1098,8 @@ def main() -> None:
         step_merge()
     elif args.analyze_deps:
         step_analyze_deps(run_dir_override=args.run_dir)
+    elif args.analyze_build_deps:
+        step_analyze_build_deps(run_dir_override=args.run_dir)
     else:
         run_all(args.test_name, approach=args.approach)
 

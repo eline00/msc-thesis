@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
-index a67e43d..949e687 100644
---- a/src/CommandLine/Text/HelpText.cs
-+++ b/src/CommandLine/Text/HelpText.cs
-@@ -902 +913 @@ namespace CommandLine.Text
--            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
-+            if (optionGroupSpecification != null)

@@ -1,0 +1,21 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -785,8 +785,8 @@ namespace CommandLine.Text
+-                    select
+-                        OptionSpecification.NewSwitch(
+-                            string.Empty,
+-                            verbTuple.Item1.Name,
+-                            false,
+-                            verbTuple.Item1.HelpText,
+-                            string.Empty,
+-                            verbTuple.Item1.Hidden);
++                              select
++                                  OptionSpecification.NewSwitch(
++                                      string.Empty,
++                                      verbTuple.Item1.Name,
++                                      false,
++                                      verbTuple.Item1.HelpText,
++                                      string.Empty,
++                                      verbTuple.Item1.Hidden);

@@ -1,0 +1,6 @@
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -3,0 +4 @@ using System;
++using System.Collections.Generic;

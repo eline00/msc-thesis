@@ -1,0 +1,10 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -86,0 +93,5 @@ namespace CommandLine.Text
++            public override Func<string> OptionGroupWord
++            {
++                get { return () => "Group"; }
++            }
++

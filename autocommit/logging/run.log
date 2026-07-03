@@ -1,91 +1,125 @@
-14:15:31 [INFO] Full patch saved to autocommit/full.patch
-14:15:31 [INFO] Creating temporary tangled commit...
-14:15:36 [INFO] Tangled SHA: 08db505c405ab3b85a14ab238724798c565391ef
-14:15:36 [SUCCESS] Reset to clean state. Working tree is clean.
-14:15:39 [INFO] Total hunks in full patch: 8
-14:15:39 [INFO] Split full patch into 8 hunk file(s).
-14:15:39 [SUCCESS] Setup complete. Run ID: 20260626_141536
-14:15:39 [INFO] Next: run with --next-iteration
-14:15:52 [INFO] ── Iteration 1: 8 hunk(s) remaining ──
-14:15:52 [INFO] Next: run with --find-group
-  [group]     test 8 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 4 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch
+12:19:44 [INFO] Full patch saved to autocommit/full.patch
+12:19:44 [INFO] Creating temporary tangled commit...
+12:19:44 [INFO] Tangled SHA: d3deae362a1c2fe14c4e74dd0d581eed6a07a2df
+12:19:45 [SUCCESS] Reset to clean state. Working tree is clean.
+12:19:47 [INFO] Total hunks in full patch: 11
+12:19:47 [INFO] Split full patch into 11 hunk file(s).
+12:19:47 [SUCCESS] Setup complete. Run ID: 20260703_121945
+12:19:47 [INFO] Next: run with --next-iteration
+12:28:44 [INFO] ── Iteration 1: 11 hunk(s) remaining ──
+12:28:44 [INFO] Next: run with --find-group
+  [group]     test 11 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 6 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0001.patch
-14:17:23 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0001.patch  [hunk_0001.patch]
-14:17:23 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:17:49 [SUCCESS] Committed group 1.
-14:17:49 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:18:03 [INFO] ── Iteration 2: 7 hunk(s) remaining ──
-14:18:03 [INFO] Next: run with --find-group
-  [group]     test 7 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 4 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 4 hunk(s) -> fail
+12:30:18 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0001.patch  [hunk_0001.patch]
+12:30:18 [INFO] Next: run with --commit-group (or inspect the group patch first)
+12:40:17 [SUCCESS] Committed group 1.
+12:40:17 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+12:55:24 [INFO] ── Iteration 2: 10 hunk(s) remaining ──
+12:55:24 [INFO] Next: run with --find-group
+  [group]     test 10 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 5 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0002.patch
-14:18:39 [SUCCESS] Found group 2 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0002.patch  [hunk_0002.patch]
-14:18:39 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:19:56 [SUCCESS] Committed group 2.
-14:19:56 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:20:35 [INFO] ── Iteration 3: 6 hunk(s) remaining ──
-14:20:35 [INFO] Next: run with --find-group
-  [group]     test 6 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
+12:55:52 [SUCCESS] Found group 2 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0002.patch  [hunk_0002.patch]
+12:55:52 [INFO] Next: run with --commit-group (or inspect the group patch first)
+13:20:17 [SUCCESS] Committed group 2.
+13:20:19 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+13:27:47 [INFO] ── Iteration 3: 9 hunk(s) remaining ──
+13:27:47 [INFO] Next: run with --find-group
+  [group]     test 9 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 5 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0003.patch
-14:22:36 [SUCCESS] Found group 3 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0003.patch  [hunk_0003.patch]
-14:22:36 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:23:56 [SUCCESS] Committed group 3.
-14:23:56 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:24:45 [INFO] ── Iteration 4: 5 hunk(s) remaining ──
-14:24:45 [INFO] Next: run with --find-group
-  [group]     test 5 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
+13:30:14 [SUCCESS] Found group 3 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0003.patch  [hunk_0003.patch]
+13:30:14 [INFO] Next: run with --commit-group (or inspect the group patch first)
+13:48:45 [SUCCESS] Committed group 3.
+13:48:45 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+14:13:30 [INFO] ── Iteration 4: 8 hunk(s) remaining ──
+14:13:34 [INFO] Next: run with --find-group
+  [group]     test 8 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 4 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch
   [group]     test 1 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 4 hunk(s) -> fail
+  [group]     test 1 hunk(s) -> PASS: hunk_0005.patch
+14:47:16 [SUCCESS] Found group 4 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0004.patch  [hunk_0005.patch]
+14:47:22 [INFO] Next: run with --commit-group (or inspect the group patch first)
+15:25:03 [SUCCESS] Committed group 4.
+15:25:03 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+15:27:33 [INFO] ── Iteration 5: 7 hunk(s) remaining ──
+15:27:33 [INFO] Next: run with --find-group
+  [group]     test 7 hunk(s) -> PASS: hunk_0004.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 4 hunk(s) -> PASS: hunk_0004.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0004.patch + hunk_0006.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0004.patch
-14:27:17 [SUCCESS] Found group 4 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0004.patch  [hunk_0004.patch]
-14:27:17 [INFO] Next: run with --commit-group (or inspect the group patch first)
-14:34:30 [SUCCESS] Committed group 4.
-14:34:32 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-14:41:00 [INFO] ── Iteration 5: 4 hunk(s) remaining ──
-14:41:02 [INFO] Next: run with --find-group
-  [group]     test 4 hunk(s) -> PASS: hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 2 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 1 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-  [group]     test 3 hunk(s) -> fail
-14:44:19 [SUCCESS] Found group 5 (4 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/groups/group_0005.patch  [hunk_0005.patch, hunk_0006.patch, hunk_0007.patch, hunk_0008.patch]
-14:44:22 [INFO] Next: run with --commit-group (or inspect the group patch first)
-15:10:32 [SUCCESS] Committed group 5.
-15:10:33 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-15:15:48 [SUCCESS] All changes have been grouped.
-15:15:48 [INFO] Next: run with --merge to finish.
-15:15:53 [SUCCESS] Done: 5 group(s) produced from 8 hunk(s).
-15:16:08 [INFO] ── Completeness ──────────────────────────────────────────────
-15:16:08 [INFO]   Hunks     : 8/8  ✓
-15:16:08 [INFO]   Lines +   : 18/18  ✓
-15:16:08 [INFO]   Lines -   : 5/5  ✓
-15:16:08 [INFO]   Files     : 3/3  ✓
-15:16:11 [INFO] Results appended → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/runs.csv, /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/groups.csv
-15:16:22 [SUCCESS] Moved 5 atomic commit(s) onto 'small-change-test' and deleted 'detangling'.
+15:34:58 [SUCCESS] Found group 5 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0005.patch  [hunk_0004.patch]
+15:34:58 [INFO] Next: run with --commit-group (or inspect the group patch first)
+15:37:56 [SUCCESS] Committed group 5.
+15:37:56 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:00:16 [INFO] ── Iteration 6: 6 hunk(s) remaining ──
+16:00:16 [INFO] Next: run with --find-group
+  [group]     test 6 hunk(s) -> PASS: hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0006.patch + hunk_0007.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0006.patch
+16:00:39 [SUCCESS] Found group 6 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0006.patch  [hunk_0006.patch]
+16:00:39 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:31:26 [SUCCESS] Committed group 6.
+16:31:28 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:33:56 [INFO] ── Iteration 7: 5 hunk(s) remaining ──
+16:33:56 [INFO] Next: run with --find-group
+  [group]     test 5 hunk(s) -> PASS: hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0007.patch + hunk_0008.patch + hunk_0009.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0007.patch + hunk_0008.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0007.patch
+16:36:01 [SUCCESS] Found group 7 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0007.patch  [hunk_0007.patch]
+16:36:01 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:49:09 [SUCCESS] Committed group 7.
+16:49:09 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:49:10 [INFO] ── Iteration 8: 4 hunk(s) remaining ──
+16:49:10 [INFO] Next: run with --find-group
+  [group]     test 4 hunk(s) -> PASS: hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0008.patch + hunk_0009.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0008.patch
+16:49:24 [SUCCESS] Found group 8 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0008.patch  [hunk_0008.patch]
+16:49:24 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:51:24 [SUCCESS] Committed group 8.
+16:51:24 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:51:26 [INFO] ── Iteration 9: 3 hunk(s) remaining ──
+16:51:26 [INFO] Next: run with --find-group
+  [group]     test 3 hunk(s) -> PASS: hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0009.patch + hunk_0010.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0009.patch
+16:51:39 [SUCCESS] Found group 9 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0009.patch  [hunk_0009.patch]
+16:51:39 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:51:46 [SUCCESS] Committed group 9.
+16:51:46 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+17:07:19 [INFO] ── Iteration 10: 2 hunk(s) remaining ──
+17:07:19 [INFO] Next: run with --find-group
+  [group]     test 2 hunk(s) -> PASS: hunk_0010.patch + hunk_0011.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0010.patch
+17:07:34 [SUCCESS] Found group 10 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0010.patch  [hunk_0010.patch]
+17:07:34 [INFO] Next: run with --commit-group (or inspect the group patch first)
+17:08:37 [SUCCESS] Committed group 10.
+17:08:37 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+17:19:47 [INFO] ── Iteration 11: 1 hunk(s) remaining ──
+17:19:47 [INFO] Next: run with --find-group
+  [group]     test 1 hunk(s) -> PASS: hunk_0011.patch
+17:19:58 [SUCCESS] Found group 11 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0011.patch  [hunk_0011.patch]
+17:19:58 [INFO] Next: run with --commit-group (or inspect the group patch first)
+17:22:34 [SUCCESS] Committed group 11.
+17:22:34 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+17:22:37 [SUCCESS] All changes have been grouped.
+17:22:37 [INFO] Next: run with --merge to finish.
+17:22:43 [SUCCESS] Done: 11 group(s) produced from 11 hunk(s).
+17:22:59 [INFO] ── Completeness ──────────────────────────────────────────────
+17:22:59 [INFO]   Hunks     : 11/11  ✓
+17:22:59 [INFO]   Lines +   : 45/45  ✓
+17:22:59 [INFO]   Lines -   : 20/20  ✓
+17:22:59 [INFO]   Files     : 3/3  ✓
+17:23:01 [INFO] Results appended → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/runs.csv, /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/groups.csv
+17:23:21 [SUCCESS] Moved 11 atomic commit(s) onto 'fake-example' and deleted 'detangling'.

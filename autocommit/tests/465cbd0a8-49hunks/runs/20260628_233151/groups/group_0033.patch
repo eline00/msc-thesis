@@ -1,0 +1,20 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -36,0 +37,5 @@ namespace CommandLine.Text
++        /// <summary>
++        /// Gets a delegate that returns the word 'group'.
++        /// </summary>
++        public abstract Func<string> OptionGroupWord { get; }
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -87,0 +93,5 @@ namespace CommandLine.Text
++            public override Func<string> OptionGroupWord
++            {
++                get { return () => "Group"; }
++            }
++

@@ -1,0 +1,10 @@
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -545,0 +553,5 @@ namespace CommandLine
++
++        public IEnumerable<NameInfo> Names
++        {
++            get { return names; }
++        }

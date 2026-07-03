@@ -1,0 +1,39 @@
+diff --git a/tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs b/tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs
+new file mode 100644
+index 0000000..9950dbc
+--- /dev/null
++++ b/tests/CommandLine.Tests/Fakes/HelpTextWithMixedLineBreaks_Options.cs
+@@ -0,0 +1,9 @@
++﻿namespace CommandLine.Tests.Fakes
++{
++    public class HelpTextWithMixedLineBreaks_Options
++    {
++        [Option(HelpText = 
++            "This is a help text description\n  It has multiple lines.\r\n  Third line")]
++        public string StringValue { get; set; }
++    }
++}
+diff --git a/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs b/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs
+index 8412e66..f384e4d 100644
+--- a/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs
++++ b/tests/CommandLine.Tests/Unit/Text/HelpTextTests.cs
+@@ -720,0 +721,19 @@ namespace CommandLine.Tests.Unit.Text
++        [Fact]
++        public void HelpTextIsConsitentRegardlessOfCompileTimeLineStyle()
++        {
++            // Fixture setup
++            // Exercize system 
++            var sut = new HelpText {AddDashesToOption = true}
++                .AddOptions(new NotParsed<Simple_Options>(TypeInfo.Create(typeof(HelpTextWithMixedLineBreaks_Options)),
++                    Enumerable.Empty<Error>()));
++
++            // Verify outcome
++
++            var lines = sut.ToString().ToNotEmptyLines();
++            lines[0].Should().BeEquivalentTo("  --stringvalue    This is a help text description");
++            lines[1].Should().BeEquivalentTo("                     It has multiple lines.");
++            lines[2].Should().BeEquivalentTo("                     Third line");
++         
++            // Teardown
++        }
++

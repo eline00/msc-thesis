@@ -1,0 +1,8 @@
+[iteration 1] 5 atoms, 1 edge(s), 10 invocation(s) -> 4 component(s)
+    group_0004  --(build)-->  group_0005
+[iteration 2] 4 atoms, 0 edge(s), 6 invocation(s) -> 4 component(s)
+Build-dependency fixpoint: 4 component(s) after 2 iteration(s), 16 total invocation(s).
+  build_graph_0001: group_0001
+  build_graph_0002: group_0002
+  build_graph_0003: group_0003
+  build_graph_0004: group_0004, group_0005

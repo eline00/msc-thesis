@@ -1,8 +1,0 @@
-diff --git a/src/CommandLine/Infrastructure/StringExtensions.cs b/src/CommandLine/Infrastructure/StringExtensions.cs
-index 7bfab66..db8aa0b 100644
---- a/src/CommandLine/Infrastructure/StringExtensions.cs
-+++ b/src/CommandLine/Infrastructure/StringExtensions.cs
-@@ -77 +77 @@ namespace CommandLine.Infrastructure
--}
-\ No newline at end of file
-+}

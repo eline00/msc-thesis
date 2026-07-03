@@ -1,9 +1,0 @@
-diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
-index 6fee809..949e687 100644
---- a/src/CommandLine/Text/HelpText.cs
-+++ b/src/CommandLine/Text/HelpText.cs
-@@ -898 +908,3 @@ namespace CommandLine.Text
--            if (specification.Required)
-+            var optionGroupSpecification = GetOptionGroupSpecification();
-+
-+            if (specification.Required && optionGroupSpecification == null)

@@ -1,0 +1,10 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -35,0 +37,5 @@ namespace CommandLine.Text
++        /// <summary>
++        /// Gets a delegate that returns the word 'group'.
++        /// </summary>
++        public abstract Func<string> OptionGroupWord { get; }
++

@@ -1,0 +1,7 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -56 +62 @@ namespace CommandLine.Text
+-        public abstract Func<bool, string> VersionCommandText { get; } 
++        public abstract Func<bool, string> VersionCommandText { get; }
