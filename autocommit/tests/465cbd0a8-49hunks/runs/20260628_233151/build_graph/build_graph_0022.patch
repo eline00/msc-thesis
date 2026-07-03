@@ -1,0 +1,9 @@
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -899,2 +899,2 @@ namespace CommandLine.Text
+-            var indented = TextWrapper.WrapAndIndentText(optionHelpText, maxLength+TotalOptionPadding, widthOfHelpText).TrimStart();
+-          
++            var indented = TextWrapper.WrapAndIndentText(optionHelpText, maxLength + TotalOptionPadding, widthOfHelpText).TrimStart();
++

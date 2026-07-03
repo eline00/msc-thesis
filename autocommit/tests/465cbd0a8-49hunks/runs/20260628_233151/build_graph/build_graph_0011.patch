@@ -1,0 +1,67 @@
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -3,0 +4 @@ using System;
++using System.Collections.Generic;
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -73 +73,5 @@ namespace CommandLine
+-        InvalidAttributeConfigurationError
++        InvalidAttributeConfigurationError,
++        /// <summary>
++        /// Value of <see cref="CommandLine.MissingGroupOptionError"/> type.
++        /// </summary>
++        MissingGroupOptionError
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -539,0 +540 @@ namespace CommandLine
++        private readonly IEnumerable<NameInfo> names;
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -545,0 +546 @@ namespace CommandLine
++            this.names = names;
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -552,0 +553,5 @@ namespace CommandLine
++
++        public IEnumerable<NameInfo> Names
++        {
++            get { return names; }
++        }
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -142,0 +143,7 @@ namespace CommandLine.Text
++                                case ErrorType.MissingGroupOptionError:
++                                    var missingGroupOptionError = (MissingGroupOptionError)error;
++                                    return "At least one option from group '".JoinTo(
++                                        missingGroupOptionError.Group,
++                                        "' (",
++                                        string.Join(", ", missingGroupOptionError.Names.Select(n => n.NameText)),
++                                        ") is required.");
+diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
+index c6a5ca5..d44b29c 100644
+--- a/src/CommandLine/Core/SpecificationPropertyRules.cs
++++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
+@@ -50 +50 @@ namespace CommandLine.Core
+-                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key));
++                    return errorGroups.Select(gr => new MissingGroupOptionError(gr.Key, gr.Select(g => new NameInfo(g.Option.ShortName, g.Option.LongName))));
+diff --git a/src/CommandLine/Error.cs b/src/CommandLine/Error.cs
+index d32ee29..e54dbf6 100644
+--- a/src/CommandLine/Error.cs
++++ b/src/CommandLine/Error.cs
+@@ -542,2 +542,2 @@ namespace CommandLine
+-        internal MissingGroupOptionError(string group)
+-            : base(ErrorType.HelpRequestedError, true)
++        internal MissingGroupOptionError(string group, IEnumerable<NameInfo> names)
++            : base(ErrorType.MissingGroupOptionError)

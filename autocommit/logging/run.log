@@ -1,956 +1,125 @@
-11:37:03 [INFO] Full patch saved to autocommit/full.patch
-11:37:04 [INFO] Creating temporary tangled commit...
-11:37:05 [INFO] Tangled SHA: 3900c3224003989bb0576d3dfe29a0240af18fbc
-11:37:05 [SUCCESS] Reset to clean state. Working tree is clean.
-11:37:05 [INFO] Total hunks in full patch: 5
-11:37:05 [INFO] Split full patch into 5 hunk file(s).
-11:37:05 [SUCCESS] Setup complete. Run ID: 20260629_113705
-11:37:05 [INFO] Next: run with --next-iteration
-11:37:12 [INFO] ── Iteration 1: 5 hunk(s) remaining ──
-11:37:12 [INFO] Next: run with --find-group
-  [group]     test 5 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
+12:19:44 [INFO] Full patch saved to autocommit/full.patch
+12:19:44 [INFO] Creating temporary tangled commit...
+12:19:44 [INFO] Tangled SHA: d3deae362a1c2fe14c4e74dd0d581eed6a07a2df
+12:19:45 [SUCCESS] Reset to clean state. Working tree is clean.
+12:19:47 [INFO] Total hunks in full patch: 11
+12:19:47 [INFO] Split full patch into 11 hunk file(s).
+12:19:47 [SUCCESS] Setup complete. Run ID: 20260703_121945
+12:19:47 [INFO] Next: run with --next-iteration
+12:28:44 [INFO] ── Iteration 1: 11 hunk(s) remaining ──
+12:28:44 [INFO] Next: run with --find-group
+  [group]     test 11 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 6 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch
   [group]     test 3 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch + hunk_0003.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0001.patch + hunk_0002.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0001.patch
-11:37:42 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0001.patch  [hunk_0001.patch]
-11:37:42 [INFO] Next: run with --commit-group (or inspect the group patch first)
-11:37:50 [SUCCESS] Committed group 1.
-11:37:50 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-11:39:10 [INFO] ── Iteration 2: 4 hunk(s) remaining ──
-11:39:10 [INFO] Next: run with --find-group
-  [group]     test 4 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
+12:30:18 [SUCCESS] Found group 1 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0001.patch  [hunk_0001.patch]
+12:30:18 [INFO] Next: run with --commit-group (or inspect the group patch first)
+12:40:17 [SUCCESS] Committed group 1.
+12:40:17 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+12:55:24 [INFO] ── Iteration 2: 10 hunk(s) remaining ──
+12:55:24 [INFO] Next: run with --find-group
+  [group]     test 10 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 5 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch + hunk_0004.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0002.patch + hunk_0003.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0002.patch
-11:39:26 [SUCCESS] Found group 2 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0002.patch  [hunk_0002.patch]
-11:39:26 [INFO] Next: run with --commit-group (or inspect the group patch first)
-11:39:58 [SUCCESS] Committed group 2.
-11:39:58 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-11:40:18 [INFO] ── Iteration 3: 3 hunk(s) remaining ──
-11:40:18 [INFO] Next: run with --find-group
+12:55:52 [SUCCESS] Found group 2 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0002.patch  [hunk_0002.patch]
+12:55:52 [INFO] Next: run with --commit-group (or inspect the group patch first)
+13:20:17 [SUCCESS] Committed group 2.
+13:20:19 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+13:27:47 [INFO] ── Iteration 3: 9 hunk(s) remaining ──
+13:27:47 [INFO] Next: run with --find-group
+  [group]     test 9 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 5 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch
   [group]     test 3 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch + hunk_0005.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0003.patch + hunk_0004.patch
   [group]     test 1 hunk(s) -> PASS: hunk_0003.patch
-11:40:37 [SUCCESS] Found group 3 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0003.patch  [hunk_0003.patch]
-11:40:37 [INFO] Next: run with --commit-group (or inspect the group patch first)
-11:40:43 [SUCCESS] Committed group 3.
-11:40:43 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-11:41:01 [INFO] ── Iteration 4: 2 hunk(s) remaining ──
-11:41:01 [INFO] Next: run with --find-group
+13:30:14 [SUCCESS] Found group 3 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0003.patch  [hunk_0003.patch]
+13:30:14 [INFO] Next: run with --commit-group (or inspect the group patch first)
+13:48:45 [SUCCESS] Committed group 3.
+13:48:45 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+14:13:30 [INFO] ── Iteration 4: 8 hunk(s) remaining ──
+14:13:34 [INFO] Next: run with --find-group
+  [group]     test 8 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 4 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch + hunk_0006.patch + hunk_0007.patch
   [group]     test 2 hunk(s) -> PASS: hunk_0004.patch + hunk_0005.patch
-  [group]     test 1 hunk(s) -> PASS: hunk_0004.patch
-11:41:14 [SUCCESS] Found group 4 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0004.patch  [hunk_0004.patch]
-11:41:14 [INFO] Next: run with --commit-group (or inspect the group patch first)
-11:41:18 [SUCCESS] Committed group 4.
-11:41:18 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-11:41:21 [INFO] ── Iteration 5: 1 hunk(s) remaining ──
-11:41:21 [INFO] Next: run with --find-group
+  [group]     test 1 hunk(s) -> fail
   [group]     test 1 hunk(s) -> PASS: hunk_0005.patch
-11:41:28 [SUCCESS] Found group 5 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/groups/group_0005.patch  [hunk_0005.patch]
-11:41:28 [INFO] Next: run with --commit-group (or inspect the group patch first)
-11:42:42 [SUCCESS] Committed group 5.
-11:42:42 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
-11:42:43 [SUCCESS] All changes have been grouped.
-11:42:43 [INFO] Next: run with --merge to finish.
-11:42:57 [INFO] Probing build dependencies between 5 atoms (base=134a1a11aa)...
-11:42:57 [ERROR] The atom hunks do not apply cleanly onto base (134a1a11aa). The base is likely wrong — pass --base <ref> (the commit before the first atom).
-11:44:46 [SUCCESS] Done: 5 group(s) produced from 5 hunk(s).
-11:44:46 [INFO] ── Completeness ──────────────────────────────────────────────
-11:44:46 [INFO]   Hunks     : 5/5  ✓
-11:44:46 [INFO]   Lines +   : 135/135  ✓
-11:44:46 [INFO]   Lines -   : 1/1  ✓
-11:44:46 [INFO]   Files     : 4/4  ✓
-11:44:46 [INFO] Results appended → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/runs.csv, /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/groups.csv
-11:44:46 [ERROR] Merge failed. The detangling branch has been left intact.
-11:44:46 [INFO] Inspect it with: git log group-03-test..detangling
-11:45:49 [INFO] Post-merge build-dep analysis: 5 group(s), base=5541daf687, head=134a1a11aa
-11:45:49 [INFO] Probing build dependencies between 5 atoms (base=5541daf687)...
-11:46:22 [INFO] Build-dependency graph: no hard build dependencies found — all atoms are independent.
-11:46:22 [INFO] Connected components (5 group(s)):
-11:46:22 [INFO]   build_graph_0001: group_0001
-11:46:22 [INFO]   build_graph_0002: group_0002
-11:46:22 [INFO]   build_graph_0003: group_0003
-11:46:22 [INFO]   build_graph_0004: group_0004
-11:46:22 [INFO]   build_graph_0005: group_0005
-11:46:22 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/build_graph  (5 file(s))
-12:40:24 [INFO] Post-merge build-dep analysis: 5 group(s), base=07eaee2340, head=327cc8e4c3
-12:40:30 [WARNING] 97 re-diffed hunk(s) did not match any group — they will be excluded from probing.
-12:40:30 [INFO] Probing build dependencies between 5 atoms (base=07eaee2340)...
-12:41:08 [INFO] Build-dependency graph: no hard build dependencies found — all atoms are independent.
-12:41:08 [INFO] Connected components (5 group(s)):
-12:41:08 [INFO]   build_graph_0001: group_0001
-12:41:08 [INFO]   build_graph_0002: group_0002
-12:41:08 [INFO]   build_graph_0003: group_0003
-12:41:08 [INFO]   build_graph_0004: group_0004
-12:41:08 [INFO]   build_graph_0005: group_0005
-12:41:08 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/build_graph  (5 file(s))
-12:49:34 [INFO] Post-merge build-dep analysis: 58 group(s), base=3760d03f94, head=68f11f7ea7
-12:49:37 [WARNING] 381 re-diffed hunk(s) did not match any group — they will be excluded from probing.
-12:49:37 [INFO] Probing build dependencies between 58 atoms (base=3760d03f94)...
-13:30:18 [INFO] Build-dependency graph (1 edge(s), 1653 invocation(s)):
-13:30:18 [INFO]   group_0001  --(build)-->  group_0002
-13:30:18 [INFO] Connected components (57 group(s)):
-13:30:18 [INFO]   build_graph_0001: group_0001, group_0002
-13:30:18 [INFO]   build_graph_0002: group_0003
-13:30:18 [INFO]   build_graph_0003: group_0004
-13:30:18 [INFO]   build_graph_0004: group_0005
-13:30:18 [INFO]   build_graph_0005: group_0006
-13:30:18 [INFO]   build_graph_0006: group_0007
-13:30:18 [INFO]   build_graph_0007: group_0008
-13:30:18 [INFO]   build_graph_0008: group_0009
-13:30:18 [INFO]   build_graph_0009: group_0010
-13:30:18 [INFO]   build_graph_0010: group_0011
-13:30:18 [INFO]   build_graph_0011: group_0012
-13:30:18 [INFO]   build_graph_0012: group_0013
-13:30:18 [INFO]   build_graph_0013: group_0014
-13:30:18 [INFO]   build_graph_0014: group_0015
-13:30:18 [INFO]   build_graph_0015: group_0016
-13:30:18 [INFO]   build_graph_0016: group_0017
-13:30:18 [INFO]   build_graph_0017: group_0018
-13:30:18 [INFO]   build_graph_0018: group_0019
-13:30:18 [INFO]   build_graph_0019: group_0020
-13:30:18 [INFO]   build_graph_0020: group_0021
-13:30:18 [INFO]   build_graph_0021: group_0022
-13:30:18 [INFO]   build_graph_0022: group_0023
-13:30:18 [INFO]   build_graph_0023: group_0024
-13:30:18 [INFO]   build_graph_0024: group_0025
-13:30:18 [INFO]   build_graph_0025: group_0026
-13:30:18 [INFO]   build_graph_0026: group_0027
-13:30:18 [INFO]   build_graph_0027: group_0028
-13:30:18 [INFO]   build_graph_0028: group_0029
-13:30:18 [INFO]   build_graph_0029: group_0030
-13:30:18 [INFO]   build_graph_0030: group_0031
-13:30:18 [INFO]   build_graph_0031: group_0032
-13:30:18 [INFO]   build_graph_0032: group_0033
-13:30:18 [INFO]   build_graph_0033: group_0034
-13:30:18 [INFO]   build_graph_0034: group_0035
-13:30:18 [INFO]   build_graph_0035: group_0036
-13:30:18 [INFO]   build_graph_0036: group_0037
-13:30:18 [INFO]   build_graph_0037: group_0038
-13:30:18 [INFO]   build_graph_0038: group_0039
-13:30:18 [INFO]   build_graph_0039: group_0040
-13:30:18 [INFO]   build_graph_0040: group_0041
-13:30:18 [INFO]   build_graph_0041: group_0042
-13:30:18 [INFO]   build_graph_0042: group_0043
-13:30:18 [INFO]   build_graph_0043: group_0044
-13:30:18 [INFO]   build_graph_0044: group_0045
-13:30:18 [INFO]   build_graph_0045: group_0046
-13:30:18 [INFO]   build_graph_0046: group_0047
-13:30:18 [INFO]   build_graph_0047: group_0048
-13:30:18 [INFO]   build_graph_0048: group_0049
-13:30:18 [INFO]   build_graph_0049: group_0050
-13:30:18 [INFO]   build_graph_0050: group_0051
-13:30:18 [INFO]   build_graph_0051: group_0052
-13:30:18 [INFO]   build_graph_0052: group_0053
-13:30:18 [INFO]   build_graph_0053: group_0054
-13:30:18 [INFO]   build_graph_0054: group_0055
-13:30:18 [INFO]   build_graph_0055: group_0056
-13:30:18 [INFO]   build_graph_0056: group_0057
-13:30:18 [INFO]   build_graph_0057: group_0058
-13:30:18 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (57 file(s))
-16:45:01 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
-16:45:01 [INFO] Probing build dependencies between 58 atoms...
-18:56:35 [WARNING] Interrupted. Cleaning up...
-18:56:47 [WARNING] Interrupted. Cleaning up...
-21:39:41 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
-21:39:41 [INFO] Probing build dependencies between 58 atoms...
-22:33:44 [INFO] Build-dependency graph (550 edge(s), 1653 invocation(s)):
-22:33:44 [INFO]   group_0001  --(build)-->  group_0003
-22:33:44 [INFO]   group_0001  --(build)-->  group_0004
-22:33:44 [INFO]   group_0001  --(build)-->  group_0005
-22:33:44 [INFO]   group_0004  --(build)-->  group_0005
-22:33:44 [INFO]   group_0001  --(build)-->  group_0006
-22:33:44 [INFO]   group_0004  --(build)-->  group_0006
-22:33:44 [INFO]   group_0001  --(build)-->  group_0007
-22:33:44 [INFO]   group_0004  --(build)-->  group_0007
-22:33:44 [INFO]   group_0006  --(build)-->  group_0007
-22:33:44 [INFO]   group_0001  --(build)-->  group_0008
-22:33:44 [INFO]   group_0004  --(build)-->  group_0008
-22:33:44 [INFO]   group_0006  --(build)-->  group_0008
-22:33:44 [INFO]   group_0001  --(build)-->  group_0009
-22:33:44 [INFO]   group_0004  --(build)-->  group_0009
-22:33:44 [INFO]   group_0006  --(build)-->  group_0009
-22:33:44 [INFO]   group_0001  --(build)-->  group_0010
-22:33:44 [INFO]   group_0004  --(build)-->  group_0010
-22:33:44 [INFO]   group_0006  --(build)-->  group_0010
-22:33:44 [INFO]   group_0001  --(build)-->  group_0011
-22:33:44 [INFO]   group_0004  --(build)-->  group_0011
-22:33:44 [INFO]   group_0005  --(build)-->  group_0011
-22:33:44 [INFO]   group_0006  --(build)-->  group_0011
-22:33:44 [INFO]   group_0001  --(build)-->  group_0012
-22:33:44 [INFO]   group_0004  --(build)-->  group_0012
-22:33:44 [INFO]   group_0005  --(build)-->  group_0012
-22:33:44 [INFO]   group_0006  --(build)-->  group_0012
-22:33:44 [INFO]   group_0001  --(build)-->  group_0013
-22:33:44 [INFO]   group_0004  --(build)-->  group_0013
-22:33:44 [INFO]   group_0005  --(build)-->  group_0013
-22:33:44 [INFO]   group_0006  --(build)-->  group_0013
-22:33:44 [INFO]   group_0001  --(build)-->  group_0014
-22:33:44 [INFO]   group_0004  --(build)-->  group_0014
-22:33:44 [INFO]   group_0005  --(build)-->  group_0014
-22:33:44 [INFO]   group_0006  --(build)-->  group_0014
-22:33:44 [INFO]   group_0001  --(build)-->  group_0015
-22:33:44 [INFO]   group_0004  --(build)-->  group_0015
-22:33:44 [INFO]   group_0005  --(build)-->  group_0015
-22:33:44 [INFO]   group_0006  --(build)-->  group_0015
-22:33:44 [INFO]   group_0001  --(build)-->  group_0016
-22:33:44 [INFO]   group_0004  --(build)-->  group_0016
-22:33:44 [INFO]   group_0005  --(build)-->  group_0016
-22:33:44 [INFO]   group_0006  --(build)-->  group_0016
-22:33:44 [INFO]   group_0001  --(build)-->  group_0017
-22:33:44 [INFO]   group_0004  --(build)-->  group_0017
-22:33:44 [INFO]   group_0005  --(build)-->  group_0017
-22:33:44 [INFO]   group_0006  --(build)-->  group_0017
-22:33:44 [INFO]   group_0001  --(build)-->  group_0018
-22:33:44 [INFO]   group_0004  --(build)-->  group_0018
-22:33:44 [INFO]   group_0005  --(build)-->  group_0018
-22:33:44 [INFO]   group_0006  --(build)-->  group_0018
-22:33:44 [INFO]   group_0001  --(build)-->  group_0019
-22:33:44 [INFO]   group_0004  --(build)-->  group_0019
-22:33:44 [INFO]   group_0005  --(build)-->  group_0019
-22:33:44 [INFO]   group_0006  --(build)-->  group_0019
-22:33:44 [INFO]   group_0001  --(build)-->  group_0020
-22:33:44 [INFO]   group_0004  --(build)-->  group_0020
-22:33:44 [INFO]   group_0005  --(build)-->  group_0020
-22:33:44 [INFO]   group_0006  --(build)-->  group_0020
-22:33:44 [INFO]   group_0001  --(build)-->  group_0021
-22:33:44 [INFO]   group_0004  --(build)-->  group_0021
-22:33:44 [INFO]   group_0005  --(build)-->  group_0021
-22:33:44 [INFO]   group_0006  --(build)-->  group_0021
-22:33:44 [INFO]   group_0001  --(build)-->  group_0022
-22:33:44 [INFO]   group_0004  --(build)-->  group_0022
-22:33:44 [INFO]   group_0005  --(build)-->  group_0022
-22:33:44 [INFO]   group_0006  --(build)-->  group_0022
-22:33:44 [INFO]   group_0001  --(build)-->  group_0023
-22:33:44 [INFO]   group_0004  --(build)-->  group_0023
-22:33:44 [INFO]   group_0005  --(build)-->  group_0023
-22:33:44 [INFO]   group_0006  --(build)-->  group_0023
-22:33:44 [INFO]   group_0013  --(build)-->  group_0023
-22:33:44 [INFO]   group_0001  --(build)-->  group_0024
-22:33:44 [INFO]   group_0004  --(build)-->  group_0024
-22:33:44 [INFO]   group_0005  --(build)-->  group_0024
-22:33:44 [INFO]   group_0006  --(build)-->  group_0024
-22:33:44 [INFO]   group_0013  --(build)-->  group_0024
-22:33:44 [INFO]   group_0021  --(build)-->  group_0024
-22:33:44 [INFO]   group_0001  --(build)-->  group_0025
-22:33:44 [INFO]   group_0004  --(build)-->  group_0025
-22:33:44 [INFO]   group_0005  --(build)-->  group_0025
-22:33:44 [INFO]   group_0006  --(build)-->  group_0025
-22:33:44 [INFO]   group_0013  --(build)-->  group_0025
-22:33:44 [INFO]   group_0021  --(build)-->  group_0025
-22:33:44 [INFO]   group_0024  --(build)-->  group_0025
-22:33:44 [INFO]   group_0001  --(build)-->  group_0026
-22:33:44 [INFO]   group_0004  --(build)-->  group_0026
-22:33:44 [INFO]   group_0005  --(build)-->  group_0026
-22:33:44 [INFO]   group_0006  --(build)-->  group_0026
-22:33:44 [INFO]   group_0013  --(build)-->  group_0026
-22:33:44 [INFO]   group_0021  --(build)-->  group_0026
-22:33:44 [INFO]   group_0024  --(build)-->  group_0026
-22:33:44 [INFO]   group_0001  --(build)-->  group_0027
-22:33:44 [INFO]   group_0004  --(build)-->  group_0027
-22:33:44 [INFO]   group_0005  --(build)-->  group_0027
-22:33:44 [INFO]   group_0006  --(build)-->  group_0027
-22:33:44 [INFO]   group_0013  --(build)-->  group_0027
-22:33:44 [INFO]   group_0021  --(build)-->  group_0027
-22:33:44 [INFO]   group_0024  --(build)-->  group_0027
-22:33:44 [INFO]   group_0001  --(build)-->  group_0028
-22:33:44 [INFO]   group_0004  --(build)-->  group_0028
-22:33:44 [INFO]   group_0005  --(build)-->  group_0028
-22:33:44 [INFO]   group_0006  --(build)-->  group_0028
-22:33:44 [INFO]   group_0013  --(build)-->  group_0028
-22:33:44 [INFO]   group_0021  --(build)-->  group_0028
-22:33:44 [INFO]   group_0024  --(build)-->  group_0028
-22:33:44 [INFO]   group_0026  --(build)-->  group_0028
-22:33:44 [INFO]   group_0001  --(build)-->  group_0029
-22:33:44 [INFO]   group_0004  --(build)-->  group_0029
-22:33:44 [INFO]   group_0005  --(build)-->  group_0029
-22:33:44 [INFO]   group_0006  --(build)-->  group_0029
-22:33:44 [INFO]   group_0013  --(build)-->  group_0029
-22:33:44 [INFO]   group_0021  --(build)-->  group_0029
-22:33:44 [INFO]   group_0024  --(build)-->  group_0029
-22:33:44 [INFO]   group_0026  --(build)-->  group_0029
-22:33:44 [INFO]   group_0001  --(build)-->  group_0030
-22:33:44 [INFO]   group_0004  --(build)-->  group_0030
-22:33:44 [INFO]   group_0005  --(build)-->  group_0030
-22:33:44 [INFO]   group_0006  --(build)-->  group_0030
-22:33:44 [INFO]   group_0013  --(build)-->  group_0030
-22:33:44 [INFO]   group_0021  --(build)-->  group_0030
-22:33:44 [INFO]   group_0022  --(build)-->  group_0030
-22:33:44 [INFO]   group_0024  --(build)-->  group_0030
-22:33:44 [INFO]   group_0026  --(build)-->  group_0030
-22:33:44 [INFO]   group_0001  --(build)-->  group_0031
-22:33:44 [INFO]   group_0004  --(build)-->  group_0031
-22:33:44 [INFO]   group_0005  --(build)-->  group_0031
-22:33:44 [INFO]   group_0006  --(build)-->  group_0031
-22:33:44 [INFO]   group_0013  --(build)-->  group_0031
-22:33:44 [INFO]   group_0021  --(build)-->  group_0031
-22:33:44 [INFO]   group_0022  --(build)-->  group_0031
-22:33:44 [INFO]   group_0024  --(build)-->  group_0031
-22:33:44 [INFO]   group_0026  --(build)-->  group_0031
-22:33:44 [INFO]   group_0001  --(build)-->  group_0032
-22:33:44 [INFO]   group_0004  --(build)-->  group_0032
-22:33:44 [INFO]   group_0005  --(build)-->  group_0032
-22:33:44 [INFO]   group_0006  --(build)-->  group_0032
-22:33:44 [INFO]   group_0013  --(build)-->  group_0032
-22:33:44 [INFO]   group_0021  --(build)-->  group_0032
-22:33:44 [INFO]   group_0022  --(build)-->  group_0032
-22:33:44 [INFO]   group_0024  --(build)-->  group_0032
-22:33:44 [INFO]   group_0026  --(build)-->  group_0032
-22:33:44 [INFO]   group_0001  --(build)-->  group_0033
-22:33:44 [INFO]   group_0004  --(build)-->  group_0033
-22:33:44 [INFO]   group_0005  --(build)-->  group_0033
-22:33:44 [INFO]   group_0006  --(build)-->  group_0033
-22:33:44 [INFO]   group_0013  --(build)-->  group_0033
-22:33:44 [INFO]   group_0021  --(build)-->  group_0033
-22:33:44 [INFO]   group_0022  --(build)-->  group_0033
-22:33:44 [INFO]   group_0024  --(build)-->  group_0033
-22:33:44 [INFO]   group_0026  --(build)-->  group_0033
-22:33:44 [INFO]   group_0001  --(build)-->  group_0034
-22:33:44 [INFO]   group_0004  --(build)-->  group_0034
-22:33:44 [INFO]   group_0005  --(build)-->  group_0034
-22:33:44 [INFO]   group_0006  --(build)-->  group_0034
-22:33:44 [INFO]   group_0013  --(build)-->  group_0034
-22:33:44 [INFO]   group_0021  --(build)-->  group_0034
-22:33:44 [INFO]   group_0022  --(build)-->  group_0034
-22:33:44 [INFO]   group_0024  --(build)-->  group_0034
-22:33:44 [INFO]   group_0026  --(build)-->  group_0034
-22:33:44 [INFO]   group_0001  --(build)-->  group_0035
-22:33:44 [INFO]   group_0004  --(build)-->  group_0035
-22:33:44 [INFO]   group_0005  --(build)-->  group_0035
-22:33:44 [INFO]   group_0006  --(build)-->  group_0035
-22:33:44 [INFO]   group_0013  --(build)-->  group_0035
-22:33:44 [INFO]   group_0021  --(build)-->  group_0035
-22:33:44 [INFO]   group_0022  --(build)-->  group_0035
-22:33:44 [INFO]   group_0024  --(build)-->  group_0035
-22:33:44 [INFO]   group_0026  --(build)-->  group_0035
-22:33:44 [INFO]   group_0001  --(build)-->  group_0036
-22:33:44 [INFO]   group_0004  --(build)-->  group_0036
-22:33:44 [INFO]   group_0005  --(build)-->  group_0036
-22:33:44 [INFO]   group_0006  --(build)-->  group_0036
-22:33:44 [INFO]   group_0013  --(build)-->  group_0036
-22:33:44 [INFO]   group_0021  --(build)-->  group_0036
-22:33:44 [INFO]   group_0022  --(build)-->  group_0036
-22:33:44 [INFO]   group_0024  --(build)-->  group_0036
-22:33:44 [INFO]   group_0026  --(build)-->  group_0036
-22:33:44 [INFO]   group_0001  --(build)-->  group_0037
-22:33:44 [INFO]   group_0004  --(build)-->  group_0037
-22:33:44 [INFO]   group_0005  --(build)-->  group_0037
-22:33:44 [INFO]   group_0006  --(build)-->  group_0037
-22:33:44 [INFO]   group_0013  --(build)-->  group_0037
-22:33:44 [INFO]   group_0021  --(build)-->  group_0037
-22:33:44 [INFO]   group_0022  --(build)-->  group_0037
-22:33:44 [INFO]   group_0024  --(build)-->  group_0037
-22:33:44 [INFO]   group_0026  --(build)-->  group_0037
-22:33:44 [INFO]   group_0001  --(build)-->  group_0038
-22:33:44 [INFO]   group_0004  --(build)-->  group_0038
-22:33:44 [INFO]   group_0005  --(build)-->  group_0038
-22:33:44 [INFO]   group_0006  --(build)-->  group_0038
-22:33:44 [INFO]   group_0012  --(build)-->  group_0038
-22:33:44 [INFO]   group_0013  --(build)-->  group_0038
-22:33:44 [INFO]   group_0017  --(build)-->  group_0038
-22:33:44 [INFO]   group_0021  --(build)-->  group_0038
-22:33:44 [INFO]   group_0022  --(build)-->  group_0038
-22:33:44 [INFO]   group_0024  --(build)-->  group_0038
-22:33:44 [INFO]   group_0026  --(build)-->  group_0038
-22:33:44 [INFO]   group_0001  --(build)-->  group_0039
-22:33:44 [INFO]   group_0004  --(build)-->  group_0039
-22:33:44 [INFO]   group_0005  --(build)-->  group_0039
-22:33:44 [INFO]   group_0006  --(build)-->  group_0039
-22:33:44 [INFO]   group_0012  --(build)-->  group_0039
-22:33:44 [INFO]   group_0013  --(build)-->  group_0039
-22:33:44 [INFO]   group_0017  --(build)-->  group_0039
-22:33:44 [INFO]   group_0021  --(build)-->  group_0039
-22:33:44 [INFO]   group_0022  --(build)-->  group_0039
-22:33:44 [INFO]   group_0024  --(build)-->  group_0039
-22:33:44 [INFO]   group_0026  --(build)-->  group_0039
-22:33:44 [INFO]   group_0030  --(build)-->  group_0039
-22:33:44 [INFO]   group_0038  --(build)-->  group_0039
-22:33:44 [INFO]   group_0001  --(build)-->  group_0040
-22:33:44 [INFO]   group_0004  --(build)-->  group_0040
-22:33:44 [INFO]   group_0005  --(build)-->  group_0040
-22:33:44 [INFO]   group_0006  --(build)-->  group_0040
-22:33:44 [INFO]   group_0012  --(build)-->  group_0040
-22:33:44 [INFO]   group_0013  --(build)-->  group_0040
-22:33:44 [INFO]   group_0017  --(build)-->  group_0040
-22:33:44 [INFO]   group_0021  --(build)-->  group_0040
-22:33:44 [INFO]   group_0022  --(build)-->  group_0040
-22:33:44 [INFO]   group_0024  --(build)-->  group_0040
-22:33:44 [INFO]   group_0026  --(build)-->  group_0040
-22:33:44 [INFO]   group_0030  --(build)-->  group_0040
-22:33:44 [INFO]   group_0038  --(build)-->  group_0040
-22:33:44 [INFO]   group_0001  --(build)-->  group_0041
-22:33:44 [INFO]   group_0004  --(build)-->  group_0041
-22:33:44 [INFO]   group_0005  --(build)-->  group_0041
-22:33:44 [INFO]   group_0006  --(build)-->  group_0041
-22:33:44 [INFO]   group_0012  --(build)-->  group_0041
-22:33:44 [INFO]   group_0013  --(build)-->  group_0041
-22:33:44 [INFO]   group_0017  --(build)-->  group_0041
-22:33:44 [INFO]   group_0021  --(build)-->  group_0041
-22:33:44 [INFO]   group_0022  --(build)-->  group_0041
-22:33:44 [INFO]   group_0024  --(build)-->  group_0041
-22:33:44 [INFO]   group_0026  --(build)-->  group_0041
-22:33:44 [INFO]   group_0030  --(build)-->  group_0041
-22:33:44 [INFO]   group_0032  --(build)-->  group_0041
-22:33:44 [INFO]   group_0038  --(build)-->  group_0041
-22:33:44 [INFO]   group_0001  --(build)-->  group_0042
-22:33:44 [INFO]   group_0004  --(build)-->  group_0042
-22:33:44 [INFO]   group_0005  --(build)-->  group_0042
-22:33:44 [INFO]   group_0006  --(build)-->  group_0042
-22:33:44 [INFO]   group_0012  --(build)-->  group_0042
-22:33:44 [INFO]   group_0013  --(build)-->  group_0042
-22:33:44 [INFO]   group_0017  --(build)-->  group_0042
-22:33:44 [INFO]   group_0021  --(build)-->  group_0042
-22:33:44 [INFO]   group_0022  --(build)-->  group_0042
-22:33:44 [INFO]   group_0024  --(build)-->  group_0042
-22:33:44 [INFO]   group_0026  --(build)-->  group_0042
-22:33:44 [INFO]   group_0030  --(build)-->  group_0042
-22:33:44 [INFO]   group_0032  --(build)-->  group_0042
-22:33:44 [INFO]   group_0038  --(build)-->  group_0042
-22:33:44 [INFO]   group_0001  --(build)-->  group_0043
-22:33:44 [INFO]   group_0004  --(build)-->  group_0043
-22:33:44 [INFO]   group_0005  --(build)-->  group_0043
-22:33:44 [INFO]   group_0006  --(build)-->  group_0043
-22:33:44 [INFO]   group_0012  --(build)-->  group_0043
-22:33:44 [INFO]   group_0013  --(build)-->  group_0043
-22:33:44 [INFO]   group_0016  --(build)-->  group_0043
-22:33:44 [INFO]   group_0017  --(build)-->  group_0043
-22:33:44 [INFO]   group_0021  --(build)-->  group_0043
-22:33:44 [INFO]   group_0022  --(build)-->  group_0043
-22:33:44 [INFO]   group_0024  --(build)-->  group_0043
-22:33:44 [INFO]   group_0026  --(build)-->  group_0043
-22:33:44 [INFO]   group_0030  --(build)-->  group_0043
-22:33:44 [INFO]   group_0032  --(build)-->  group_0043
-22:33:44 [INFO]   group_0038  --(build)-->  group_0043
-22:33:44 [INFO]   group_0001  --(build)-->  group_0044
-22:33:44 [INFO]   group_0004  --(build)-->  group_0044
-22:33:44 [INFO]   group_0005  --(build)-->  group_0044
-22:33:44 [INFO]   group_0006  --(build)-->  group_0044
-22:33:44 [INFO]   group_0012  --(build)-->  group_0044
-22:33:44 [INFO]   group_0013  --(build)-->  group_0044
-22:33:44 [INFO]   group_0016  --(build)-->  group_0044
-22:33:44 [INFO]   group_0017  --(build)-->  group_0044
-22:33:44 [INFO]   group_0021  --(build)-->  group_0044
-22:33:44 [INFO]   group_0022  --(build)-->  group_0044
-22:33:44 [INFO]   group_0024  --(build)-->  group_0044
-22:33:44 [INFO]   group_0026  --(build)-->  group_0044
-22:33:44 [INFO]   group_0030  --(build)-->  group_0044
-22:33:44 [INFO]   group_0032  --(build)-->  group_0044
-22:33:44 [INFO]   group_0038  --(build)-->  group_0044
-22:33:44 [INFO]   group_0043  --(build)-->  group_0044
-22:33:44 [INFO]   group_0001  --(build)-->  group_0045
-22:33:44 [INFO]   group_0004  --(build)-->  group_0045
-22:33:44 [INFO]   group_0005  --(build)-->  group_0045
-22:33:44 [INFO]   group_0006  --(build)-->  group_0045
-22:33:44 [INFO]   group_0012  --(build)-->  group_0045
-22:33:44 [INFO]   group_0013  --(build)-->  group_0045
-22:33:44 [INFO]   group_0016  --(build)-->  group_0045
-22:33:44 [INFO]   group_0017  --(build)-->  group_0045
-22:33:44 [INFO]   group_0021  --(build)-->  group_0045
-22:33:44 [INFO]   group_0022  --(build)-->  group_0045
-22:33:44 [INFO]   group_0024  --(build)-->  group_0045
-22:33:44 [INFO]   group_0026  --(build)-->  group_0045
-22:33:44 [INFO]   group_0030  --(build)-->  group_0045
-22:33:44 [INFO]   group_0032  --(build)-->  group_0045
-22:33:44 [INFO]   group_0038  --(build)-->  group_0045
-22:33:44 [INFO]   group_0043  --(build)-->  group_0045
-22:33:44 [INFO]   group_0001  --(build)-->  group_0046
-22:33:44 [INFO]   group_0004  --(build)-->  group_0046
-22:33:44 [INFO]   group_0005  --(build)-->  group_0046
-22:33:44 [INFO]   group_0006  --(build)-->  group_0046
-22:33:44 [INFO]   group_0012  --(build)-->  group_0046
-22:33:44 [INFO]   group_0013  --(build)-->  group_0046
-22:33:44 [INFO]   group_0016  --(build)-->  group_0046
-22:33:44 [INFO]   group_0017  --(build)-->  group_0046
-22:33:44 [INFO]   group_0021  --(build)-->  group_0046
-22:33:44 [INFO]   group_0022  --(build)-->  group_0046
-22:33:44 [INFO]   group_0024  --(build)-->  group_0046
-22:33:44 [INFO]   group_0026  --(build)-->  group_0046
-22:33:44 [INFO]   group_0030  --(build)-->  group_0046
-22:33:44 [INFO]   group_0032  --(build)-->  group_0046
-22:33:44 [INFO]   group_0038  --(build)-->  group_0046
-22:33:44 [INFO]   group_0043  --(build)-->  group_0046
-22:33:44 [INFO]   group_0001  --(build)-->  group_0047
-22:33:44 [INFO]   group_0004  --(build)-->  group_0047
-22:33:44 [INFO]   group_0005  --(build)-->  group_0047
-22:33:44 [INFO]   group_0006  --(build)-->  group_0047
-22:33:44 [INFO]   group_0012  --(build)-->  group_0047
-22:33:44 [INFO]   group_0013  --(build)-->  group_0047
-22:33:44 [INFO]   group_0016  --(build)-->  group_0047
-22:33:44 [INFO]   group_0017  --(build)-->  group_0047
-22:33:44 [INFO]   group_0018  --(build)-->  group_0047
-22:33:44 [INFO]   group_0019  --(build)-->  group_0047
-22:33:44 [INFO]   group_0021  --(build)-->  group_0047
-22:33:44 [INFO]   group_0022  --(build)-->  group_0047
-22:33:44 [INFO]   group_0024  --(build)-->  group_0047
-22:33:44 [INFO]   group_0026  --(build)-->  group_0047
-22:33:44 [INFO]   group_0030  --(build)-->  group_0047
-22:33:44 [INFO]   group_0032  --(build)-->  group_0047
-22:33:44 [INFO]   group_0038  --(build)-->  group_0047
-22:33:44 [INFO]   group_0043  --(build)-->  group_0047
-22:33:44 [INFO]   group_0001  --(build)-->  group_0048
-22:33:44 [INFO]   group_0004  --(build)-->  group_0048
-22:33:44 [INFO]   group_0005  --(build)-->  group_0048
-22:33:44 [INFO]   group_0006  --(build)-->  group_0048
-22:33:44 [INFO]   group_0012  --(build)-->  group_0048
-22:33:44 [INFO]   group_0013  --(build)-->  group_0048
-22:33:44 [INFO]   group_0016  --(build)-->  group_0048
-22:33:44 [INFO]   group_0017  --(build)-->  group_0048
-22:33:44 [INFO]   group_0018  --(build)-->  group_0048
-22:33:44 [INFO]   group_0019  --(build)-->  group_0048
-22:33:44 [INFO]   group_0021  --(build)-->  group_0048
-22:33:44 [INFO]   group_0022  --(build)-->  group_0048
-22:33:44 [INFO]   group_0024  --(build)-->  group_0048
-22:33:44 [INFO]   group_0026  --(build)-->  group_0048
-22:33:44 [INFO]   group_0030  --(build)-->  group_0048
-22:33:44 [INFO]   group_0032  --(build)-->  group_0048
-22:33:44 [INFO]   group_0038  --(build)-->  group_0048
-22:33:44 [INFO]   group_0043  --(build)-->  group_0048
-22:33:44 [INFO]   group_0001  --(build)-->  group_0049
-22:33:44 [INFO]   group_0004  --(build)-->  group_0049
-22:33:44 [INFO]   group_0005  --(build)-->  group_0049
-22:33:44 [INFO]   group_0006  --(build)-->  group_0049
-22:33:44 [INFO]   group_0012  --(build)-->  group_0049
-22:33:44 [INFO]   group_0013  --(build)-->  group_0049
-22:33:44 [INFO]   group_0016  --(build)-->  group_0049
-22:33:44 [INFO]   group_0017  --(build)-->  group_0049
-22:33:44 [INFO]   group_0018  --(build)-->  group_0049
-22:33:44 [INFO]   group_0019  --(build)-->  group_0049
-22:33:44 [INFO]   group_0021  --(build)-->  group_0049
-22:33:44 [INFO]   group_0022  --(build)-->  group_0049
-22:33:44 [INFO]   group_0024  --(build)-->  group_0049
-22:33:44 [INFO]   group_0026  --(build)-->  group_0049
-22:33:44 [INFO]   group_0030  --(build)-->  group_0049
-22:33:44 [INFO]   group_0032  --(build)-->  group_0049
-22:33:44 [INFO]   group_0038  --(build)-->  group_0049
-22:33:44 [INFO]   group_0043  --(build)-->  group_0049
-22:33:44 [INFO]   group_0048  --(build)-->  group_0049
-22:33:44 [INFO]   group_0001  --(build)-->  group_0050
-22:33:44 [INFO]   group_0004  --(build)-->  group_0050
-22:33:44 [INFO]   group_0005  --(build)-->  group_0050
-22:33:44 [INFO]   group_0006  --(build)-->  group_0050
-22:33:44 [INFO]   group_0012  --(build)-->  group_0050
-22:33:44 [INFO]   group_0013  --(build)-->  group_0050
-22:33:44 [INFO]   group_0016  --(build)-->  group_0050
-22:33:44 [INFO]   group_0017  --(build)-->  group_0050
-22:33:44 [INFO]   group_0018  --(build)-->  group_0050
-22:33:44 [INFO]   group_0019  --(build)-->  group_0050
-22:33:44 [INFO]   group_0021  --(build)-->  group_0050
-22:33:44 [INFO]   group_0022  --(build)-->  group_0050
-22:33:44 [INFO]   group_0024  --(build)-->  group_0050
-22:33:44 [INFO]   group_0026  --(build)-->  group_0050
-22:33:44 [INFO]   group_0030  --(build)-->  group_0050
-22:33:44 [INFO]   group_0032  --(build)-->  group_0050
-22:33:44 [INFO]   group_0038  --(build)-->  group_0050
-22:33:44 [INFO]   group_0043  --(build)-->  group_0050
-22:33:44 [INFO]   group_0048  --(build)-->  group_0050
-22:33:44 [INFO]   group_0001  --(build)-->  group_0051
-22:33:44 [INFO]   group_0004  --(build)-->  group_0051
-22:33:44 [INFO]   group_0005  --(build)-->  group_0051
-22:33:44 [INFO]   group_0006  --(build)-->  group_0051
-22:33:44 [INFO]   group_0012  --(build)-->  group_0051
-22:33:44 [INFO]   group_0013  --(build)-->  group_0051
-22:33:44 [INFO]   group_0016  --(build)-->  group_0051
-22:33:44 [INFO]   group_0017  --(build)-->  group_0051
-22:33:44 [INFO]   group_0018  --(build)-->  group_0051
-22:33:44 [INFO]   group_0019  --(build)-->  group_0051
-22:33:44 [INFO]   group_0021  --(build)-->  group_0051
-22:33:44 [INFO]   group_0022  --(build)-->  group_0051
-22:33:44 [INFO]   group_0024  --(build)-->  group_0051
-22:33:44 [INFO]   group_0026  --(build)-->  group_0051
-22:33:44 [INFO]   group_0030  --(build)-->  group_0051
-22:33:44 [INFO]   group_0032  --(build)-->  group_0051
-22:33:44 [INFO]   group_0038  --(build)-->  group_0051
-22:33:44 [INFO]   group_0043  --(build)-->  group_0051
-22:33:44 [INFO]   group_0048  --(build)-->  group_0051
-22:33:44 [INFO]   group_0001  --(build)-->  group_0052
-22:33:44 [INFO]   group_0004  --(build)-->  group_0052
-22:33:44 [INFO]   group_0005  --(build)-->  group_0052
-22:33:44 [INFO]   group_0006  --(build)-->  group_0052
-22:33:44 [INFO]   group_0012  --(build)-->  group_0052
-22:33:44 [INFO]   group_0013  --(build)-->  group_0052
-22:33:44 [INFO]   group_0016  --(build)-->  group_0052
-22:33:44 [INFO]   group_0017  --(build)-->  group_0052
-22:33:44 [INFO]   group_0018  --(build)-->  group_0052
-22:33:44 [INFO]   group_0019  --(build)-->  group_0052
-22:33:44 [INFO]   group_0021  --(build)-->  group_0052
-22:33:44 [INFO]   group_0022  --(build)-->  group_0052
-22:33:44 [INFO]   group_0024  --(build)-->  group_0052
-22:33:44 [INFO]   group_0026  --(build)-->  group_0052
-22:33:44 [INFO]   group_0030  --(build)-->  group_0052
-22:33:44 [INFO]   group_0032  --(build)-->  group_0052
-22:33:44 [INFO]   group_0038  --(build)-->  group_0052
-22:33:44 [INFO]   group_0043  --(build)-->  group_0052
-22:33:44 [INFO]   group_0048  --(build)-->  group_0052
-22:33:44 [INFO]   group_0001  --(build)-->  group_0053
-22:33:44 [INFO]   group_0004  --(build)-->  group_0053
-22:33:44 [INFO]   group_0005  --(build)-->  group_0053
-22:33:44 [INFO]   group_0006  --(build)-->  group_0053
-22:33:44 [INFO]   group_0012  --(build)-->  group_0053
-22:33:44 [INFO]   group_0013  --(build)-->  group_0053
-22:33:44 [INFO]   group_0016  --(build)-->  group_0053
-22:33:44 [INFO]   group_0017  --(build)-->  group_0053
-22:33:44 [INFO]   group_0018  --(build)-->  group_0053
-22:33:44 [INFO]   group_0019  --(build)-->  group_0053
-22:33:44 [INFO]   group_0021  --(build)-->  group_0053
-22:33:44 [INFO]   group_0022  --(build)-->  group_0053
-22:33:44 [INFO]   group_0024  --(build)-->  group_0053
-22:33:44 [INFO]   group_0026  --(build)-->  group_0053
-22:33:44 [INFO]   group_0030  --(build)-->  group_0053
-22:33:44 [INFO]   group_0032  --(build)-->  group_0053
-22:33:44 [INFO]   group_0038  --(build)-->  group_0053
-22:33:44 [INFO]   group_0043  --(build)-->  group_0053
-22:33:44 [INFO]   group_0048  --(build)-->  group_0053
-22:33:44 [INFO]   group_0050  --(build)-->  group_0053
-22:33:44 [INFO]   group_0001  --(build)-->  group_0054
-22:33:44 [INFO]   group_0004  --(build)-->  group_0054
-22:33:44 [INFO]   group_0005  --(build)-->  group_0054
-22:33:44 [INFO]   group_0006  --(build)-->  group_0054
-22:33:44 [INFO]   group_0012  --(build)-->  group_0054
-22:33:44 [INFO]   group_0013  --(build)-->  group_0054
-22:33:44 [INFO]   group_0016  --(build)-->  group_0054
-22:33:44 [INFO]   group_0017  --(build)-->  group_0054
-22:33:44 [INFO]   group_0018  --(build)-->  group_0054
-22:33:44 [INFO]   group_0019  --(build)-->  group_0054
-22:33:44 [INFO]   group_0021  --(build)-->  group_0054
-22:33:44 [INFO]   group_0022  --(build)-->  group_0054
-22:33:44 [INFO]   group_0024  --(build)-->  group_0054
-22:33:44 [INFO]   group_0026  --(build)-->  group_0054
-22:33:44 [INFO]   group_0030  --(build)-->  group_0054
-22:33:44 [INFO]   group_0032  --(build)-->  group_0054
-22:33:44 [INFO]   group_0038  --(build)-->  group_0054
-22:33:44 [INFO]   group_0043  --(build)-->  group_0054
-22:33:44 [INFO]   group_0048  --(build)-->  group_0054
-22:33:44 [INFO]   group_0050  --(build)-->  group_0054
-22:33:44 [INFO]   group_0001  --(build)-->  group_0055
-22:33:44 [INFO]   group_0004  --(build)-->  group_0055
-22:33:44 [INFO]   group_0005  --(build)-->  group_0055
-22:33:44 [INFO]   group_0006  --(build)-->  group_0055
-22:33:44 [INFO]   group_0012  --(build)-->  group_0055
-22:33:44 [INFO]   group_0013  --(build)-->  group_0055
-22:33:44 [INFO]   group_0016  --(build)-->  group_0055
-22:33:44 [INFO]   group_0017  --(build)-->  group_0055
-22:33:44 [INFO]   group_0018  --(build)-->  group_0055
-22:33:44 [INFO]   group_0019  --(build)-->  group_0055
-22:33:44 [INFO]   group_0021  --(build)-->  group_0055
-22:33:44 [INFO]   group_0022  --(build)-->  group_0055
-22:33:44 [INFO]   group_0024  --(build)-->  group_0055
-22:33:44 [INFO]   group_0026  --(build)-->  group_0055
-22:33:44 [INFO]   group_0030  --(build)-->  group_0055
-22:33:44 [INFO]   group_0032  --(build)-->  group_0055
-22:33:44 [INFO]   group_0038  --(build)-->  group_0055
-22:33:44 [INFO]   group_0043  --(build)-->  group_0055
-22:33:44 [INFO]   group_0048  --(build)-->  group_0055
-22:33:44 [INFO]   group_0050  --(build)-->  group_0055
-22:33:44 [INFO]   group_0001  --(build)-->  group_0056
-22:33:44 [INFO]   group_0004  --(build)-->  group_0056
-22:33:44 [INFO]   group_0005  --(build)-->  group_0056
-22:33:44 [INFO]   group_0006  --(build)-->  group_0056
-22:33:44 [INFO]   group_0012  --(build)-->  group_0056
-22:33:44 [INFO]   group_0013  --(build)-->  group_0056
-22:33:44 [INFO]   group_0016  --(build)-->  group_0056
-22:33:44 [INFO]   group_0017  --(build)-->  group_0056
-22:33:44 [INFO]   group_0018  --(build)-->  group_0056
-22:33:44 [INFO]   group_0019  --(build)-->  group_0056
-22:33:44 [INFO]   group_0021  --(build)-->  group_0056
-22:33:44 [INFO]   group_0022  --(build)-->  group_0056
-22:33:44 [INFO]   group_0024  --(build)-->  group_0056
-22:33:44 [INFO]   group_0026  --(build)-->  group_0056
-22:33:44 [INFO]   group_0030  --(build)-->  group_0056
-22:33:44 [INFO]   group_0032  --(build)-->  group_0056
-22:33:44 [INFO]   group_0038  --(build)-->  group_0056
-22:33:44 [INFO]   group_0043  --(build)-->  group_0056
-22:33:44 [INFO]   group_0048  --(build)-->  group_0056
-22:33:44 [INFO]   group_0050  --(build)-->  group_0056
-22:33:44 [INFO]   group_0001  --(build)-->  group_0057
-22:33:44 [INFO]   group_0004  --(build)-->  group_0057
-22:33:44 [INFO]   group_0005  --(build)-->  group_0057
-22:33:44 [INFO]   group_0006  --(build)-->  group_0057
-22:33:44 [INFO]   group_0012  --(build)-->  group_0057
-22:33:44 [INFO]   group_0013  --(build)-->  group_0057
-22:33:44 [INFO]   group_0014  --(build)-->  group_0057
-22:33:44 [INFO]   group_0016  --(build)-->  group_0057
-22:33:44 [INFO]   group_0017  --(build)-->  group_0057
-22:33:44 [INFO]   group_0018  --(build)-->  group_0057
-22:33:44 [INFO]   group_0019  --(build)-->  group_0057
-22:33:44 [INFO]   group_0021  --(build)-->  group_0057
-22:33:44 [INFO]   group_0022  --(build)-->  group_0057
-22:33:44 [INFO]   group_0024  --(build)-->  group_0057
-22:33:44 [INFO]   group_0026  --(build)-->  group_0057
-22:33:44 [INFO]   group_0030  --(build)-->  group_0057
-22:33:44 [INFO]   group_0032  --(build)-->  group_0057
-22:33:44 [INFO]   group_0038  --(build)-->  group_0057
-22:33:44 [INFO]   group_0043  --(build)-->  group_0057
-22:33:44 [INFO]   group_0048  --(build)-->  group_0057
-22:33:44 [INFO]   group_0050  --(build)-->  group_0057
-22:33:44 [INFO]   group_0056  --(build)-->  group_0057
-22:33:44 [INFO]   group_0001  --(build)-->  group_0058
-22:33:44 [INFO]   group_0004  --(build)-->  group_0058
-22:33:44 [INFO]   group_0005  --(build)-->  group_0058
-22:33:44 [INFO]   group_0006  --(build)-->  group_0058
-22:33:44 [INFO]   group_0012  --(build)-->  group_0058
-22:33:44 [INFO]   group_0013  --(build)-->  group_0058
-22:33:44 [INFO]   group_0014  --(build)-->  group_0058
-22:33:44 [INFO]   group_0016  --(build)-->  group_0058
-22:33:44 [INFO]   group_0017  --(build)-->  group_0058
-22:33:44 [INFO]   group_0018  --(build)-->  group_0058
-22:33:44 [INFO]   group_0019  --(build)-->  group_0058
-22:33:44 [INFO]   group_0021  --(build)-->  group_0058
-22:33:44 [INFO]   group_0022  --(build)-->  group_0058
-22:33:44 [INFO]   group_0024  --(build)-->  group_0058
-22:33:44 [INFO]   group_0026  --(build)-->  group_0058
-22:33:44 [INFO]   group_0030  --(build)-->  group_0058
-22:33:44 [INFO]   group_0032  --(build)-->  group_0058
-22:33:44 [INFO]   group_0038  --(build)-->  group_0058
-22:33:44 [INFO]   group_0043  --(build)-->  group_0058
-22:33:44 [INFO]   group_0048  --(build)-->  group_0058
-22:33:44 [INFO]   group_0050  --(build)-->  group_0058
-22:33:44 [INFO]   group_0056  --(build)-->  group_0058
-22:33:44 [INFO] Connected components (2 group(s)):
-22:33:44 [INFO]   build_graph_0001: group_0001, group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013, group_0014, group_0015, group_0016, group_0017, group_0018, group_0019, group_0020, group_0021, group_0022, group_0023, group_0024, group_0025, group_0026, group_0027, group_0028, group_0029, group_0030, group_0031, group_0032, group_0033, group_0034, group_0035, group_0036, group_0037, group_0038, group_0039, group_0040, group_0041, group_0042, group_0043, group_0044, group_0045, group_0046, group_0047, group_0048, group_0049, group_0050, group_0051, group_0052, group_0053, group_0054, group_0055, group_0056, group_0057, group_0058
-22:33:44 [INFO]   build_graph_0002: group_0002
-22:36:13 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (2 file(s))
-10:03:55 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
-10:03:55 [INFO] Probing build dependencies between 58 atoms...
-10:52:39 [INFO] Build-dependency graph (22 edge(s), 1125 invocation(s)):
-10:52:39 [INFO]   group_0001  --(build)-->  group_0003
-10:52:39 [INFO]   group_0004  --(build)-->  group_0005
-10:52:39 [INFO]   group_0005  --(build)-->  group_0011
-10:52:39 [INFO]   group_0006  --(build)-->  group_0007
-10:52:39 [INFO]   group_0012  --(build)-->  group_0038
-10:52:39 [INFO]   group_0013  --(build)-->  group_0023
-10:52:39 [INFO]   group_0014  --(build)-->  group_0057
-10:52:39 [INFO]   group_0016  --(build)-->  group_0043
-10:52:39 [INFO]   group_0017  --(build)-->  group_0038
-10:52:39 [INFO]   group_0018  --(build)-->  group_0047
-10:52:39 [INFO]   group_0019  --(build)-->  group_0047
-10:52:39 [INFO]   group_0021  --(build)-->  group_0024
-10:52:39 [INFO]   group_0022  --(build)-->  group_0030
-10:52:39 [INFO]   group_0024  --(build)-->  group_0025
-10:52:39 [INFO]   group_0026  --(build)-->  group_0028
-10:52:39 [INFO]   group_0030  --(build)-->  group_0039
-10:52:39 [INFO]   group_0032  --(build)-->  group_0041
-10:52:39 [INFO]   group_0038  --(build)-->  group_0039
-10:52:39 [INFO]   group_0043  --(build)-->  group_0044
-10:52:39 [INFO]   group_0048  --(build)-->  group_0049
-10:52:39 [INFO]   group_0050  --(build)-->  group_0053
-10:52:39 [INFO]   group_0056  --(build)-->  group_0057
-10:52:39 [INFO] Connected components (36 group(s)):
-10:52:39 [INFO]   build_graph_0001: group_0001, group_0003
-10:52:39 [INFO]   build_graph_0002: group_0002
-10:52:39 [INFO]   build_graph_0003: group_0004, group_0005, group_0011
-10:52:39 [INFO]   build_graph_0004: group_0006, group_0007
-10:52:39 [INFO]   build_graph_0005: group_0008
-10:52:39 [INFO]   build_graph_0006: group_0009
-10:52:39 [INFO]   build_graph_0007: group_0010
-10:52:39 [INFO]   build_graph_0008: group_0012, group_0017, group_0022, group_0030, group_0038, group_0039
-10:52:39 [INFO]   build_graph_0009: group_0013, group_0023
-10:52:39 [INFO]   build_graph_0010: group_0014, group_0056, group_0057
-10:52:39 [INFO]   build_graph_0011: group_0015
-10:52:39 [INFO]   build_graph_0012: group_0016, group_0043, group_0044
-10:52:39 [INFO]   build_graph_0013: group_0018, group_0019, group_0047
-10:52:39 [INFO]   build_graph_0014: group_0020
-10:52:39 [INFO]   build_graph_0015: group_0021, group_0024, group_0025
-10:52:39 [INFO]   build_graph_0016: group_0026, group_0028
-10:52:39 [INFO]   build_graph_0017: group_0027
-10:52:39 [INFO]   build_graph_0018: group_0029
-10:52:39 [INFO]   build_graph_0019: group_0031
-10:52:39 [INFO]   build_graph_0020: group_0032, group_0041
-10:52:39 [INFO]   build_graph_0021: group_0033
-10:52:39 [INFO]   build_graph_0022: group_0034
-10:52:39 [INFO]   build_graph_0023: group_0035
-10:52:39 [INFO]   build_graph_0024: group_0036
-10:52:39 [INFO]   build_graph_0025: group_0037
-10:52:39 [INFO]   build_graph_0026: group_0040
-10:52:39 [INFO]   build_graph_0027: group_0042
-10:52:39 [INFO]   build_graph_0028: group_0045
-10:52:39 [INFO]   build_graph_0029: group_0046
-10:52:39 [INFO]   build_graph_0030: group_0048, group_0049
-10:52:39 [INFO]   build_graph_0031: group_0050, group_0053
-10:52:39 [INFO]   build_graph_0032: group_0051
-10:52:39 [INFO]   build_graph_0033: group_0052
-10:52:39 [INFO]   build_graph_0034: group_0054
-10:52:39 [INFO]   build_graph_0035: group_0055
-10:52:39 [INFO]   build_graph_0036: group_0058
-10:52:39 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (36 file(s))
-11:48:40 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
-11:48:40 [INFO] [iteration 1] probing 58 atoms...
-22:09:05 [INFO] [iteration 1] 58 atoms, 22 edge(s), 1125 invocation(s) -> 36 component(s)
-22:09:05 [INFO]     group_0001  --(build)-->  group_0003
-22:09:05 [INFO]     group_0004  --(build)-->  group_0005
-22:09:05 [INFO]     group_0005  --(build)-->  group_0011
-22:09:05 [INFO]     group_0006  --(build)-->  group_0007
-22:09:05 [INFO]     group_0012  --(build)-->  group_0038
-22:09:05 [INFO]     group_0013  --(build)-->  group_0023
-22:09:05 [INFO]     group_0014  --(build)-->  group_0057
-22:09:05 [INFO]     group_0016  --(build)-->  group_0043
-22:09:05 [INFO]     group_0017  --(build)-->  group_0038
-22:09:05 [INFO]     group_0018  --(build)-->  group_0047
-22:09:05 [INFO]     group_0019  --(build)-->  group_0047
-22:09:05 [INFO]     group_0021  --(build)-->  group_0024
-22:09:05 [INFO]     group_0022  --(build)-->  group_0030
-22:09:05 [INFO]     group_0024  --(build)-->  group_0025
-22:09:05 [INFO]     group_0026  --(build)-->  group_0028
-22:09:05 [INFO]     group_0030  --(build)-->  group_0039
-22:09:05 [INFO]     group_0032  --(build)-->  group_0041
-22:09:05 [INFO]     group_0038  --(build)-->  group_0039
-22:09:05 [INFO]     group_0043  --(build)-->  group_0044
-22:09:05 [INFO]     group_0048  --(build)-->  group_0049
-22:09:05 [INFO]     group_0050  --(build)-->  group_0053
-22:09:05 [INFO]     group_0056  --(build)-->  group_0057
-22:09:05 [INFO] [iteration 2] probing 36 atoms...
-10:13:59 [WARNING] Interrupted. Cleaning up...
-10:14:00 [WARNING] Interrupted. Cleaning up...
-16:11:46 [INFO] Post-merge build-dep analysis: 58 group(s), probing against current HEAD (68f11f7).
-16:11:46 [INFO] [iteration 1] probing 58 atoms...
-17:56:01 [INFO] [iteration 1] 58 atoms, 24 edge(s), 1112 invocation(s) -> 34 component(s)
-17:56:01 [INFO]     group_0001  --(build)-->  group_0003
-17:56:01 [INFO]     group_0004  --(build)-->  group_0005
-17:56:01 [INFO]     group_0005  --(build)-->  group_0011
-17:56:01 [INFO]     group_0006  --(build)-->  group_0007
-17:56:01 [INFO]     group_0011  --(build)-->  group_0050
-17:56:01 [INFO]     group_0012  --(build)-->  group_0038
-17:56:01 [INFO]     group_0013  --(build)-->  group_0023
-17:56:01 [INFO]     group_0014  --(build)-->  group_0057
-17:56:01 [INFO]     group_0016  --(build)-->  group_0043
-17:56:01 [INFO]     group_0017  --(build)-->  group_0038
-17:56:01 [INFO]     group_0018  --(build)-->  group_0047
-17:56:01 [INFO]     group_0019  --(build)-->  group_0047
-17:56:01 [INFO]     group_0021  --(build)-->  group_0024
-17:56:01 [INFO]     group_0022  --(build)-->  group_0030
-17:56:01 [INFO]     group_0024  --(build)-->  group_0025
-17:56:01 [INFO]     group_0026  --(build)-->  group_0028
-17:56:01 [INFO]     group_0030  --(build)-->  group_0039
-17:56:01 [INFO]     group_0032  --(build)-->  group_0041
-17:56:01 [INFO]     group_0038  --(build)-->  group_0039
-17:56:01 [INFO]     group_0043  --(build)-->  group_0044
-17:56:01 [INFO]     group_0047  --(build)-->  group_0053
-17:56:01 [INFO]     group_0048  --(build)-->  group_0049
-17:56:01 [INFO]     group_0050  --(build)-->  group_0053
-17:56:01 [INFO]     group_0056  --(build)-->  group_0057
-17:56:01 [INFO] [iteration 2] probing 34 atoms...
-18:30:23 [INFO] [iteration 2] 34 atoms, 14 edge(s), 230 invocation(s) -> 20 component(s)
-18:30:23 [INFO]     {group_0001+group_0003}  --(build)-->  {group_0004+group_0005+group_0011+group_0018+group_0019+group_0047+group_0050+group_0053}
-18:30:23 [INFO]     group_0002  --(build)-->  {group_0004+group_0005+group_0011+group_0018+group_0019+group_0047+group_0050+group_0053}
-18:30:23 [INFO]     {group_0004+group_0005+group_0011+group_0018+group_0019+group_0047+group_0050+group_0053}  --(build)-->  {group_0014+group_0056+group_0057}
-18:30:23 [INFO]     {group_0006+group_0007}  --(build)-->  group_0008
-18:30:23 [INFO]     group_0008  --(build)-->  group_0009
-18:30:23 [INFO]     group_0009  --(build)-->  group_0010
-18:30:23 [INFO]     group_0010  --(build)-->  {group_0012+group_0017+group_0022+group_0030+group_0038+group_0039}
-18:30:23 [INFO]     {group_0012+group_0017+group_0022+group_0030+group_0038+group_0039}  --(build)-->  {group_0013+group_0023}
-18:30:23 [INFO]     {group_0013+group_0023}  --(build)-->  {group_0014+group_0056+group_0057}
-18:30:23 [INFO]     {group_0014+group_0056+group_0057}  --(build)-->  group_0015
-18:30:23 [INFO]     group_0015  --(build)-->  {group_0016+group_0043+group_0044}
-18:30:23 [INFO]     {group_0016+group_0043+group_0044}  --(build)-->  group_0020
-18:30:23 [INFO]     {group_0021+group_0024+group_0025}  --(build)-->  {group_0026+group_0028}
-18:30:23 [INFO]     {group_0032+group_0041}  --(build)-->  group_0055
-18:30:23 [INFO] [iteration 3] probing 20 atoms...
-18:49:36 [INFO] [iteration 3] 20 atoms, 2 edge(s), 159 invocation(s) -> 18 component(s)
-18:49:36 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0038+group_0039+group_0043+group_0044+group_0047+group_0050+group_0053+group_0056+group_0057}  --(build)-->  {group_0032+group_0041+group_0055}
-18:49:36 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0028}  --(build)-->  group_0027
-18:49:36 [INFO] [iteration 4] probing 18 atoms...
-19:12:36 [INFO] [iteration 4] 18 atoms, 2 edge(s), 126 invocation(s) -> 16 component(s)
-19:12:36 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0038+group_0039+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0034
-19:12:36 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028}  --(build)-->  group_0029
-19:12:36 [INFO] [iteration 5] probing 16 atoms...
-19:22:58 [INFO] [iteration 5] 16 atoms, 2 edge(s), 96 invocation(s) -> 14 component(s)
-19:22:58 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0038+group_0039+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0035
-19:22:58 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029}  --(build)-->  group_0031
-19:22:58 [INFO] [iteration 6] probing 14 atoms...
-19:32:36 [INFO] [iteration 6] 14 atoms, 2 edge(s), 72 invocation(s) -> 12 component(s)
-19:32:36 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0040
-19:32:36 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031}  --(build)-->  group_0033
-19:32:36 [INFO] [iteration 7] probing 12 atoms...
-19:39:48 [INFO] [iteration 7] 12 atoms, 2 edge(s), 50 invocation(s) -> 10 component(s)
-19:39:48 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0042
-19:39:48 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033}  --(build)-->  group_0036
-19:39:48 [INFO] [iteration 8] probing 10 atoms...
-19:41:22 [INFO] [iteration 8] 10 atoms, 2 edge(s), 34 invocation(s) -> 8 component(s)
-19:41:22 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  {group_0048+group_0049}
-19:41:22 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036}  --(build)-->  group_0037
-19:41:22 [INFO] [iteration 9] probing 8 atoms...
-19:46:12 [INFO] [iteration 9] 8 atoms, 2 edge(s), 20 invocation(s) -> 6 component(s)
-19:46:12 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0048+group_0049+group_0050+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0051
-19:46:12 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036+group_0037}  --(build)-->  group_0045
-19:46:12 [INFO] [iteration 10] probing 6 atoms...
-19:46:57 [INFO] [iteration 10] 6 atoms, 2 edge(s), 11 invocation(s) -> 4 component(s)
-19:46:57 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0048+group_0049+group_0050+group_0051+group_0053+group_0055+group_0056+group_0057}  --(build)-->  group_0054
-19:46:57 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036+group_0037+group_0045}  --(build)-->  group_0046
-19:46:57 [INFO] [iteration 11] probing 4 atoms...
-19:47:09 [INFO] [iteration 11] 4 atoms, 2 edge(s), 5 invocation(s) -> 2 component(s)
-19:47:09 [INFO]     {group_0001+group_0002+group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012+group_0013+group_0014+group_0015+group_0016+group_0017+group_0018+group_0019+group_0020+group_0022+group_0023+group_0030+group_0032+group_0034+group_0035+group_0038+group_0039+group_0040+group_0041+group_0042+group_0043+group_0044+group_0047+group_0048+group_0049+group_0050+group_0051+group_0053+group_0054+group_0055+group_0056+group_0057}  --(build)-->  group_0058
-19:47:09 [INFO]     {group_0021+group_0024+group_0025+group_0026+group_0027+group_0028+group_0029+group_0031+group_0033+group_0036+group_0037+group_0045+group_0046}  --(build)-->  group_0052
-19:47:09 [INFO] [iteration 12] probing 2 atoms...
-19:47:11 [INFO] [iteration 12] 2 atoms, 0 edge(s), 1 invocation(s) -> 2 component(s)
-19:47:11 [INFO] Build-dependency fixpoint: 2 component(s) after 12 iteration(s), 1916 total invocation(s).
-19:47:11 [INFO]   build_graph_0001: group_0001, group_0002, group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013, group_0014, group_0015, group_0016, group_0017, group_0018, group_0019, group_0020, group_0022, group_0023, group_0030, group_0032, group_0034, group_0035, group_0038, group_0039, group_0040, group_0041, group_0042, group_0043, group_0044, group_0047, group_0048, group_0049, group_0050, group_0051, group_0053, group_0054, group_0055, group_0056, group_0057, group_0058
-19:47:11 [INFO]   build_graph_0002: group_0021, group_0024, group_0025, group_0026, group_0027, group_0028, group_0029, group_0031, group_0033, group_0036, group_0037, group_0045, group_0046, group_0052
-19:48:31 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/889ac3bf1-75hunks/runs/20260608_115913/build_graph  (2 file(s))
-11:34:00 [INFO] Post-merge build-dep analysis: 5 group(s), probing against current HEAD (3fbcbdb).
-11:34:02 [INFO] [iteration 1] probing 5 atoms...
-11:37:21 [INFO] [iteration 1] 5 atoms, 0 edge(s), 10 invocation(s) -> 5 component(s)
-11:37:21 [INFO] Build-dependency fixpoint: 5 component(s) after 1 iteration(s), 10 total invocation(s).
-11:37:21 [INFO]   build_graph_0001: group_0001
-11:37:21 [INFO]   build_graph_0002: group_0002
-11:37:21 [INFO]   build_graph_0003: group_0003
-11:37:21 [INFO]   build_graph_0004: group_0004
-11:37:21 [INFO]   build_graph_0005: group_0005
-11:37:21 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1fe68f0d53-8hunks/runs/20260626_141536/build_graph  (5 file(s))
-11:45:38 [INFO] Post-merge build-dep analysis: 13 group(s), probing against current HEAD (bb4a3ce).
-11:45:43 [INFO] [iteration 1] probing 13 atoms...
-11:49:22 [INFO] [iteration 1] 13 atoms, 1 edge(s), 69 invocation(s) -> 12 component(s)
-11:49:22 [INFO]     group_0003  --(build)-->  group_0004
-11:49:22 [INFO] [iteration 2] probing 12 atoms...
-11:56:20 [INFO] [iteration 2] 12 atoms, 1 edge(s), 58 invocation(s) -> 11 component(s)
-11:56:20 [INFO]     {group_0003+group_0004}  --(build)-->  group_0005
-11:56:20 [INFO] [iteration 3] probing 11 atoms...
-11:57:29 [INFO] [iteration 3] 11 atoms, 1 edge(s), 48 invocation(s) -> 10 component(s)
-11:57:29 [INFO]     {group_0003+group_0004+group_0005}  --(build)-->  group_0006
-11:57:29 [INFO] [iteration 4] probing 10 atoms...
-12:02:19 [INFO] [iteration 4] 10 atoms, 1 edge(s), 39 invocation(s) -> 9 component(s)
-12:02:19 [INFO]     {group_0003+group_0004+group_0005+group_0006}  --(build)-->  group_0007
-12:02:19 [INFO] [iteration 5] probing 9 atoms...
-12:03:03 [INFO] [iteration 5] 9 atoms, 1 edge(s), 31 invocation(s) -> 8 component(s)
-12:03:03 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007}  --(build)-->  group_0008
-12:03:03 [INFO] [iteration 6] probing 8 atoms...
-12:03:37 [INFO] [iteration 6] 8 atoms, 1 edge(s), 24 invocation(s) -> 7 component(s)
-12:03:37 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008}  --(build)-->  group_0009
-12:03:37 [INFO] [iteration 7] probing 7 atoms...
-12:04:08 [INFO] [iteration 7] 7 atoms, 1 edge(s), 18 invocation(s) -> 6 component(s)
-12:04:08 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009}  --(build)-->  group_0010
-12:04:08 [INFO] [iteration 8] probing 6 atoms...
-12:09:56 [INFO] [iteration 8] 6 atoms, 1 edge(s), 13 invocation(s) -> 5 component(s)
-12:09:56 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010}  --(build)-->  group_0011
-12:09:56 [INFO] [iteration 9] probing 5 atoms...
-12:10:31 [INFO] [iteration 9] 5 atoms, 1 edge(s), 9 invocation(s) -> 4 component(s)
-12:10:31 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011}  --(build)-->  group_0012
-12:10:31 [INFO] [iteration 10] probing 4 atoms...
-12:13:16 [INFO] [iteration 10] 4 atoms, 1 edge(s), 6 invocation(s) -> 3 component(s)
-12:13:16 [INFO]     {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012}  --(build)-->  group_0013
-12:13:16 [INFO] [iteration 11] probing 3 atoms...
-12:13:20 [INFO] [iteration 11] 3 atoms, 0 edge(s), 3 invocation(s) -> 3 component(s)
-12:13:20 [INFO] Build-dependency fixpoint: 3 component(s) after 11 iteration(s), 318 total invocation(s).
-12:13:20 [INFO]   build_graph_0001: group_0001
-12:13:20 [INFO]   build_graph_0002: group_0002
-12:13:20 [INFO]   build_graph_0003: group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013
-12:14:18 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/ac9e31c5a-13hunks/runs/20260628_222124/build_graph  (3 file(s))
-12:27:02 [INFO] Post-merge build-dep analysis: 5 group(s), probing against current HEAD (0d611f9).
-12:27:04 [INFO] [iteration 1] probing 5 atoms...
-12:28:52 [INFO] [iteration 1] 5 atoms, 1 edge(s), 10 invocation(s) -> 4 component(s)
-12:28:52 [INFO]     group_0004  --(build)-->  group_0005
-12:28:52 [INFO] [iteration 2] probing 4 atoms...
-12:29:01 [INFO] [iteration 2] 4 atoms, 0 edge(s), 6 invocation(s) -> 4 component(s)
-12:29:01 [INFO] Build-dependency fixpoint: 4 component(s) after 2 iteration(s), 16 total invocation(s).
-12:29:01 [INFO]   build_graph_0001: group_0001
-12:29:01 [INFO]   build_graph_0002: group_0002
-12:29:01 [INFO]   build_graph_0003: group_0003
-12:29:01 [INFO]   build_graph_0004: group_0004, group_0005
-12:29:01 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/18e5e7850-5hunks/runs/20260628_221153/build_graph  (4 file(s))
-12:38:59 [INFO] Post-merge build-dep analysis: 5 group(s), probing against current HEAD (5541daf).
-12:39:01 [INFO] [iteration 1] probing 5 atoms...
-12:43:36 [INFO] [iteration 1] 5 atoms, 0 edge(s), 10 invocation(s) -> 5 component(s)
-12:43:36 [INFO] Build-dependency fixpoint: 5 component(s) after 1 iteration(s), 10 total invocation(s).
-12:43:36 [INFO]   build_graph_0001: group_0001
-12:43:36 [INFO]   build_graph_0002: group_0002
-12:43:36 [INFO]   build_graph_0003: group_0003
-12:43:36 [INFO]   build_graph_0004: group_0004
-12:43:36 [INFO]   build_graph_0005: group_0005
-12:44:02 [INFO] Build-graph folder written → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/dd25e301a-5hunks/runs/20260629_113705/build_graph  (5 file(s))
+14:47:16 [SUCCESS] Found group 4 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0004.patch  [hunk_0005.patch]
+14:47:22 [INFO] Next: run with --commit-group (or inspect the group patch first)
+15:25:03 [SUCCESS] Committed group 4.
+15:25:03 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+15:27:33 [INFO] ── Iteration 5: 7 hunk(s) remaining ──
+15:27:33 [INFO] Next: run with --find-group
+  [group]     test 7 hunk(s) -> PASS: hunk_0004.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 4 hunk(s) -> PASS: hunk_0004.patch + hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0004.patch + hunk_0006.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0004.patch
+15:34:58 [SUCCESS] Found group 5 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0005.patch  [hunk_0004.patch]
+15:34:58 [INFO] Next: run with --commit-group (or inspect the group patch first)
+15:37:56 [SUCCESS] Committed group 5.
+15:37:56 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:00:16 [INFO] ── Iteration 6: 6 hunk(s) remaining ──
+16:00:16 [INFO] Next: run with --find-group
+  [group]     test 6 hunk(s) -> PASS: hunk_0006.patch + hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0006.patch + hunk_0007.patch + hunk_0008.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0006.patch + hunk_0007.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0006.patch
+16:00:39 [SUCCESS] Found group 6 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0006.patch  [hunk_0006.patch]
+16:00:39 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:31:26 [SUCCESS] Committed group 6.
+16:31:28 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:33:56 [INFO] ── Iteration 7: 5 hunk(s) remaining ──
+16:33:56 [INFO] Next: run with --find-group
+  [group]     test 5 hunk(s) -> PASS: hunk_0007.patch + hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 3 hunk(s) -> PASS: hunk_0007.patch + hunk_0008.patch + hunk_0009.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0007.patch + hunk_0008.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0007.patch
+16:36:01 [SUCCESS] Found group 7 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0007.patch  [hunk_0007.patch]
+16:36:01 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:49:09 [SUCCESS] Committed group 7.
+16:49:09 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:49:10 [INFO] ── Iteration 8: 4 hunk(s) remaining ──
+16:49:10 [INFO] Next: run with --find-group
+  [group]     test 4 hunk(s) -> PASS: hunk_0008.patch + hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0008.patch + hunk_0009.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0008.patch
+16:49:24 [SUCCESS] Found group 8 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0008.patch  [hunk_0008.patch]
+16:49:24 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:51:24 [SUCCESS] Committed group 8.
+16:51:24 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+16:51:26 [INFO] ── Iteration 9: 3 hunk(s) remaining ──
+16:51:26 [INFO] Next: run with --find-group
+  [group]     test 3 hunk(s) -> PASS: hunk_0009.patch + hunk_0010.patch + hunk_0011.patch
+  [group]     test 2 hunk(s) -> PASS: hunk_0009.patch + hunk_0010.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0009.patch
+16:51:39 [SUCCESS] Found group 9 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0009.patch  [hunk_0009.patch]
+16:51:39 [INFO] Next: run with --commit-group (or inspect the group patch first)
+16:51:46 [SUCCESS] Committed group 9.
+16:51:46 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+17:07:19 [INFO] ── Iteration 10: 2 hunk(s) remaining ──
+17:07:19 [INFO] Next: run with --find-group
+  [group]     test 2 hunk(s) -> PASS: hunk_0010.patch + hunk_0011.patch
+  [group]     test 1 hunk(s) -> PASS: hunk_0010.patch
+17:07:34 [SUCCESS] Found group 10 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0010.patch  [hunk_0010.patch]
+17:07:34 [INFO] Next: run with --commit-group (or inspect the group patch first)
+17:08:37 [SUCCESS] Committed group 10.
+17:08:37 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+17:19:47 [INFO] ── Iteration 11: 1 hunk(s) remaining ──
+17:19:47 [INFO] Next: run with --find-group
+  [group]     test 1 hunk(s) -> PASS: hunk_0011.patch
+17:19:58 [SUCCESS] Found group 11 (1 hunk(s)) → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/tests/1e3607b97a-11hunks/runs/20260703_121945/groups/group_0011.patch  [hunk_0011.patch]
+17:19:58 [INFO] Next: run with --commit-group (or inspect the group patch first)
+17:22:34 [SUCCESS] Committed group 11.
+17:22:34 [INFO] Next: run with --next-iteration for the next iteration, or --merge when done.
+17:22:37 [SUCCESS] All changes have been grouped.
+17:22:37 [INFO] Next: run with --merge to finish.
+17:22:43 [SUCCESS] Done: 11 group(s) produced from 11 hunk(s).
+17:22:59 [INFO] ── Completeness ──────────────────────────────────────────────
+17:22:59 [INFO]   Hunks     : 11/11  ✓
+17:22:59 [INFO]   Lines +   : 45/45  ✓
+17:22:59 [INFO]   Lines -   : 20/20  ✓
+17:22:59 [INFO]   Files     : 3/3  ✓
+17:23:01 [INFO] Results appended → /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/runs.csv, /Users/elinejorgensen/Documents/repos/msc-thesis/autocommit/results/groups.csv
+17:23:21 [SUCCESS] Moved 11 atomic commit(s) onto 'fake-example' and deleted 'detangling'.

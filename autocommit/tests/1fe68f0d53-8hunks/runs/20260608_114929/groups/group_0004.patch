@@ -1,6 +1,0 @@
-diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
-index a67e43d..949e687 100644
---- a/src/CommandLine/Text/HelpText.cs
-+++ b/src/CommandLine/Text/HelpText.cs
-@@ -309 +309,0 @@ namespace CommandLine.Text
--        /// <param name="comparison">a comparison lambda to order options in help text</param>

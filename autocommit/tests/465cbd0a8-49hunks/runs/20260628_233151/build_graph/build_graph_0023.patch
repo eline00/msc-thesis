@@ -1,0 +1,83 @@
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -36,0 +37,5 @@ namespace CommandLine.Text
++        /// <summary>
++        /// Gets a delegate that returns the word 'group'.
++        /// </summary>
++        public abstract Func<string> OptionGroupWord { get; }
++
+diff --git a/src/CommandLine/Text/SentenceBuilder.cs b/src/CommandLine/Text/SentenceBuilder.cs
+index 1c150b6..d58bf9c 100644
+--- a/src/CommandLine/Text/SentenceBuilder.cs
++++ b/src/CommandLine/Text/SentenceBuilder.cs
+@@ -87,0 +93,5 @@ namespace CommandLine.Text
++            public override Func<string> OptionGroupWord
++            {
++                get { return () => "Group"; }
++            }
++
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -524,0 +525 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -541,0 +543 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -557,0 +560 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -575,0 +579 @@ namespace CommandLine.Text
++                SentenceBuilder.OptionGroupWord(),
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -802,0 +807 @@ namespace CommandLine.Text
++            string optionGroupWord,
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -832 +832 @@ namespace CommandLine.Text
+-                    AddOption(requiredWord, maxLength, spec, remainingSpace);
++                    AddOption(requiredWord, optionGroupWord, maxLength, spec, remainingSpace);
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -839 +839 @@ namespace CommandLine.Text
+-                        AddOption(requiredWord, maxLength, option, remainingSpace));
++                        AddOption(requiredWord, optionGroupWord, maxLength, option, remainingSpace));
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -875 +875 @@ namespace CommandLine.Text
+-        private HelpText AddOption(string requiredWord, int maxLength, Specification specification, int widthOfHelpText)
++        private HelpText AddOption(string requiredWord, string optionGroupWord, int maxLength, Specification specification, int widthOfHelpText)
+diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
+index b23bb80..a67e43d 100644
+--- a/src/CommandLine/Text/HelpText.cs
++++ b/src/CommandLine/Text/HelpText.cs
+@@ -901 +901,6 @@ namespace CommandLine.Text
+-          
++
++            if (specification.Tag == SpecificationType.Option && specification is OptionSpecification optionSpecification && optionSpecification.Group.IsJust())
++            {
++                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
++            }
++

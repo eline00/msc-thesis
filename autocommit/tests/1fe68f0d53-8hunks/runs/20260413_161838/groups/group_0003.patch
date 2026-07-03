@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/OptionAttribute.cs b/src/CommandLine/OptionAttribute.cs
-index ce2e1fa..4a38a4d 100644
---- a/src/CommandLine/OptionAttribute.cs
-+++ b/src/CommandLine/OptionAttribute.cs
-@@ -110 +110 @@ namespace CommandLine
--        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value.
-+        /// Gets or sets the option group name. When one or more options are grouped, at least one of them should have value. Required rules are ignored.

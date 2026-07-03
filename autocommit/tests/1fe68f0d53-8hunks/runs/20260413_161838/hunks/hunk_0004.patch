@@ -1,7 +1,0 @@
-diff --git a/src/CommandLine/Text/HelpText.cs b/src/CommandLine/Text/HelpText.cs
-index 6fee809..949e687 100644
---- a/src/CommandLine/Text/HelpText.cs
-+++ b/src/CommandLine/Text/HelpText.cs
-@@ -903 +915 @@ namespace CommandLine.Text
--                optionHelpText = "({0}: {1})".FormatInvariant(optionGroupWord, optionSpecification.Group.GetValueOrDefault(null)) + optionHelpText;
-+                optionHelpText = "({0}: {1}) ".FormatInvariant(optionGroupWord, optionGroupSpecification.Group.GetValueOrDefault(null)) + optionHelpText;

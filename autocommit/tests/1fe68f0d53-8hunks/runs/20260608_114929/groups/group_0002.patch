@@ -1,6 +1,0 @@
-diff --git a/src/CommandLine/Core/SpecificationPropertyRules.cs b/src/CommandLine/Core/SpecificationPropertyRules.cs
-index d44b29c..31a2002 100644
---- a/src/CommandLine/Core/SpecificationPropertyRules.cs
-+++ b/src/CommandLine/Core/SpecificationPropertyRules.cs
-@@ -116,0 +117 @@ namespace CommandLine.Core
-+                            where o.Group.IsNothing()

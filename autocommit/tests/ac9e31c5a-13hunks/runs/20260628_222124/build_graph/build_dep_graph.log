@@ -9,17 +9,23 @@
 [iteration 5] 9 atoms, 1 edge(s), 31 invocation(s) -> 8 component(s)
     {group_0003+group_0004+group_0005+group_0006+group_0007}  --(build)-->  group_0008
 [iteration 6] 8 atoms, 1 edge(s), 24 invocation(s) -> 7 component(s)
-    {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008}  --(build)-->  group_0009
+    {group_0003+group_0004+group_0005+
+     group_0006+group_0007+group_0008}  --(build)-->  group_0009
 [iteration 7] 7 atoms, 1 edge(s), 18 invocation(s) -> 6 component(s)
-    {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009}  --(build)-->  group_0010
+    {group_0003+group_0004+group_0005+
+     group_0006+group_0007+group_0008+group_0009}  --(build)-->  group_0010
 [iteration 8] 6 atoms, 1 edge(s), 13 invocation(s) -> 5 component(s)
-    {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010}  --(build)-->  group_0011
+    {group_0003+group_0004+group_0005+
+     group_0006+group_0007+group_0008+group_0009+group_0010}  --(build)-->  group_0011
 [iteration 9] 5 atoms, 1 edge(s), 9 invocation(s) -> 4 component(s)
-    {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011}  --(build)-->  group_0012
+    {group_0003+group_0004+group_0005+
+     group_0006+group_0007+group_0008+group_0009+group_0010+group_0011}  --(build)-->  group_0012
 [iteration 10] 4 atoms, 1 edge(s), 6 invocation(s) -> 3 component(s)
-    {group_0003+group_0004+group_0005+group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012}  --(build)-->  group_0013
+    {group_0003+group_0004+group_0005+
+     group_0006+group_0007+group_0008+group_0009+group_0010+group_0011+group_0012}  --(build)-->  group_0013
 [iteration 11] 3 atoms, 0 edge(s), 3 invocation(s) -> 3 component(s)
 Build-dependency fixpoint: 3 component(s) after 11 iteration(s), 318 total invocation(s).
   build_graph_0001: group_0001
   build_graph_0002: group_0002
-  build_graph_0003: group_0003, group_0004, group_0005, group_0006, group_0007, group_0008, group_0009, group_0010, group_0011, group_0012, group_0013
+  build_graph_0003: group_0003, group_0004, group_0005, group_0006, group_0007, 
+                    group_0008, group_0009, group_0010, group_0011, group_0012, group_0013
